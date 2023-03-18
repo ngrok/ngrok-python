@@ -42,6 +42,10 @@ python -m pip install ngrok
 
 ngrok-py officially supports Python 3.7+.
 
+# Documentation
+
+A quickstart guide and a full API reference are included in the [ngrok-py Python API documentation](https://ngrok.github.io/ngrok-py/).
+
 # Quickstart
 
 After you've installed the package, you'll need an Auth Token. Retrieve one on the
