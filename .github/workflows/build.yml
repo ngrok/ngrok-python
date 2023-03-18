@@ -1,0 +1,124 @@
+on:
+  workflow_call:
+    inputs:
+      docker:
+        required: false
+        type: string
+      host:
+        required: true
+        type: string
+      if:
+        description: 'Whether to run this job'
+        required: false
+        default: true
+        type: boolean
+      publish:
+        required: false
+        type: string
+      setup:
+        required: false
+        type: string
+      target:
+        required: true
+        type: string
+jobs:
+  reusable-build:
+    if: ${{ inputs.if }}
+    name: stable - ${{ inputs.target }} - node@18
+    runs-on: ${{ inputs.host }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache cargo
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            .cargo-cache
+            target/
+          key: ${{ inputs.target }}-cargo-${{ inputs.host }}
+      - uses: goto-bus-stop/setup-zig@v2
+        if: ${{ inputs.target == 'armv7-unknown-linux-gnueabihf' }}
+        with:
+          version: 0.10.0
+      - name: Setup toolchain
+        run: ${{ inputs.setup }}
+        if: ${{ inputs.setup }}
+        shell: bash
+      - name: Build in docker
+        uses: addnab/docker-run-action@v3
+        if: ${{ inputs.docker }}
+        with:
+          image: ${{ inputs.docker }}
+          options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
+          run: |
+            pwd
+            ls -lah
+            whoami
+            env
+            apk update
+            apk add --no-cache python3 py3-pip
+            python3 -m venv .env
+            . .env/bin/activate && pip install -r requirements.txt
+            . .env/bin/activate && pip install patchelf
+            if [ "${SHOULD_PUBLISH}" == 'true' ]; then
+              echo "~~~~ maturin publishing"
+              . .env/bin/activate && maturin publish --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+            else
+              echo "~~~~ maturin building"
+              . .env/bin/activate && maturin build
+            fi
+      - name: Build aarch64-linux-android
+        if: ${{ inputs.target == 'aarch64-linux-android' }}
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ inputs.target }}
+          args: --release -i python3.9 -m Cargo.toml
+          docker-options: |
+            --mount type=bind,source=/usr/local/lib/android/sdk/ndk/25.2.9519653,target=/usr/local/lib/android/sdk/ndk/25.2.9519653
+            -e CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang
+            -e CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-androideabi24-clang
+            -e CC=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang
+            -e CXX=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++
+            -e AR=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+            -e ANDROID_NDK=/usr/local/lib/android/sdk/ndk/25.2.9519653
+      - name: Build armv7-linux-androideabi
+        if: ${{ inputs.target == 'armv7-linux-androideabi' }}
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ inputs.target }}
+          args: --release -i python3.9 -m Cargo.toml
+          docker-options: |
+            --mount type=bind,source=/usr/local/lib/android/sdk/ndk/25.2.9519653,target=/usr/local/lib/android/sdk/ndk/25.2.9519653
+            -e CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang
+            -e CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang
+            -e CC=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang
+            -e CXX=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang++
+            -e AR=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+            -e ANDROID_NDK=/usr/local/lib/android/sdk/ndk/25.2.9519653
+      - name: Setup x86 Python
+        if: ${{ inputs.target == 'i686-pc-windows-msvc' }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+          architecture: "x86"
+      - name: Build
+        if: ${{ inputs.publish != 'true' && !inputs.docker && !contains(inputs.target,'android') }}
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ inputs.target }}
+          args: --release -i python3.9 -m Cargo.toml
+      - name: Publish
+        if: ${{ inputs.publish == 'true' && !inputs.docker && !contains(inputs.target,'android') }}
+        uses: PyO3/maturin-action@v1
+        with:
+          command: publish
+          target: ${{ inputs.target }}
+          args: --no-sdist -i python3.9 -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: bindings-${{ inputs.target }}
+          path: target/wheels/*.whl
+          if-no-files-found: error

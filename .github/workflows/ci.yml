@@ -1,0 +1,225 @@
+name: CI
+env:
+  DEBUG: napi:*
+  APP_NAME: ngrok
+  MACOSX_DEPLOYMENT_TARGET: '10.13'
+'on':
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - '**'
+    paths-ignore:
+      - '**/*.md'
+      - LICENSE
+      - '**/*.gitignore'
+      - .editorconfig
+      - docs/**
+  pull_request: null
+jobs:
+  udeps:
+    name: Udeps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
+      - uses: actions-rs/cargo@v1
+        with:
+          command: udeps
+          args: '--workspace --all-targets --all-features'
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: '--all -- --check'
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: '--all-targets --all-features --workspace -- -D warnings'
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
+      - name: Run Tests
+        run: |
+          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
+  decide:
+    name: Decide on Publishing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Decide
+        id: decide
+        run: |
+          echo "github.ref: ${{ github.ref }}"
+          echo "git log:"
+          git log -1 --pretty=%B
+
+          if [ '${{ github.ref }}' == 'refs/heads/main' ] && git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$"; then
+            echo "SHOULD_PUBLISH=true" >> $GITHUB_OUTPUT
+          else
+            echo "SHOULD_PUBLISH=false" >> $GITHUB_OUTPUT
+          fi
+          cat $GITHUB_OUTPUT
+    outputs:
+      publish: ${{ steps.decide.outputs.SHOULD_PUBLISH }}
+
+  build:
+    needs:
+      - clippy
+      - decide
+      - fmt
+      - test
+      - udeps
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+    with:
+      docker: ${{ matrix.settings.docker }}
+      host: ${{ matrix.settings.host }}
+      if: ${{ matrix.settings.if }}
+      publish: ${{ needs.decide.outputs.publish || 'false' }}
+      setup: ${{ matrix.settings.setup }}
+      target: ${{ matrix.settings.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - host: macos-latest
+            target: x86_64-apple-darwin
+            if: ${{ github.ref == 'refs/heads/main' }}
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+            if: true
+          - host: windows-latest
+            if: ${{ github.ref == 'refs/heads/main' }}
+            target: i686-pc-windows-msvc
+          - host: ubuntu-latest
+            if: true
+            target: x86_64-unknown-linux-gnu
+          - host: ubuntu-latest
+            compiler: gcc
+            if: ${{ github.ref == 'refs/heads/main' }}
+            target: x86_64-unknown-linux-musl
+            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
+          - host: macos-latest
+            if: true
+            target: aarch64-apple-darwin
+          - host: macos-latest
+            if: ${{ github.ref == 'refs/heads/main' }}
+            target: universal2-apple-darwin
+          - host: ubuntu-latest
+            if: ${{ github.ref == 'refs/heads/main' }}
+            target: aarch64-unknown-linux-gnu
+          - host: ubuntu-latest
+            if: ${{ github.ref == 'refs/heads/main' }}
+            target: armv7-unknown-linux-gnueabihf
+            setup: |
+              sudo apt-get update
+              sudo apt-get install gcc-arm-linux-gnueabihf -y
+          - host: ubuntu-latest
+            # need to build python against the android ndk
+            if: false
+            target: aarch64-linux-android
+          - host: ubuntu-latest
+            # need to build python against the android ndk
+            if: false
+            target: armv7-linux-androideabi
+          - host: ubuntu-latest
+            if: ${{ github.ref == 'refs/heads/main' }}
+            target: aarch64-unknown-linux-musl
+          - host: windows-latest
+            target: aarch64-pc-windows-msvc
+            # target not supported by the 'ring' rust dependency (ssl library partially built by gcc)
+            # https://github.com/briansmith/ring/issues/1167
+            if: false
+  build-freebsd:
+    if: github.ref == 'refs/heads/main'
+    needs: decide
+    runs-on: macos-12
+    name: Build FreeBSD
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        id: build
+        uses: vmactions/freebsd-vm@v0
+        env:
+          DEBUG: napi:*
+          RUSTUP_HOME: /usr/local/rustup
+          CARGO_HOME: /usr/local/cargo
+          RUSTUP_IO_THREADS: 1
+          SHOULD_PUBLISH: ${{ needs.decide.outputs.publish }}
+        with:
+          envs: DEBUG RUSTUP_HOME CARGO_HOME RUSTUP_IO_THREADS SHOULD_PUBLISH
+          usesh: true
+          mem: 3000
+          prepare: |
+            pkg install -y -f curl libnghttp2 python3 yarn
+            alias curl="curl --retry 5 --retry-all-errors"
+            curl https://sh.rustup.rs -sSf --output rustup.sh
+            sh rustup.sh -y --profile minimal --default-toolchain beta
+            export PATH="/usr/local/cargo/bin:$PATH"
+            echo "~~~~ rustc --version ~~~~"
+            rustc --version
+            echo "~~~~ node -v ~~~~"
+            node -v
+            echo "~~~~ yarn --version ~~~~"
+            yarn --version
+          run: |
+            export PATH="/usr/local/cargo/bin:$PATH"
+            pwd
+            ls -lah
+            whoami
+            env
+            freebsd-version
+            python3 -m venv .env
+            . .env/bin/activate && pip install -r requirements.txt
+            if [ "${SHOULD_PUBLISH}" == 'true' ]; then
+              echo "~~~~ maturin just building since pypi doesn't support BSD wheels"
+              # https://discuss.python.org/t/pypi-org-unsupported-platform-tag-openbsd-7-0-amd64/16302
+              # . .env/bin/activate && maturin publish --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+              . .env/bin/activate && maturin build
+            else
+              echo "~~~~ maturin building"
+              . .env/bin/activate && maturin build
+            fi
+            # make the rsync back faster
+            rm -rf .env/ target/debug/ target/release/
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: bindings-freebsd
+          path: target/wheels/*.whl
+          if-no-files-found: error
+  tag:
+    if: ${{ github.ref == 'refs/heads/main' && needs.decide.outputs.publish == 'true' }}
+    needs:
+      - decide
+      - build
+    runs-on: ubuntu-latest
+    name: Tag Release
+    steps:
+      - uses: actions/checkout@v2
+      - uses: jrobsonchase/direnv-action@v0.7
+      - name: Tag
+        run: |
+          version="$(extract-crate-version ngrok)"
+          git config user.name "GitHub Action"
+          git config user.email noreply@ngrok.com
+          git tag -a -m "Version ${version}" v${version}
+          git push --tags
