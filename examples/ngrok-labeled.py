@@ -1,21 +1,14 @@
 #!/usr/bin/env python
 
-import asyncio
-from http.server import HTTPServer, BaseHTTPRequestHandler
-import logging
-import io
-from ngrok import NgrokSessionBuilder, log_level
-import os
-import socket
-import socketserver
-import threading
-import time
+import asyncio, logging, ngrok, socketserver, threading
+from http.server import BaseHTTPRequestHandler
 
-UNIX_SOCKET = "/tmp/http.socket"
+logging.basicConfig(level=logging.INFO)
+pipe = ngrok.pipe_name()
 
 async def create_tunnel():
-  builder = NgrokSessionBuilder()
-  session = (await builder.authtoken_from_env()
+  # create session
+  session = (await ngrok.NgrokSessionBuilder().authtoken_from_env()
     .metadata("Online in One Line")
     .connect()
   )
@@ -25,8 +18,7 @@ async def create_tunnel():
     .metadata("example tunnel metadata from python")
     .listen()
   )
-  print("established tunnel at: {}".format(tunnel.labels()))
-  await tunnel.forward_pipe(UNIX_SOCKET)
+  await tunnel.forward_pipe(pipe)
 
 class HelloHandler(BaseHTTPRequestHandler):
   def do_GET(self):
@@ -44,14 +36,6 @@ class UnixSocketHttpServer(socketserver.UnixStreamServer):
         request, client_address = super(UnixSocketHttpServer, self).get_request()
         return (request, ["local", 0])
 
-def start_unix_http_server():
-  if os.path.exists(UNIX_SOCKET):
-    os.remove(UNIX_SOCKET)
-  httpd = UnixSocketHttpServer((UNIX_SOCKET), HelloHandler)
-  thread = threading.Thread(target=httpd.serve_forever, daemon=True)
-  thread.start()
-
-start_unix_http_server()
-loop = asyncio.new_event_loop()
-loop.run_until_complete(create_tunnel())
-loop.close()
+httpd = UnixSocketHttpServer((pipe), HelloHandler)
+threading.Thread(target=httpd.serve_forever, daemon=True).start()
+asyncio.run(create_tunnel())

@@ -1,5 +1,9 @@
+from aiohttp import web, ClientSession
+from aiohttp.web_runner import GracefulExit
 from collections import defaultdict
 from http.server import HTTPServer, BaseHTTPRequestHandler
+import asyncio
+import logging
 import ngrok
 import http
 import os
@@ -267,12 +271,82 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
     await shutdown(tunnel, http_server)
 
-  # no analog for these currently:
-  # async def test_standard_listen(self):
-  # async def test_standard_listenable(self):
-  # async def test_aio_listen(self):
-  # async def test_aio_listenable(self):
-  # async def test_no_bind(self):
+
+  async def test_standard_listen(self):
+    http_server = make_http()
+    tunnel1 = await ngrok.listen()
+    tunnel2 = await ngrok.listen(tunnel=tunnel1)
+    self.assertEqual(tunnel1.url(), tunnel2.url());
+    tunnel3 = await ngrok.listen(http_server, tunnel2)
+    self.assertEqual(tunnel2.url(), tunnel3.url());
+    await self.forward_validate_shutdown(http_server, tunnel3, tunnel3.url())
+
+  async def test_standard_listen_server(self):
+    http_server = make_http()
+    tunnel = await ngrok.listen(http_server)
+    await self.forward_validate_shutdown(http_server, tunnel, tunnel.url())
+
+  def test_aiohttp_listen(self):
+    async def hello(request):
+      return web.Response(text=expected);
+
+    async def shutdown(request):
+      # workaround of not having a close after run_app
+      raise GracefulExit();
+
+    loop = asyncio.new_event_loop();
+    app = web.Application();
+    app.add_routes([web.get('/', hello)]);
+    app.add_routes([web.get('/shutdown', shutdown)]);
+    tunnel = ngrok.listen();
+
+    async def validate():
+      # have to use an async http client
+      async with ClientSession() as client:
+        # test that tunnel to server works
+        async with client.get(tunnel.url()) as response:
+          self.assertEqual(200, response.status);
+          self.assertEqual(expected, await response.text());
+        # shutdown server
+        await client.get("{}/shutdown".format(tunnel.url()))
+      # shutdown tunnel
+      await tunnel.close();
+
+    loop.create_task(validate())
+    try:
+      web.run_app(app, sock=tunnel, loop=loop)
+    except GracefulExit:
+      pass
+
+  def test_pipe_name(self):
+    pipe_name = ngrok.pipe_name();
+    self.assertTrue('tun' in pipe_name);
+
+  async def test_werkzeug_develop(self):
+    tunnel = await ngrok.werkzeug_develop();
+    self.assertIsNotNone(tunnel.fd);
+    self.assertEqual(os.environ["WERKZEUG_SERVER_FD"], str(tunnel.fd));
+    self.assertEqual(os.environ["WERKZEUG_RUN_MAIN"], "true");
+    await tunnel.close();
+
+  async def test_default(self):
+    session = await make_session();
+    tunnel = await ngrok.default(session);
+    self.assertTrue('http' in tunnel.url());
+    await session.close();
+
+  async def test_getsockname(self):
+    session = await make_session();
+    sockname = await ngrok.getsockname(session);
+    self.assertTrue('tun' in sockname);
+    await session.close();
+
+  async def test_fd(self):
+    session = await make_session();
+    fd = await ngrok.fd(session);
+    self.assertIsNotNone(fd);
+    self.assertTrue(fd > 0);
+    await session.close();
 
   async def test_tcp_multipass(self):
     http_server, session1 = await make_http_and_session()

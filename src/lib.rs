@@ -25,7 +25,17 @@ use tunnel_builder::{
     NgrokTlsTunnelBuilder,
 };
 
-use crate::logging::log_level;
+use crate::{
+    logging::log_level,
+    wrapper::{
+        default,
+        fd,
+        getsockname,
+        listen,
+        pipe_name,
+        werkzeug_develop,
+    },
+};
 
 pub mod http;
 pub mod logging;
@@ -34,6 +44,7 @@ pub mod tcp;
 pub mod tls;
 pub mod tunnel;
 pub mod tunnel_builder;
+pub mod wrapper;
 
 // A Python module implemented in Rust. The name of this function must match
 // the `lib.name` setting in the `Cargo.toml`, else Python will not be able to
@@ -42,7 +53,13 @@ pub mod tunnel_builder;
 /// The ngrok Agent SDK for Python
 #[pymodule]
 fn ngrok(py: Python<'_>, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(default, m)?)?;
+    m.add_function(wrap_pyfunction!(fd, m)?)?;
+    m.add_function(wrap_pyfunction!(getsockname, m)?)?;
+    m.add_function(wrap_pyfunction!(listen, m)?)?;
     m.add_function(wrap_pyfunction!(log_level, m)?)?;
+    m.add_function(wrap_pyfunction!(pipe_name, m)?)?;
+    m.add_function(wrap_pyfunction!(werkzeug_develop, m)?)?;
 
     m.add_class::<NgrokSessionBuilder>()?;
     m.add_class::<NgrokSession>()?;

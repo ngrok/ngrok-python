@@ -55,7 +55,7 @@ macro_rules! make_tunnel_builder {
             }
 
             /// Begin listening for new connections on this tunnel.
-            pub fn listen<'a>(&self, py: Python<'a>, _bind: Option<bool>) -> PyResult<&'a PyAny> {
+            pub fn listen<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
                 let session = self.session.lock().clone();
                 let tun = self.tunnel_builder.lock().clone();
                 pyo3_asyncio::tokio::future_into_py(

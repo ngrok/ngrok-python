@@ -304,9 +304,20 @@ impl NgrokSession {
 
             if res.is_ok() {
                 // remove our reference to allow it to drop
-                remove_global_tunnel(&id).await;
+                remove_global_tunnel(&id).await?;
             }
             res
+        })
+    }
+
+    /// Close the ngrok session.
+    pub fn close<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+        let mut session = self.raw_session.lock().clone();
+        pyo3_asyncio::tokio::future_into_py(py, async move {
+            session
+                .close()
+                .await
+                .map_err(|e| py_err(format!("failed to close tunnel, {e:?}")))
         })
     }
 }
