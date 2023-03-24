@@ -68,10 +68,11 @@ jobs:
         id: decide
         run: |
           echo "github.ref: ${{ github.ref }}"
+          echo "github.repository: ${{ github.repository }}"
           echo "git log:"
           git log -1 --pretty=%B
 
-          if [ '${{ github.ref }}' == 'refs/heads/main' ] && git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$"; then
+          if [ '${{ github.ref }}' == 'refs/heads/main' ] && [ '${{ github.repository }}' == 'ngrok/ngrok-py' ] && git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$"; then
             echo "SHOULD_PUBLISH=true" >> $GITHUB_OUTPUT
           else
             echo "SHOULD_PUBLISH=false" >> $GITHUB_OUTPUT

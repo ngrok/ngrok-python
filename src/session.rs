@@ -1,4 +1,5 @@
 use std::{
+    io,
     sync::Arc,
     time::Duration,
 };
@@ -6,20 +7,31 @@ use std::{
 // the lib.name and the pymodule below need to be 'ngrok' for that to be the python library
 // name, so this has to explicitly set this as a crate with the '::' prefix
 use ::ngrok::session::Session;
-use ngrok::session::{
-    SessionBuilder,
-    Update,
+use async_rustls::rustls::{
+    self,
+    ClientConfig,
+};
+use ngrok::{
+    session::{
+        default_connect,
+        ConnectError,
+        SessionBuilder,
+        Update,
+    },
+    tunnel::AcceptError,
 };
 use parking_lot::Mutex as SyncMutex;
 use pyo3::{
     pyclass,
     pymethods,
+    types::PyByteArray,
     PyAny,
     PyObject,
     PyRefMut,
     PyResult,
     Python,
 };
+use rustls_pemfile::Item;
 use tracing::{
     debug,
     info,
@@ -44,6 +56,8 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 #[allow(dead_code)]
 pub(crate) struct NgrokSessionBuilder {
     raw_builder: Arc<SyncMutex<Option<SessionBuilder>>>,
+    connect_handler: Option<PyObject>,
+    disconnect_handler: Option<PyObject>,
 }
 
 impl NgrokSessionBuilder {
@@ -54,6 +68,45 @@ impl NgrokSessionBuilder {
     {
         let mut builder = self.raw_builder.lock();
         *builder = builder.take().map(f);
+    }
+
+    /// Update the connector callback in the upstream rust sdk.
+    fn update_connector(&self) {
+        // clone for move to connector function
+        let disconnect_handler = self.disconnect_handler.clone();
+        let connect_handler = self.connect_handler.clone();
+
+        self.set(|b| {
+            b.connector(
+                move |addr: String, tls_config: Arc<ClientConfig>, err: Option<AcceptError>| {
+                    // clone for async move out of environment
+                    let disconn_fn = disconnect_handler.clone();
+                    let conn_fn = connect_handler.clone();
+                    async move {
+                        // call disconnect python handler
+                        if let Some(handler) = disconn_fn.clone() {
+                            if let Some(err) = err.clone() {
+                                Python::with_gil(|py| -> PyResult<()> {
+                                    handler
+                                        .call(py, (addr.clone(), err.to_string()), None)
+                                        .map(|_o| ())
+                                })
+                                .map_err(|_e| ConnectError::Canceled)?;
+                            }
+                        };
+                        // call connect python handler
+                        if let Some(handler) = conn_fn {
+                            Python::with_gil(|py| -> PyResult<()> {
+                                handler.call(py, (addr.clone(),), None).map(|_o| ())
+                            })
+                            .map_err(|_e| ConnectError::Canceled)?;
+                        };
+                        // call the upstream connector
+                        default_connect(addr, tls_config, err).await
+                    }
+                },
+            )
+        });
     }
 }
 
@@ -70,6 +123,8 @@ impl NgrokSessionBuilder {
             raw_builder: Arc::new(SyncMutex::new(Some(
                 Session::builder().child_client(CLIENT_TYPE, VERSION),
             ))),
+            connect_handler: None,
+            disconnect_handler: None,
         }
     }
 
@@ -139,6 +194,60 @@ impl NgrokSessionBuilder {
     /// [server_addr parameter in the ngrok docs]: https://ngrok.com/docs/ngrok-agent/config#server_addr
     pub fn server_addr(self_: PyRefMut<Self>, addr: String) -> PyRefMut<Self> {
         self_.set(|b| b.server_addr(addr));
+        self_
+    }
+
+    /// Configures the TLS certificate used to connect to the ngrok service while
+    /// establishing the session. Use this option only if you are connecting through
+    /// a man-in-the-middle or deep packet inspection proxy. Pass in the bytes of the certificate
+    /// to be used to validate the connection, then override the address to connect to via
+    /// the server_addr call.
+    ///
+    /// Roughly corresponds to the [root_cas parameter in the ngrok docs].
+    ///
+    /// [root_cas parameter in the ngrok docs]: https://ngrok.com/docs/ngrok-agent/config#root_cas
+    pub fn ca_cert<'a>(self_: PyRefMut<'a, Self>, cert_bytes: &PyByteArray) -> PyRefMut<'a, Self> {
+        let mut root_store = rustls::RootCertStore::empty();
+        let mut cert_pem = io::Cursor::new(cert_bytes.to_vec());
+        root_store.add_parsable_certificates(
+            rustls_pemfile::read_all(&mut cert_pem)
+                .expect("a valid root certificate")
+                .into_iter()
+                .filter_map(|it| match it {
+                    Item::X509Certificate(bs) => Some(bs),
+                    _ => None,
+                })
+                .collect::<Vec<_>>()
+                .as_slice(),
+        );
+
+        let tls_config = rustls::ClientConfig::builder()
+            .with_safe_defaults()
+            .with_root_certificates(root_store)
+            .with_no_client_auth();
+
+        self_.set(|b| b.tls_config(tls_config));
+        self_
+    }
+
+    /// Configures a function which is called to prior the connection to the
+    /// ngrok service. In the event of network disruptions, it will be called each time
+    /// the session reconnects. The handler is given the address that will be used to
+    /// connect the session to, e.g. "example.com:443".
+    pub fn handle_connection(mut self_: PyRefMut<Self>, handler: PyObject) -> PyRefMut<Self> {
+        self_.connect_handler = Some(handler);
+        self_.update_connector();
+        self_
+    }
+
+    /// Configures a function which is called to after a disconnection to the
+    /// ngrok service. In the event of network disruptions, it will be called each time
+    /// the session reconnects. The handler is given the address that will be used to
+    /// connect the session to, e.g. "example.com:443", and the message from the error
+    /// that occurred.
+    pub fn handle_disconnection(mut self_: PyRefMut<Self>, handler: PyObject) -> PyRefMut<Self> {
+        self_.disconnect_handler = Some(handler);
+        self_.update_connector();
         self_
     }
 
@@ -227,9 +336,31 @@ impl NgrokSessionBuilder {
         self_
     }
 
-    // Omitting these configurations:
-    // tls_config(&mut self, config: rustls::ClientConfig)
-    // connector(&mut self, connect: ConnectFn)
+    /// Call the provided handler whenever a heartbeat response is received,
+    /// with the latency in milliseconds.
+    ///
+    /// If the handler returns an error, the heartbeat task will exit, resulting
+    /// in the session eventually dying as well.
+    pub fn handle_heartbeat(self_: PyRefMut<'_, Self>, handler: PyObject) -> PyRefMut<'_, Self> {
+        self_.set(|b| {
+            b.handle_heartbeat(move |latency: Option<Duration>| {
+                let handler = handler.clone();
+                let millis = latency.and_then(|d| u32::try_from(d.as_millis()).ok());
+                async move {
+                    Python::with_gil(|py| -> PyResult<()> {
+                        if let Some(m) = millis {
+                            handler.call(py, (m,), None)
+                        } else {
+                            handler.call(py, (), None)
+                        }
+                        .map(|_o| ())
+                    })
+                    .map_err(|e| format!("Callback error {e:?}").into())
+                }
+            })
+        });
+        self_
+    }
 
     /// Attempt to establish an ngrok session using the current configuration.
     pub fn connect<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
