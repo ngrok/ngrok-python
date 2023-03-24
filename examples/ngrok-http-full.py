@@ -17,13 +17,22 @@ logging.basicConfig(level=logging.INFO, \
 # ngrok.log_level("TRACE")
 
 def on_stop():
-  print("on_stop")
+  print("stop command")
 
 def on_restart():
-  print("on_restart")
+  print("restart command")
 
 def on_update(version, permit_major_version):
-  print("on_update, version: {}, permit_major_version: {}".format(version, permit_major_version))
+  print(f"update command, version: {version}, permit_major_version: {permit_major_version}")
+
+def on_heartbeat(latency):
+  print(f"heartbeat, latency: {latency} milliseconds")
+
+def on_connection(addr):
+  print(f"connecting, addr: {addr}")
+
+def on_disconnection(addr, error):
+  print(f"connecting, addr: {addr} error: {error}")
 
 async def create_tunnel():
   # create session
@@ -33,6 +42,9 @@ async def create_tunnel():
     .handle_stop_command(on_stop)
     .handle_restart_command(on_restart)
     .handle_update_command(on_update)
+    .handle_heartbeat(on_heartbeat)
+    .handle_connection(on_connection)
+    .handle_disconnection(on_disconnection)
     .connect()
   )
   # create tunnel

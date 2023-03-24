@@ -68,6 +68,7 @@ jobs:
         id: decide
         run: |
           echo "github.ref: ${{ github.ref }}"
+          echo "github.repository: ${{ github.repository}}"
           echo "git log:"
           git log -1 --pretty=%B
 
