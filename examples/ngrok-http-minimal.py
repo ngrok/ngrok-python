@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-import asyncio
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from ngrok import NgrokSessionBuilder
+import logging, ngrok
 
 class HelloHandler(BaseHTTPRequestHandler):
   def do_GET(self):
@@ -13,11 +12,7 @@ class HelloHandler(BaseHTTPRequestHandler):
     self.end_headers()
     self.wfile.write(body)
 
-async def create_tunnel():
-  session = await NgrokSessionBuilder().authtoken_from_env().connect()
-  tunnel = await session.http_endpoint().listen()
-  print("established tunnel at: {}".format(tunnel.url()))
-  tunnel.forward_tcp("localhost:9000")
-  HTTPServer(('localhost',9000), HelloHandler).serve_forever()
-
-asyncio.run(create_tunnel())
+logging.basicConfig(level=logging.INFO)
+server = HTTPServer(("localhost",0), HelloHandler)
+ngrok.listen(server)
+server.serve_forever()

@@ -22,8 +22,16 @@ use ngrok::tunnel::{
     TlsTunnel,
 };
 use pyo3::{
+    intern,
+    once_cell::GILOnceCell,
+    prelude::*,
     pyclass,
     pymethods,
+    types::{
+        PyDict,
+        PyString,
+        PyTuple,
+    },
     PyAny,
     PyResult,
     Python,
@@ -34,7 +42,15 @@ use tracing::{
     info,
 };
 
-use crate::py_err;
+use crate::{
+    py_err,
+    wrapper::{
+        bound_default_pipe_socket,
+        bound_default_tcp_socket,
+    },
+};
+
+static SOCK_CELL: GILOnceCell<Py<PyDict>> = GILOnceCell::new();
 
 lazy_static! {
     // tunnel references to be kept until explicit close to prevent python gc from dropping them.
@@ -214,7 +230,7 @@ macro_rules! make_tunnel_type {
 
             /// Forward incoming tunnel connections to the provided file socket path.
             /// On Linux/Darwin addr can be a unix domain socket path, e.g. "/tmp/ngrok.sock"
-            /// On Windows addr can be a named pipe, e.e. "\\.\pipe\an_ngrok_pipe"
+            /// On Windows addr can be a named pipe, e.e. "\\\\.\\pipe\\an_ngrok_pipe"
             pub fn forward_pipe<'a>(&self, py: Python<'a>, addr: String) -> PyResult<&'a PyAny> {
                 let id = self.id.clone();
                 pyo3_asyncio::tokio::future_into_py(
@@ -262,11 +278,95 @@ macro_rules! make_tunnel_type {
                             .map_err(|e| py_err(format!("error closing tunnel: {e:?}")));
 
                         // drop our internal reference to the tunnel after awaiting close
-                        GLOBAL_TUNNELS.lock().await.remove(&id);
+                        remove_global_tunnel(&id).await?;
 
                         res
                     }
                 )
+            }
+        }
+
+        // Methods designed to act like a native socket
+        #[pymethods]
+        #[allow(dead_code)]
+        impl $wrapper {
+            // for aiohttp case, proxy calls to socket
+            #[getter]
+            pub fn get_family(&self, py: Python) -> PyResult<Py<PyAny>> {
+                self.get_sock_attr(py, intern!(py, "family"))
+            }
+
+            pub fn getsockname(&self, py: Python) -> PyResult<Py<PyAny>> {
+                self.get_sock_attr(py, intern!(py, "getsockname"))?.call0(py)
+            }
+
+            #[getter]
+            pub fn get_type(&self, py: Python) -> PyResult<Py<PyAny>> {
+                self.get_sock_attr(py, intern!(py, "type"))
+            }
+
+            pub fn setblocking(&self, py: Python, blocking: bool) -> PyResult<Py<PyAny>> {
+                let args = PyTuple::new(py, &[blocking]);
+                self.get_sock_attr(py, intern!(py, "setblocking"))?.call1(py, args)
+            }
+
+            pub fn fileno(&self, py: Python) -> PyResult<Py<PyAny>> {
+                self.get_sock_attr(py, intern!(py, "fileno"))?.call0(py)
+            }
+
+            pub fn accept(&self, py: Python) -> PyResult<Py<PyAny>> {
+                self.get_sock_attr(py, intern!(py, "accept"))?.call0(py)
+            }
+
+            pub fn listen(&self, py: Python, backlog: i32) -> PyResult<Py<PyAny>> {
+                // call listen on socket
+                let args = PyTuple::new(py, &[backlog]);
+                let result = self.get_sock_attr(py, intern!(py, "listen"))?.call1(py, args);
+
+                // set up forwarding depending on socket type
+                let sockname = self.getsockname(py)?;
+                let socket = PyModule::import(py, "socket")?;
+                let af_unix = socket.getattr(intern!(py, "AF_UNIX"))?;
+                if self.get_family(py)?.as_ref(py).eq(af_unix)? {
+                    // pipe
+                    let sockname_str: &PyString = sockname.downcast(py)?;
+                    self.forward_pipe(py, sockname_str.to_string())?;
+                }
+                else {
+                    // tcp
+                    let sockname_tuple: &PyTuple = sockname.downcast(py)?;
+                    self.forward_tcp(py, format!("localhost:{}", sockname_tuple.get_item(1)?))?;
+                }
+                result
+            }
+
+            // For uvicorn case, generate a file descriptor for a listening socket
+            #[getter]
+            pub fn get_fd(&self, py: Python) -> PyResult<Py<PyAny>> {
+                self.listen(py, 0)?;
+                self.fileno(py)
+            }
+
+            // Get or create the python socket to use for this tunnel, and return an attribute of it.
+            fn get_sock_attr(&self, py: Python, attr: &PyString) -> PyResult<Py<PyAny>> {
+                let map: &PyDict = SOCK_CELL.get_or_init(py, || PyDict::new(py).into()).extract(py)?;
+                let maybe_socket = map.get_item(&self.id);
+                let socket = match maybe_socket {
+                    Some(s) => s.into_py(py),
+                    None => {
+                        // try pipe first, fall back to tcp
+                        let res = match bound_default_pipe_socket(py) {
+                            Ok(res) => res,
+                            Err(error) => {
+                                debug!("error binding to pipe: {}", error);
+                                bound_default_tcp_socket(py)?
+                            }
+                        };
+                        map.set_item(self.id.clone(), res.clone())?;
+                        res
+                    }
+                };
+                socket.getattr(py, attr)
             }
         }
 
@@ -297,6 +397,22 @@ make_tunnel_type! {
 }
 
 /// Delete any reference to the tunnel id
-pub(crate) async fn remove_global_tunnel(id: &String) {
+pub(crate) async fn remove_global_tunnel(id: &String) -> PyResult<()> {
     GLOBAL_TUNNELS.lock().await.remove(id);
+
+    // remove any references to sockets
+    Python::with_gil(|py| -> PyResult<()> {
+        if let Some(map) = SOCK_CELL.get(py) {
+            let dict: &PyDict = map.extract(py)?;
+            // close socket if it exists
+            let existing = dict.get_item(id);
+            if let Some(existing) = existing {
+                existing.call_method0("close")?;
+
+                // delete reference
+                dict.del_item(id)?;
+            }
+        }
+        Ok(())
+    })
 }

@@ -14,6 +14,7 @@ use crate::py_err;
 /// Set the log level for the bridge to Python logging.
 /// The log level defaults to INFO, it can be set to one of ERROR, WARN, INFO, DEBUG, or TRACE.
 #[pyfunction]
+#[pyo3(text_signature = "(level=\"INFO\")")]
 pub fn log_level(py: Python, level: Option<String>) -> PyResult<()> {
     let tracing_level = if let Some(level) = level {
         match level.to_uppercase().as_str() {
