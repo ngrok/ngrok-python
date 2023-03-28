@@ -233,3 +233,38 @@ pub(crate) fn bound_default_pipe_socket(py: Python) -> PyResult<Py<PyAny>> {
     let res = obj.into_py(py);
     Ok(res)
 }
+
+pub fn wrap_object(py: Python, input: Py<PyAny>) -> PyResult<Py<PyAny>> {
+    call_code(
+        py,
+        Some(input),
+        r###"
+class Proxy:
+    def __init__(self, proxied):
+        object.__setattr__(self, '_proxied', proxied)
+
+    def __getattribute__(self, name):
+        p = object.__getattribute__(self, '_proxied')
+        return getattr(p, name)
+
+    def __setattr__(self, name, value):
+        p = object.__getattribute__(self, '_proxied')
+        setattr(p, name, value)
+
+    def __getitem__(self, key):
+        p = object.__getattribute__(self, '_proxied')
+        return p[key]
+
+    def __setitem__(self, key, value):
+        p = object.__getattribute__(self, '_proxied')
+        p[key] = value
+
+    def __delitem__(self, key):
+        p = object.__getattribute__(self, '_proxied')
+        del p[key]
+
+def run(input):
+    return Proxy(input)
+"###,
+    )
+}

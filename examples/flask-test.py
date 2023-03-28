@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-import flask, ngrok
+import flask, logging, ngrok, sys
 
+logging.basicConfig(level=logging.INFO)
 tunnel = ngrok.werkzeug_develop()
-print("tunnel established at: {}".format(tunnel.url()))
 
 if __name__ == "__main__":
   app = flask.Flask(__name__)

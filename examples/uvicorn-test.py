@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import logging, ngrok, uvicorn
+import asyncio, logging, ngrok, os, uvicorn
+logging.basicConfig(level=logging.INFO)
 
 async def app(scope, receive, send):
   assert scope['type'] == 'http'
@@ -15,5 +16,12 @@ async def app(scope, receive, send):
     'body': b'Hello, world!',
   })
 
-logging.basicConfig(level=logging.INFO)
+if os.name == 'nt': # windows
+  async def setup():
+    tunnel = await ngrok.default()
+    tunnel.forward_tcp('localhost:8000')
+  asyncio.run(setup())
+  uvicorn.run(app=app)
+  exit()
+
 uvicorn.run(app=app, fd=ngrok.fd())

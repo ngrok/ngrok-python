@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 
-import asyncio
-from http.server import BaseHTTPRequestHandler
-import logging
-import ngrok
-import os
-import socketserver
-import threading
+import asyncio, logging, ngrok, os, socketserver, threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 pipe = ngrok.pipe_name()
 logging.basicConfig(level=logging.INFO, \
@@ -31,7 +26,7 @@ def on_heartbeat(latency):
 def on_disconnection(addr, error):
   print(f"connecting, addr: {addr} error: {error}")
 
-async def create_tunnel():
+async def create_tunnel(httpd):
   # create session
   session = (await ngrok.NgrokSessionBuilder().authtoken_from_env()
     # .authtoken("<authtoken>")
@@ -41,8 +36,7 @@ async def create_tunnel():
     .handle_update_command(on_update)
     .handle_heartbeat(on_heartbeat)
     .handle_disconnection(on_disconnection)
-    .connect()
-  )
+    .connect())
   # create tunnel
   tunnel = (await session.http_endpoint()
     # .allow_cidr("0.0.0.0/0")
@@ -63,9 +57,9 @@ async def create_tunnel():
     # .websocket_tcp_conversion()
     # .webhook_verification("twilio", "asdf")
     .metadata("example tunnel metadata from python")
-    .listen()
-  )
-  await tunnel.forward_pipe(pipe)
+    .listen())
+  sock = httpd.server_address
+  tunnel.forward_pipe(sock) if os.name != 'nt' else tunnel.forward_tcp(f"localhost:{sock[1]}")
 
 def load_file(name):
   with open("examples/{}".format(name), "r") as crt:
@@ -81,12 +75,15 @@ class HelloHandler(BaseHTTPRequestHandler):
     self.end_headers()
     self.wfile.write(body)
 
-# Set up a unix socket wrapper around standard http server
-class UnixSocketHttpServer(socketserver.UnixStreamServer):
+httpd = ThreadingHTTPServer(('localhost',0), HelloHandler)
+if os.name != 'nt':
+  # Set up a unix socket wrapper around standard http server
+  class UnixSocketHttpServer(socketserver.UnixStreamServer):
     def get_request(self):
-        request, client_address = super(UnixSocketHttpServer, self).get_request()
-        return (request, ["local", 0])
+      request, client_address = super(UnixSocketHttpServer, self).get_request()
+      return (request, ["local", 0])
+  httpd = UnixSocketHttpServer((ngrok.pipe_name()), HelloHandler)
 
-httpd = UnixSocketHttpServer((pipe), HelloHandler)
-threading.Thread(target=httpd.serve_forever, daemon=True).start()
-asyncio.run(create_tunnel())
+logging.basicConfig(level=logging.INFO)
+asyncio.run(create_tunnel(httpd))
+httpd.serve_forever()
