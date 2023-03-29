@@ -56,7 +56,6 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 #[allow(dead_code)]
 pub(crate) struct NgrokSessionBuilder {
     raw_builder: Arc<SyncMutex<Option<SessionBuilder>>>,
-    connect_handler: Option<PyObject>,
     disconnect_handler: Option<PyObject>,
 }
 
@@ -74,14 +73,12 @@ impl NgrokSessionBuilder {
     fn update_connector(&self) {
         // clone for move to connector function
         let disconnect_handler = self.disconnect_handler.clone();
-        let connect_handler = self.connect_handler.clone();
 
         self.set(|b| {
             b.connector(
                 move |addr: String, tls_config: Arc<ClientConfig>, err: Option<AcceptError>| {
                     // clone for async move out of environment
                     let disconn_fn = disconnect_handler.clone();
-                    let conn_fn = connect_handler.clone();
                     async move {
                         // call disconnect python handler
                         if let Some(handler) = disconn_fn.clone() {
@@ -91,15 +88,11 @@ impl NgrokSessionBuilder {
                                         .call(py, (addr.clone(), err.to_string()), None)
                                         .map(|_o| ())
                                 })
-                                .map_err(|_e| ConnectError::Canceled)?;
+                                .map_err(|e| {
+                                    info!("Canceling connection to {addr} due to {e}");
+                                    ConnectError::Canceled
+                                })?;
                             }
-                        };
-                        // call connect python handler
-                        if let Some(handler) = conn_fn {
-                            Python::with_gil(|py| -> PyResult<()> {
-                                handler.call(py, (addr.clone(),), None).map(|_o| ())
-                            })
-                            .map_err(|_e| ConnectError::Canceled)?;
                         };
                         // call the upstream connector
                         default_connect(addr, tls_config, err).await
@@ -123,7 +116,6 @@ impl NgrokSessionBuilder {
             raw_builder: Arc::new(SyncMutex::new(Some(
                 Session::builder().child_client(CLIENT_TYPE, VERSION),
             ))),
-            connect_handler: None,
             disconnect_handler: None,
         }
     }
@@ -230,21 +222,12 @@ impl NgrokSessionBuilder {
         self_
     }
 
-    /// Configures a function which is called to prior the connection to the
-    /// ngrok service. In the event of network disruptions, it will be called each time
-    /// the session reconnects. The handler is given the address that will be used to
-    /// connect the session to, e.g. "example.com:443".
-    pub fn handle_connection(mut self_: PyRefMut<Self>, handler: PyObject) -> PyRefMut<Self> {
-        self_.connect_handler = Some(handler);
-        self_.update_connector();
-        self_
-    }
-
     /// Configures a function which is called to after a disconnection to the
     /// ngrok service. In the event of network disruptions, it will be called each time
     /// the session reconnects. The handler is given the address that will be used to
     /// connect the session to, e.g. "example.com:443", and the message from the error
-    /// that occurred.
+    /// that occurred. Raising an exception in the handler will cause the Session to
+    /// throw an uncaught error instead of reconnecting.
     pub fn handle_disconnection(mut self_: PyRefMut<Self>, handler: PyObject) -> PyRefMut<Self> {
         self_.disconnect_handler = Some(handler);
         self_.update_connector();

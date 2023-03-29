@@ -28,9 +28,6 @@ def on_update(version, permit_major_version):
 def on_heartbeat(latency):
   print(f"heartbeat, latency: {latency} milliseconds")
 
-def on_connection(addr):
-  print(f"connecting, addr: {addr}")
-
 def on_disconnection(addr, error):
   print(f"connecting, addr: {addr} error: {error}")
 
@@ -43,7 +40,6 @@ async def create_tunnel():
     .handle_restart_command(on_restart)
     .handle_update_command(on_update)
     .handle_heartbeat(on_heartbeat)
-    .handle_connection(on_connection)
     .handle_disconnection(on_disconnection)
     .connect()
   )

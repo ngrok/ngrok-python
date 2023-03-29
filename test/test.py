@@ -393,26 +393,20 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
     await tunnel4.close()
 
   async def test_connect_heartbeat_callbacks(self):
-    global conn_addr
     global disconn_addr
     global test_latency
     disconn_addr = None
     def on_heartbeat(latency):
       global test_latency
       test_latency = latency
-    def on_conn(addr):
-      global conn_addr
-      conn_addr = addr
     def on_disconn(addr, err):
       global disconn_addr
       disconn_addr = addr
     builder = ngrok.NgrokSessionBuilder()
     (builder
       .handle_heartbeat(on_heartbeat)
-      .handle_connection(on_conn)
       .handle_disconnection(on_disconn))
     await builder.connect()
-    self.assertTrue("ngrok" in conn_addr)
     self.assertTrue(test_latency > 0)
     self.assertEqual(None, disconn_addr)
 
