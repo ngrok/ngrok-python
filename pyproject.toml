@@ -32,4 +32,5 @@ repository = "https://github.com/ngrok/ngrok-py"
 changelog = "https://github.com/ngrok/ngrok-py/blob/main/CHANGELOG.md"
 
 [build-system]
-requires = ["maturin"]
+requires = ["maturin>=0.14,<0.15"]
+build-backend = "maturin"
