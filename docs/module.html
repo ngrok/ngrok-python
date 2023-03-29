@@ -215,9 +215,56 @@
 <p>The ngrok Agent SDK for Python</p>
 <dl class="py function">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">log_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Create a default HTTP tunnel. Optionally pass in a connected NgrokSession to use.</p>
+<p>Returns the tunnel if no async loop is running, otherwise returns a Task to await with a tunnel result.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">fd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Create a default HTTP tunnel and get its file descriptor. Optionally pass in a connected NgrokSession to use.</p>
+<p>Returns the file descriptor if no async loop is running, otherwise returns a Task to await with a file descriptor result.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">getsockname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Create a default HTTP tunnel and get its socket name. Optionally pass in a connected NgrokSession to use.</p>
+<p>Returns the socket name if no async loop is running, otherwise returns a Task to await with a socket name result.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">listen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tunnel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Create and return a listening default HTTP tunnel.
+Optionally pass in an object with at “server_address” attribute,
+such as a http.server.HTTPServer, and the tunnel will
+forward TCP to that server_address. Optionally also pass in a previously created tunnel.</p>
+<p>Returns the created tunnel if no async loop is running, otherwise returns a Task to await with a tunnel result.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">log_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INFO'</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Set the log level for the bridge to Python logging.
 The log level defaults to INFO, it can be set to one of ERROR, WARN, INFO, DEBUG, or TRACE.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">pipe_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Create a path name to use for pipe forwarding.
+This will be a file path in the temp directory on unix-like systems,
+or a named pipe on Windows. Files will be removed at program exit.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">werkzeug_develop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tunnel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Set the WERKZEUG_SERVER_FD environment variable with a file descriptor from a default HTTP tunnel.
+Also sets WERKZEUG_RUN_MAIN to “true” to engage the use of WERKZEUG_SERVER_FD.</p>
+<p>Returns the created tunnel if no async loop is running, otherwise returns a Task to await with a tunnel result.</p>
 </dd></dl>
 
 </section>
@@ -243,7 +290,7 @@ The log level defaults to INFO, it can be set to one of ERROR, WARN, INFO, DEBUG
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 1980, ngrok
+                Copyright &#169;  2023, ngrok
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

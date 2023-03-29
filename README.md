@@ -17,7 +17,7 @@
 [ci-badge]: https://github.com/ngrok/ngrok-py/actions/workflows/ci.yml/badge.svg
 [ci-url]: https://github.com/ngrok/ngrok-py/actions/workflows/ci.yml
 
-**Note: This is alpha-quality software. Interfaces are subject to change without warning.**
+**Note: This is alpha-quality software. Interfaces may change without warning.**
 
 [ngrok](https://ngrok.com) is a globally distributed reverse proxy commonly used for quickly getting a public URL to a
 service running inside a private network, such as on your local laptop. The ngrok agent is usually
