@@ -10,7 +10,7 @@ Release
 -------
 1. `git checkout main; git pull origin main`
 1. `git checkout -b <username>/<version>`
-1. Bump patch number in `version` in `Cargo.toml`
+1. Bump version number in `version` in `Cargo.toml`
 1. make docs
 1. `git add .`
 1. `git commit -m '<version>'`

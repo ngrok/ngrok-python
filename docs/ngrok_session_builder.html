@@ -238,8 +238,40 @@ NGROK_AUTHTOKEN environment variable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ca_cert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cert_bytes</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Configures the TLS certificate used to connect to the ngrok service while
+establishing the session. Use this option only if you are connecting through
+a man-in-the-middle or deep packet inspection proxy. Pass in the bytes of the certificate
+to be used to validate the connection, then override the address to connect to via
+the server_addr call.</p>
+<p>Roughly corresponds to the [root_cas parameter in the ngrok docs].</p>
+<p>[root_cas parameter in the ngrok docs]: <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#root_cas">https://ngrok.com/docs/ngrok-agent/config#root_cas</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>Attempt to establish an ngrok session using the current configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">handle_disconnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Configures a function which is called to after a disconnection to the
+ngrok service. In the event of network disruptions, it will be called each time
+the session reconnects. The handler is given the address that will be used to
+connect the session to, e.g. “example.com:443”, and the message from the error
+that occurred. Raising an exception in the handler will cause the Session to
+throw an uncaught error instead of reconnecting.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">handle_heartbeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Call the provided handler whenever a heartbeat response is received,
+with the latency in milliseconds.</p>
+<p>If the handler returns an error, the heartbeat task will exit, resulting
+in the session eventually dying as well.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -356,7 +388,7 @@ Use this option only if you are connecting to a custom agent ingress.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 1980, ngrok
+                Copyright &#169;  2023, ngrok
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
