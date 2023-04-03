@@ -1,4 +1,5 @@
 aiohttp==3.8.4
+black==23.3.0
 Flask==2.2.3
 furo==2022.12.7
 maturin==0.14.16

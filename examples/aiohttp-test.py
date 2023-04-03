@@ -3,10 +3,12 @@
 from aiohttp import web
 import logging, ngrok
 
+
 async def hello(request):
-  return web.Response(text="Hello, world")
+    return web.Response(text="Hello, world")
+
 
 logging.basicConfig(level=logging.INFO)
 app = web.Application()
-app.add_routes([web.get('/', hello)])
+app.add_routes([web.get("/", hello)])
 web.run_app(app, sock=ngrok.listen())
