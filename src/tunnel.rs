@@ -42,6 +42,8 @@ use tracing::{
     info,
 };
 
+#[cfg(target_os = "windows")]
+use crate::wrapper::wrap_object;
 use crate::{
     py_err,
     wrapper::{
@@ -318,40 +320,51 @@ macro_rules! make_tunnel_type {
                 self.get_sock_attr(py, intern!(py, "accept"))?.call0(py)
             }
 
-            pub fn listen(&self, py: Python, backlog: i32) -> PyResult<Py<PyAny>> {
+            pub fn gettimeout(&self, py: Python) -> PyResult<Py<PyAny>> {
+                self.get_sock_attr(py, intern!(py, "gettimeout"))?.call0(py)
+            }
+
+            pub fn listen(&self, py: Python, backlog: i32, listen_attr: Option<&str>) -> PyResult<Py<PyAny>> {
                 // call listen on socket
                 let args = PyTuple::new(py, &[backlog]);
-                let result = self.get_sock_attr(py, intern!(py, "listen"))?.call1(py, args);
+                let listen_string = PyString::new(py, listen_attr.unwrap_or("listen"));
+                let result = self.get_sock_attr(py, listen_string)?.call1(py, args);
 
                 // set up forwarding depending on socket type
                 let sockname = self.getsockname(py)?;
                 let socket = PyModule::import(py, "socket")?;
-                let af_unix = socket.getattr(intern!(py, "AF_UNIX"))?;
-                if self.get_family(py)?.as_ref(py).eq(af_unix)? {
-                    // pipe
-                    let sockname_str: &PyString = sockname.downcast(py)?;
-                    self.forward_pipe(py, sockname_str.to_string())?;
+                // windows does not have AF_UNIX enum at all
+                let af_unix = socket.getattr(intern!(py, "AF_UNIX"));
+                if let Ok(af_unix) = af_unix {
+                    if self.get_family(py)?.as_ref(py).eq(af_unix)? {
+                        // pipe
+                        let sockname_str: &PyString = sockname.downcast(py)?;
+                        self.forward_pipe(py, sockname_str.to_string())?;
+                        return result;
+                    }
                 }
-                else {
-                    // tcp
-                    let sockname_tuple: &PyTuple = sockname.downcast(py)?;
-                    self.forward_tcp(py, format!("localhost:{}", sockname_tuple.get_item(1)?))?;
-                }
+                // fallback to tcp
+                let sockname_tuple: &PyTuple = sockname.downcast(py)?;
+                self.forward_tcp(py, format!("localhost:{}", sockname_tuple.get_item(1)?))?;
                 result
             }
 
             // For uvicorn case, generate a file descriptor for a listening socket
             #[getter]
             pub fn get_fd(&self, py: Python) -> PyResult<Py<PyAny>> {
-                self.listen(py, 0)?;
+                self.listen(py, 0, None)?;
                 self.fileno(py)
             }
 
             // Get or create the python socket to use for this tunnel, and return an attribute of it.
             fn get_sock_attr(&self, py: Python, attr: &PyString) -> PyResult<Py<PyAny>> {
+                self.get_sock(py)?.getattr(py, attr)
+            }
+
+            fn get_sock(&self, py: Python) -> PyResult<Py<PyAny>> {
                 let map: &PyDict = SOCK_CELL.get_or_init(py, || PyDict::new(py).into()).extract(py)?;
                 let maybe_socket = map.get_item(&self.id);
-                let socket = match maybe_socket {
+                Ok(match maybe_socket {
                     Some(s) => s.into_py(py),
                     None => {
                         // try pipe first, fall back to tcp
@@ -365,8 +378,20 @@ macro_rules! make_tunnel_type {
                         map.set_item(self.id.clone(), res.clone())?;
                         res
                     }
+                })
+            }
+
+            // Fulfill the iterator protocol so aiohttp will grab the wrap object.
+            // This prevents the windows proactor framework from trying to use a weakref
+            // directly to the rust tunnel, which is not supported until ABI 3.9.
+            #[cfg(target_os = "windows")]
+            fn __iter__(self_: PyRef<'_, Self>, py: Python) -> PyResult<Py<Iter>> {
+                // Wrap self in a native python object to support weakref
+                let burrito = wrap_object(py, self_.into_py(py))?;
+                let iter = Iter {
+                    inner: vec![burrito].into_iter(),
                 };
-                socket.getattr(py, attr)
+                Py::new(py, iter)
             }
         }
 
@@ -415,4 +440,22 @@ pub(crate) async fn remove_global_tunnel(id: &String) -> PyResult<()> {
         }
         Ok(())
     })
+}
+
+// Helper class to implement the iterator protocol for tunnel sockets.
+#[pyclass]
+struct Iter {
+    inner: std::vec::IntoIter<Py<PyAny>>,
+}
+
+#[pymethods]
+impl Iter {
+    #[allow(clippy::self_named_constructors)]
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+
+    fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<Py<PyAny>> {
+        slf.inner.next()
+    }
 }

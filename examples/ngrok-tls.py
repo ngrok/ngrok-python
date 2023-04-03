@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 
-import asyncio
-from http.server import BaseHTTPRequestHandler
-import logging
-import ngrok
-import socketserver
-import threading
+import asyncio, logging, ngrok, os, socketserver, threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 logging.basicConfig(level=logging.INFO)
 pipe = ngrok.pipe_name()
@@ -18,7 +14,7 @@ async def create_tunnel():
     .connect()
   )
   # create tunnel
-  tunnel = (await session.tls_endpoint()
+  return (await session.tls_endpoint()
     # .allow_cidr("0.0.0.0/0")
     # .deny_cidr("10.1.1.1/32")
     # .domain("<somedomain>.ngrok.io")
@@ -27,9 +23,7 @@ async def create_tunnel():
     # .proxy_proto("") # One of: "", "1", "2"
     .termination(load_file("domain.crt"), load_file("domain.key"))
     .metadata("example tunnel metadata from python")
-    .listen()
-  )
-  await tunnel.forward_pipe(pipe)
+    .listen())
 
 def load_file(name):
   with open("examples/{}".format(name), "r") as crt:
@@ -45,12 +39,16 @@ class HelloHandler(BaseHTTPRequestHandler):
     self.end_headers()
     self.wfile.write(body)
 
-# Set up a unix socket wrapper around standard http server
-class UnixSocketHttpServer(socketserver.UnixStreamServer):
+httpd = ThreadingHTTPServer(('localhost',0), HelloHandler)
+if os.name != 'nt':
+  # Set up a unix socket wrapper around standard http server
+  class UnixSocketHttpServer(socketserver.UnixStreamServer):
     def get_request(self):
-        request, client_address = super(UnixSocketHttpServer, self).get_request()
-        return (request, ["local", 0])
+      request, client_address = super(UnixSocketHttpServer, self).get_request()
+      return (request, ["local", 0])
+  httpd = UnixSocketHttpServer((ngrok.pipe_name()), HelloHandler)
 
-httpd = UnixSocketHttpServer((pipe), HelloHandler)
-threading.Thread(target=httpd.serve_forever, daemon=True).start()
-asyncio.run(create_tunnel())
+logging.basicConfig(level=logging.INFO)
+tunnel = asyncio.run(create_tunnel())
+ngrok.listen(httpd, tunnel)
+httpd.serve_forever()
