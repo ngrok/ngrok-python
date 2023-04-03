@@ -15,7 +15,7 @@ bytes = "1.3.0"
 futures = "0.3.26"
 lazy_static = "1.4.0"
 log = "0.4"
-ngrok = { version = "0.11.0" }
+ngrok = { version = "0.11.3" }
 pyo3 = { version = "0.18.1", features = ["abi3", "abi3-py37", "extension-module", "multiple-pymethods"]}
 pyo3-asyncio = { version = "0.18.0", features = ["attributes", "tokio-runtime"] }
 pyo3-log = { version = "0.8.1" }
