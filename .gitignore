@@ -197,4 +197,4 @@ Cargo.lock
 *.node
 .direnv
 *.swp
-test/__pycache__
+__pycache__/

@@ -9,10 +9,6 @@ logging.basicConfig(
     format="%(asctime)-15s %(levelname)s %(name)s %(filename)s:%(lineno)d %(message)s",
 )
 
-# To enable more verbose logging:
-# logging.getLogger().setLevel(5)
-# ngrok.log_level("TRACE")
-
 
 def on_stop():
     print("stop command")
@@ -103,6 +99,10 @@ if os.name != "nt":
             return (request, ["local", 0])
 
     httpd = UnixSocketHttpServer((ngrok.pipe_name()), HelloHandler)
+
+# To enable more verbose logging:
+# logging.getLogger().setLevel(5)
+# ngrok.log_level("TRACE")
 
 logging.basicConfig(level=logging.INFO)
 asyncio.run(create_tunnel(httpd))
