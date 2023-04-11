@@ -11,10 +11,12 @@ Release
 1. `git checkout main; git pull origin main`
 1. `git checkout -b <username>/<version>`
 1. Bump version number in `version` in `Cargo.toml`
+1. Update CHANGELOG.md
 1. make docs
 1. `git add .`
 1. `git commit -m '<version>'`
 1. `git push origin <username>/<version>`
+    - Or with graphite: `gt branch track` and `gt stack submit`
 1. Create a pull request off this branch
     - Make sure the name of the pull request is also just the `<version>` so the workflow will know to do a release
 1. Merge the pull request
