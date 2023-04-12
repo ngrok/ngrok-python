@@ -212,5 +212,9 @@ def main(args):
         uvicorn()
 
 
+def asgi_cli():
+    main(sys.argv)
+
+
 if __name__ == "__main__":
     main(sys.argv)

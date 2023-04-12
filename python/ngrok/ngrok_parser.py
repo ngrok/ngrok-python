@@ -8,7 +8,9 @@ def get_pass_through_args():
 def get_parser():
     # argument parsing
     parser = argparse.ArgumentParser(
-        prog="ngrok", description="ASGI wrapper for ngrok", epilog="Online in One Line"
+        prog="ngrok-asgi",
+        description="ASGI wrapper for ngrok",
+        epilog="Online in One Line",
     )
     parser.add_argument(
         "command", choices=["gunicorn", "uvicorn"], help="gunicorn or uvicorn"

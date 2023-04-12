@@ -57,6 +57,10 @@ run-ngrok-uvicorn: develop examples-install
 run-ngrok-gunicorn: develop examples-install
 	. $(BIN)/activate && pushd ./examples/djangosite && python -m ngrok gunicorn djangosite.asgi:application -k uvicorn.workers.UvicornWorker $(args)
 
+# Run ngrok-asgi script via uvicorn. The python/ngrok/__main__.py file has the ngrok tunnel setup code.
+run-ngrok-asgi: develop examples-install
+	. $(BIN)/activate && pushd ./examples/djangosite && ngrok-asgi uvicorn djangosite.asgi:application $(args)
+
 run-flask: develop examples-install
 	. $(BIN)/activate && python ./examples/flask-ngrok.py
 
