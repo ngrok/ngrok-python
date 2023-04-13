@@ -1,3 +1,8 @@
+## 0.5.0:
+
+* Add ngrok-asgi ASGI runner.
+* Migrate `ca_cert` to the upstream call in `ngrok-rs`.
+
 ## 0.4.0:
 
 * Django, auto-format, and windows support in examples.

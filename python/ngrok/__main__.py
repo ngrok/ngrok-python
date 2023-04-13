@@ -170,7 +170,9 @@ async def bind(parser, args):
 
     # fallback to the default host and port for these runners
     if not tunnel_success:
-        tunnel_success = setup_forwarding(tunnel, args, tcp_string=f"{DEFAULT_HOST}:{fallback_port(args)}")
+        tunnel_success = setup_forwarding(
+            tunnel, args, tcp_string=f"{DEFAULT_HOST}:{fallback_port(args)}"
+        )
 
     # give up
     if not tunnel_success:
