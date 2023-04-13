@@ -410,5 +410,17 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
     self.assertTrue(test_latency > 0)
     self.assertEqual(None, disconn_addr)
 
+  async def test_ca_cert(self):
+    error = None
+    cert = None
+    with open("examples/domain.crt", "r") as crt:
+        cert = bytearray(crt.read().encode())
+    try:
+      await ngrok.NgrokSessionBuilder().ca_cert(cert).connect()
+    except ValueError as err:
+      error = err
+    self.assertIsInstance(error, ValueError)
+    self.assertTrue("cert" in f"{error}")
+
 if __name__ == '__main__':
   unittest.main()
