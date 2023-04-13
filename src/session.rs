@@ -1,5 +1,4 @@
 use std::{
-    io,
     sync::Arc,
     time::Duration,
 };
@@ -7,10 +6,8 @@ use std::{
 // the lib.name and the pymodule below need to be 'ngrok' for that to be the python library
 // name, so this has to explicitly set this as a crate with the '::' prefix
 use ::ngrok::session::Session;
-use async_rustls::rustls::{
-    self,
-    ClientConfig,
-};
+use async_rustls::rustls::ClientConfig;
+use bytes::Bytes;
 use ngrok::{
     session::{
         default_connect,
@@ -31,7 +28,6 @@ use pyo3::{
     PyResult,
     Python,
 };
-use rustls_pemfile::Item;
 use tracing::{
     debug,
     info,
@@ -199,26 +195,7 @@ impl NgrokSessionBuilder {
     ///
     /// [root_cas parameter in the ngrok docs]: https://ngrok.com/docs/ngrok-agent/config#root_cas
     pub fn ca_cert<'a>(self_: PyRefMut<'a, Self>, cert_bytes: &PyByteArray) -> PyRefMut<'a, Self> {
-        let mut root_store = rustls::RootCertStore::empty();
-        let mut cert_pem = io::Cursor::new(cert_bytes.to_vec());
-        root_store.add_parsable_certificates(
-            rustls_pemfile::read_all(&mut cert_pem)
-                .expect("a valid root certificate")
-                .into_iter()
-                .filter_map(|it| match it {
-                    Item::X509Certificate(bs) => Some(bs),
-                    _ => None,
-                })
-                .collect::<Vec<_>>()
-                .as_slice(),
-        );
-
-        let tls_config = rustls::ClientConfig::builder()
-            .with_safe_defaults()
-            .with_root_certificates(root_store)
-            .with_no_client_auth();
-
-        self_.set(|b| b.tls_config(tls_config));
+        self_.set(|b| b.ca_cert(Bytes::from(cert_bytes.to_vec())));
         self_
     }
 
