@@ -14,24 +14,3 @@ from django.core.asgi import get_asgi_application
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangosite.settings")
 
 application = get_asgi_application()
-
-"""Added by ngrok"""
-# This block handles 'make rundjangouvi' and 'make rundjangoguni' which uses this asgi.py as the entry point.
-# Set env variable to protect against the autoreloader.
-if os.getenv("NGROK_TUNNEL_RUNNING") is None:
-    os.environ["NGROK_TUNNEL_RUNNING"] = "true"
-    import asyncio, multiprocessing, ngrok, sys
-
-    async def setup():
-        listen = "localhost:8000"
-        tunnel = await ngrok.default()
-        print(f"Forwarding to {listen} from ingress url: {tunnel.url()}")
-        tunnel.forward_tcp(listen)
-
-    try:
-        running_loop = asyncio.get_running_loop()
-        running_loop.create_task(setup())
-    except RuntimeError:
-        # no running loop, run on its own
-        asyncio.run(setup())
-"""End added by ngrok"""

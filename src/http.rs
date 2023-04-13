@@ -58,22 +58,22 @@ impl NgrokHttpTunnelBuilder {
         self_
     }
 
-    /// with_request_header adds a header to all requests to this edge.
+    /// Adds a header to all requests to this edge.
     pub fn request_header(self_: PyRefMut<Self>, name: String, value: String) -> PyRefMut<Self> {
         self_.set(|b| b.request_header(name, value));
         self_
     }
-    /// with_response_header adds a header to all responses coming from this edge.
+    /// Adds a header to all responses coming from this edge.
     pub fn response_header(self_: PyRefMut<Self>, name: String, value: String) -> PyRefMut<Self> {
         self_.set(|b| b.response_header(name, value));
         self_
     }
-    /// with_remove_request_header removes a header from requests to this edge.
+    /// Removes a header from requests to this edge.
     pub fn remove_request_header(self_: PyRefMut<Self>, name: String) -> PyRefMut<Self> {
         self_.set(|b| b.remove_request_header(name));
         self_
     }
-    /// with_remove_response_header removes a header from responses from this edge.
+    /// Removes a header from responses from this edge.
     pub fn remove_response_header(self_: PyRefMut<Self>, name: String) -> PyRefMut<Self> {
         self_.set(|b| b.remove_response_header(name));
         self_
