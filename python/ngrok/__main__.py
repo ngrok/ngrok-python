@@ -135,7 +135,11 @@ def get_tcp_string(args):
     return tcp_string
 
 
-def setup_forwarding(tunnel, args):
+def setup_forwarding(tunnel, args, tcp_string=None):
+    if tcp_string:
+        tunnel.forward_tcp(tcp_string)
+        return True
+
     # prefer pipe over tcp
     pipe_string = get_pipe_string(args)
     if pipe_string:
@@ -166,9 +170,7 @@ async def bind(parser, args):
 
     # fallback to the default host and port for these runners
     if not tunnel_success:
-        args.host = DEFAULT_HOST
-        args.port = fallback_port(args)
-        tunnel_success = setup_forwarding(tunnel, args)
+        tunnel_success = setup_forwarding(tunnel, args, tcp_string=f"{DEFAULT_HOST}:{fallback_port(args)}")
 
     # give up
     if not tunnel_success:

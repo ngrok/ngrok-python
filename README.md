@@ -54,13 +54,53 @@ A minimal use-case looks like the following:
 
 ```python
 async def create_tunnel():
-  builder = NgrokSessionBuilder()
-  session = await builder.authtoken_from_env().connect()
-  tunnel = await session.http_endpoint().metadata("python tun meta").listen()
-  print("tunnel: {}".format(tunnel.url()))
-
-  res = await tunnel.forward_tcp("localhost:9000")
+    session = await ngrok.NgrokSessionBuilder().authtoken_from_env().connect()
+    tunnel = await session.http_endpoint().listen()
+    print (f"Ingress established at {tunnel.url()}")
+    tunnel.forward_tcp("localhost:9000")
 ```
+
+# ASGI Runner - Tunnels to Uvicorn, Gunicorn, Django and More, With No Code
+
+Prefix the command line which starts up a Uvicorn or Gunicorn web server with either `ngrok-asgi` or `python -m ngrok`. Any TCP or Unix Domain Socket arguments will be used to establish connectivity automatically. There are many command line arguments to configure the Tunnel used, for instance adding `--basic-auth ngrok online1line` will introduce basic authentication to the ingress tunnel.
+
+## Uvicorn
+Examples:
+```shell
+ngrok-asgi uvicorn mysite.asgi:application
+ngrok-asgi uvicorn mysite.asgi:application --host localhost --port 1234
+ngrok-asgi uvicorn mysite.asgi:application --host localhost --port 1234 --basic-auth ngrok online1line
+ngrok-asgi uvicorn mysite.asgi:application --uds /tmp/uvicorn.sock
+
+# Can use the module name as well, such as:
+python -m ngrok uvicorn mysite.asgi:application --oauth-provider google --allow-emails bob@example.com
+```
+
+## Gunicorn
+Examples:
+```shell
+ngrok-asgi gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker
+ngrok-asgi gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker --webhook-verification twilio s3cr3t
+ngrok-asgi gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker --bind localhost:1234
+ngrok-asgi gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker --bind unix:/tmp/gunicorn.sock
+
+# Can use the module name as well, such as:
+python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker --response-header X-Awesome True
+```
+
+# Examples
+
+## Frameworks
+* Aiohttp - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/aiohttp-ngrok.py)
+* Django - [Single File Example](https://github.com/ngrok/ngrok-py/tree/main/examples/django-single-file.py), [Modify manage.py Example](https://github.com/ngrok/ngrok-py/tree/main/examples/djangosite/manage.py), [Modify asgi.py Example](https://github.com/ngrok/ngrok-py/tree/main/examples/djangosite/djangosite/ngrok-asgi.py), or use the `ngrok-asgi` ASGI Runner discussed above
+* Flask - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/flask-ngrok.py)
+* Uvicorn - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/uvicorn-ngrok.py), or use the `ngrok-asgi` ASGI Runner discussed above
+
+## Tunnel Types
+* HTTP - [Minimal Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-http-minimal.py), [Full Configuration Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-http-full.py)
+* Labeled - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-labeled.py)
+* TCP - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-tcp.py)
+* TLS - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-tls.py)
 
 # Platform Support
 
