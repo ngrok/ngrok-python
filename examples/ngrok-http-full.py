@@ -39,6 +39,7 @@ async def create_tunnel(httpd):
         .authtoken_from_env()
         # .authtoken("<authtoken>")
         .metadata("Online in One Line")
+        .client_info("ngrok-http-full", "1.2.3")
         .handle_stop_command(on_stop)
         .handle_restart_command(on_restart)
         .handle_update_command(on_update)

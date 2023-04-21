@@ -415,6 +415,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
             disconn_addr = addr
 
         builder = ngrok.NgrokSessionBuilder()
+        builder.client_info("test_connect_heartbeat_callbacks", "1.2.3")
         (builder.handle_heartbeat(on_heartbeat).handle_disconnection(on_disconn))
         await builder.connect()
         self.assertTrue(test_latency > 0)
