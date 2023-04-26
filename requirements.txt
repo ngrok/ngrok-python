@@ -2,6 +2,7 @@ aiohttp==3.8.4
 black==23.3.0
 furo==2022.12.7
 maturin==0.14.16
+myst_parser==1.0.0
 pytest-xdist==3.2.0
 requests==2.28.2
 Sphinx==6.1.3
