@@ -64,6 +64,12 @@ run-ngrok-asgi: develop examples-install
 run-flask: develop examples-install
 	. $(BIN)/activate && python ./examples/flask-ngrok.py
 
+run-gradio: develop examples-install
+	. $(BIN)/activate && gradio ./examples/gradio/gradio-ngrok.py
+
+run-gradio-asgi: develop examples-install
+	. $(BIN)/activate && ngrok-asgi uvicorn examples.gradio.gradio-asgi:demo.app --port 7860 --reload
+
 run-full: develop
 	. $(BIN)/activate && ./examples/ngrok-http-full.py
 
