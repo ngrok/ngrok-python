@@ -10,11 +10,12 @@ API Reference
 =============
 
 .. toctree::
-   :caption: Sessions:
+   :caption: Tunnel and Sessions:
    :maxdepth: 1
 
    ngrok_session_builder
    ngrok_session
+   ngrok_tunnel
 
 .. toctree::
    :caption: Tunnel Builders:
@@ -24,15 +25,6 @@ API Reference
    ngrok_tcp_tunnel_builder
    ngrok_tls_tunnel_builder
    ngrok_labeled_tunnel_builder
-
-.. toctree::
-   :caption: Tunnels:
-   :maxdepth: 1
-
-   ngrok_http_tunnel
-   ngrok_tcp_tunnel
-   ngrok_tls_tunnel
-   ngrok_labeled_tunnel
 
 .. toctree::
    :caption: Module:
