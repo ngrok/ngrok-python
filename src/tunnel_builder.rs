@@ -32,6 +32,7 @@ use crate::{
         NgrokLabeledTunnel,
         NgrokTcpTunnel,
         NgrokTlsTunnel,
+        NgrokTunnel,
     },
 };
 
@@ -61,16 +62,7 @@ macro_rules! make_tunnel_builder {
                 pyo3_asyncio::tokio::future_into_py(
                     py,
                     async move {
-                        let result = tun.expect("tunnel builder is always set")
-                            .listen()
-                            .await
-                            .map_err(|e| py_err(format!("failed to start tunnel: {e:?}")));
-
-                        // create the wrapping tunnel object via its async new()
-                        match result {
-                            Ok(raw_tun) => Ok($tunnel::new_tunnel(session, raw_tun).await),
-                            Err(val) => Err(val),
-                        }
+                        $wrapper::do_listen(session, tun).await
                     },
                 )
             }
@@ -92,6 +84,25 @@ macro_rules! make_tunnel_builder {
             {
                 let mut builder = self.tunnel_builder.lock();
                 *builder = builder.take().map(f);
+            }
+
+            pub(crate) async fn async_listen(&self) -> PyResult<NgrokTunnel> {
+                let session = self.session.lock().clone();
+                let tun = self.tunnel_builder.lock().clone();
+                $wrapper::do_listen(session, tun).await
+            }
+
+            async fn do_listen(session: Session, builder: Option<$builder>) -> PyResult<NgrokTunnel> {
+                let result = builder.expect("tunnel builder is always set")
+                            .listen()
+                            .await
+                            .map_err(|e| py_err(format!("failed to start tunnel: {e:?}")));
+
+                // create the wrapping tunnel object via its async new()
+                match result {
+                    Ok(raw_tun) => Ok($tunnel::new_tunnel(session, raw_tun).await),
+                    Err(val) => Err(val),
+                }
             }
         }
 

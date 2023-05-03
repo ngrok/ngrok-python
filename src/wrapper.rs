@@ -164,10 +164,11 @@ pub fn werkzeug_develop(py: Python, tunnel: Option<Py<PyAny>>) -> PyResult<Py<Py
 }
 
 /// Python wrapper to call the passed in work in an async context whether or not an async loop is running.
-fn loop_wrap(py: Python, input: Option<Py<PyAny>>, work: &str) -> PyResult<Py<PyAny>> {
+pub(crate) fn loop_wrap(py: Python, input: Option<Py<PyAny>>, work: &str) -> PyResult<Py<PyAny>> {
     let code = format!(
         r###"
 import asyncio
+import ngrok
 from ngrok import NgrokSessionBuilder
 import os
 

@@ -3,9 +3,7 @@ from aiohttp.web_runner import GracefulExit
 from collections import defaultdict
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import asyncio
-import logging
 import ngrok
-import http
 import os
 import random
 import requests
@@ -157,8 +155,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
         tunnel.forward_tcp(http_server.listen_to)
 
-        config = dict()
-        config["auth"] = ("ngrok", "online1line")
+        config = {"auth": ("ngrok","online1line")}
         response = await self.forward_validate_shutdown(
             http_server, tunnel, tunnel.url(), config
         )

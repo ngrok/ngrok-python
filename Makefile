@@ -33,6 +33,12 @@ run: develop
 run-aio: develop examples-install
 	. $(BIN)/activate && python ./examples/aiohttp-ngrok.py
 
+run-connect-full: develop
+	. $(BIN)/activate && python ./examples/ngrok-connect-full.py
+
+run-connect-minimal: develop
+	. $(BIN)/activate && python ./examples/ngrok-connect-minimal.py
+
 run-django: develop examples-install
 	. $(BIN)/activate && python ./examples/django-single-file.py
 
