@@ -16,8 +16,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangosite.settings")
 application = get_asgi_application()
 
 """Added by ngrok"""
-# This block handles 'make rundjangouvi' and 'make rundjangoguni' which uses this asgi.py as the entry point.
-# Set env variable to protect against the autoreloader.
+# This block handles 'make run-django-uvicorn' and 'make run-django-gunicorn' which uses this asgi.py as the entry point.
+# Set env variable to protect against the gunicorn autoreloader.
 if os.getenv("NGROK_TUNNEL_RUNNING") is None:
     os.environ["NGROK_TUNNEL_RUNNING"] = "true"
     import asyncio, multiprocessing, ngrok, sys
