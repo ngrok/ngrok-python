@@ -1,7 +1,7 @@
-Ngrok Labeled Tunnel
+Ngrok Tunnel
 =====================================
 
 .. automodule:: ngrok
-   :members: NgrokLabeledTunnel
+   :members: NgrokTunnel
    :noindex:
 

@@ -68,7 +68,7 @@ macro_rules! make_tunnel_builder {
 
                         // create the wrapping tunnel object via its async new()
                         match result {
-                            Ok(raw_tun) => Ok($tunnel::new(session, raw_tun).await),
+                            Ok(raw_tun) => Ok($tunnel::new_tunnel(session, raw_tun).await),
                             Err(val) => Err(val),
                         }
                     },

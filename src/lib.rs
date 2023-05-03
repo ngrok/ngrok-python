@@ -12,12 +12,7 @@ use session::{
     NgrokSessionBuilder,
 };
 use tracing::debug;
-use tunnel::{
-    NgrokHttpTunnel,
-    NgrokLabeledTunnel,
-    NgrokTcpTunnel,
-    NgrokTlsTunnel,
-};
+use tunnel::NgrokTunnel;
 use tunnel_builder::{
     NgrokHttpTunnelBuilder,
     NgrokLabeledTunnelBuilder,
@@ -64,13 +59,10 @@ fn ngrok(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<NgrokSessionBuilder>()?;
     m.add_class::<NgrokSession>()?;
 
-    m.add_class::<NgrokHttpTunnel>()?;
+    m.add_class::<NgrokTunnel>()?;
     m.add_class::<NgrokHttpTunnelBuilder>()?;
-    m.add_class::<NgrokLabeledTunnel>()?;
     m.add_class::<NgrokLabeledTunnelBuilder>()?;
-    m.add_class::<NgrokTcpTunnel>()?;
     m.add_class::<NgrokTcpTunnelBuilder>()?;
-    m.add_class::<NgrokTlsTunnel>()?;
     m.add_class::<NgrokTlsTunnelBuilder>()?;
 
     // turn on logging bridge by default, since user won't see unless they activate Python logging
