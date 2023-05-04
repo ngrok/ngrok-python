@@ -4,6 +4,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import logging, ngrok, os
 import asyncio
 
+
 class HelloHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         body = bytes("Hello", "utf-8")
@@ -46,7 +47,7 @@ tunnel = ngrok.connect(
     # oidc_allow_domains=["<domain>"],
     # oidc_allow_emails=["<email>"],
     # oidc_scopes=["<scope>"],
-    proxy_proto="", # One of: "", "1", "2"
+    proxy_proto="",  # One of: "", "1", "2"
     request_header_remove="X-Req-Nope",
     response_header_remove="X-Res-Nope",
     request_header_add="X-Req-Yup:true",

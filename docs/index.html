@@ -154,10 +154,11 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Sessions:</span></p>
+  <p class="caption" role="heading"><span class="caption-text">Tunnel and Sessions:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ngrok_session_builder.html">Ngrok Session Builder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ngrok_session.html">Ngrok Session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ngrok_tunnel.html">Ngrok Tunnel</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tunnel Builders:</span></p>
 <ul>
@@ -165,13 +166,6 @@
 <li class="toctree-l1"><a class="reference internal" href="ngrok_tcp_tunnel_builder.html">Ngrok TCP Tunnel Builder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ngrok_tls_tunnel_builder.html">Ngrok TLS Tunnel Builder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ngrok_labeled_tunnel_builder.html">Ngrok Labeled Tunnel Builder</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Tunnels:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_http_tunnel.html">Ngrok HTTP Tunnel</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_tcp_tunnel.html">Ngrok TCP Tunnel</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_tls_tunnel.html">Ngrok TLS Tunnel</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_labeled_tunnel.html">Ngrok Labeled Tunnel</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Module:</span></p>
 <ul>
@@ -291,6 +285,7 @@ python<span class="w"> </span>-m<span class="w"> </span>ngrok<span class="w"> </
 <li><p><a class="reference external" href="https://docs.aiohttp.org">Aiohttp</a> - <a class="reference external" href="https://github.com/ngrok/ngrok-py/tree/main/examples/aiohttp-ngrok.py">Example</a></p></li>
 <li><p><a class="reference external" href="https://www.djangoproject.com/">Django</a> - <a class="reference external" href="https://github.com/ngrok/ngrok-py/tree/main/examples/django-single-file.py">Single File Example</a>, <a class="reference external" href="https://github.com/ngrok/ngrok-py/tree/main/examples/djangosite/manage.py">Modify manage.py Example</a>, <a class="reference external" href="https://github.com/ngrok/ngrok-py/tree/main/examples/djangosite/djangosite/ngrok-asgi.py">Modify asgi.py Example</a>, or use the <code class="docutils literal notranslate"><span class="pre">ngrok-asgi</span></code> ASGI Runner discussed above</p></li>
 <li><p><a class="reference external" href="https://flask.palletsprojects.com">Flask</a> - <a class="reference external" href="https://github.com/ngrok/ngrok-py/tree/main/examples/flask-ngrok.py">Example</a></p></li>
+<li><p><a class="reference external" href="https://gradio.app/">Gradio</a> - <a class="reference external" href="https://github.com/ngrok/ngrok-py/tree/main/examples/gradio/gradio-asgi.py">ngrok-asgi Example</a>, <a class="reference external" href="https://github.com/ngrok/ngrok-py/tree/main/examples/gradio/gradio-ngrok.py">gradio CLI Example</a> sharing machine learning apps</p></li>
 <li><p><a class="reference external" href="https://gunicorn.org/">Gunicorn</a> - Use the <code class="docutils literal notranslate"><span class="pre">ngrok-asgi</span></code> ASGI Runner discussed above</p></li>
 <li><p><a class="reference external" href="https://www.uvicorn.org/">Uvicorn</a> - <a class="reference external" href="https://github.com/ngrok/ngrok-py/tree/main/examples/uvicorn-ngrok.py">Example</a>, or use the <code class="docutils literal notranslate"><span class="pre">ngrok-asgi</span></code> ASGI Runner discussed above</p></li>
 </ul>
@@ -383,10 +378,11 @@ dual licensed as above, without any additional terms or conditions.</p>
 <section id="api-reference">
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this heading">#</a></h1>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Sessions:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Tunnel and Sessions:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ngrok_session_builder.html">Ngrok Session Builder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ngrok_session.html">Ngrok Session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ngrok_tunnel.html">Ngrok Tunnel</a></li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
@@ -396,15 +392,6 @@ dual licensed as above, without any additional terms or conditions.</p>
 <li class="toctree-l1"><a class="reference internal" href="ngrok_tcp_tunnel_builder.html">Ngrok TCP Tunnel Builder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ngrok_tls_tunnel_builder.html">Ngrok TLS Tunnel Builder</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ngrok_labeled_tunnel_builder.html">Ngrok Labeled Tunnel Builder</a></li>
-</ul>
-</div>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Tunnels:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_http_tunnel.html">Ngrok HTTP Tunnel</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_tcp_tunnel.html">Ngrok TCP Tunnel</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_tls_tunnel.html">Ngrok TLS Tunnel</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_labeled_tunnel.html">Ngrok Labeled Tunnel</a></li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">

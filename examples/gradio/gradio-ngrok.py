@@ -9,19 +9,25 @@
 import asyncio, ngrok, os, sys
 import gradio as gr
 
+
 def greet(name):
     return "Hello " + name + "!"
 
+
 demo = gr.Interface(fn=greet, inputs="text", outputs="text")
+
 
 async def setup_tunnel():
     listen = "localhost:7860"
     session = await ngrok.NgrokSessionBuilder().authtoken_from_env().connect()
-    tunnel = await (session.http_endpoint()
-      # .domain('<name>.ngrok.app') # if on a paid plan, set a custom static domain
-      .listen())
+    tunnel = await (
+        session.http_endpoint()
+        # .domain('<name>.ngrok.app') # if on a paid plan, set a custom static domain
+        .listen()
+    )
     print(f"Forwarding to {listen} from ingress url: {tunnel.url()}")
     tunnel.forward_tcp(listen)
+
 
 try:
     # 'gradio' command line already has a loop running via uvicorn
