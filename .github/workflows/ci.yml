@@ -19,7 +19,7 @@ env:
 jobs:
   udeps:
     name: Udeps
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - uses: jrobsonchase/direnv-action@v0.7
@@ -30,7 +30,7 @@ jobs:
           args: '--workspace --all-targets --all-features'
   fmt:
     name: Rustfmt
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - uses: jrobsonchase/direnv-action@v0.7
@@ -40,7 +40,7 @@ jobs:
           args: '--all -- --check'
   clippy:
     name: Clippy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - uses: jrobsonchase/direnv-action@v0.7
@@ -51,7 +51,7 @@ jobs:
           args: '--all-targets --all-features --workspace -- -D warnings'
   test:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - uses: jrobsonchase/direnv-action@v0.7
@@ -61,7 +61,7 @@ jobs:
           NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
   decide:
     name: Decide on Publishing
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Decide
@@ -101,50 +101,50 @@ jobs:
       fail-fast: false
       matrix:
         settings:
-          - host: macos-latest
+          - host: macos-11
             target: x86_64-apple-darwin
-            if: ${{ github.ref == 'refs/heads/main' }}
-          - host: windows-latest
+            if: ${{ github.ref == 'refs/heads/main' }} || true
+          - host: windows-2019
             target: x86_64-pc-windows-msvc
             if: true
-          - host: windows-latest
-            if: ${{ github.ref == 'refs/heads/main' }}
+          - host: windows-2019
+            if: ${{ github.ref == 'refs/heads/main' }} || true
             target: i686-pc-windows-msvc
-          - host: ubuntu-latest
+          - host: ubuntu-20.04
             if: true
             target: x86_64-unknown-linux-gnu
-          - host: ubuntu-latest
+          - host: ubuntu-20.04
             compiler: gcc
-            if: ${{ github.ref == 'refs/heads/main' }}
+            if: ${{ github.ref == 'refs/heads/main' }} || true
             target: x86_64-unknown-linux-musl
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-          - host: macos-latest
+          - host: macos-11
             if: true
             target: aarch64-apple-darwin
-          - host: macos-latest
-            if: ${{ github.ref == 'refs/heads/main' }}
+          - host: macos-11
+            if: ${{ github.ref == 'refs/heads/main' }} || true
             target: universal2-apple-darwin
-          - host: ubuntu-latest
-            if: ${{ github.ref == 'refs/heads/main' }}
+          - host: ubuntu-20.04
+            if: ${{ github.ref == 'refs/heads/main' }} || true
             target: aarch64-unknown-linux-gnu
-          - host: ubuntu-latest
-            if: ${{ github.ref == 'refs/heads/main' }}
+          - host: ubuntu-20.04
+            if: ${{ github.ref == 'refs/heads/main' }} || true
             target: armv7-unknown-linux-gnueabihf
             setup: |
               sudo apt-get update
               sudo apt-get install gcc-arm-linux-gnueabihf -y
-          - host: ubuntu-latest
+          - host: ubuntu-20.04
             # need to build python against the android ndk
             if: false
             target: aarch64-linux-android
-          - host: ubuntu-latest
+          - host: ubuntu-20.04
             # need to build python against the android ndk
             if: false
             target: armv7-linux-androideabi
-          - host: ubuntu-latest
-            if: ${{ github.ref == 'refs/heads/main' }}
+          - host: ubuntu-20.04
+            if: ${{ github.ref == 'refs/heads/main' }} || true
             target: aarch64-unknown-linux-musl
-          - host: windows-latest
+          - host: windows-2019
             target: aarch64-pc-windows-msvc
             # target not supported by the 'ring' rust dependency (ssl library partially built by gcc)
             # https://github.com/briansmith/ring/issues/1167
@@ -212,7 +212,7 @@ jobs:
     needs:
       - decide
       - build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Tag Release
     steps:
       - uses: actions/checkout@v2
