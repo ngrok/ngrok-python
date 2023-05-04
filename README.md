@@ -94,9 +94,13 @@ python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorke
 * [Aiohttp](https://docs.aiohttp.org) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/aiohttp-ngrok.py)
 * [Django](https://www.djangoproject.com/) - [Single File Example](https://github.com/ngrok/ngrok-py/tree/main/examples/django-single-file.py), [Modify manage.py Example](https://github.com/ngrok/ngrok-py/tree/main/examples/djangosite/manage.py), [Modify asgi.py Example](https://github.com/ngrok/ngrok-py/tree/main/examples/djangosite/djangosite/ngrok-asgi.py), or use the `ngrok-asgi` ASGI Runner discussed above
 * [Flask](https://flask.palletsprojects.com) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/flask-ngrok.py)
-* [Gradio](https://gradio.app/) - [ngrok-asgi Example](https://github.com/ngrok/ngrok-py/tree/main/examples/gradio/gradio-asgi.py), [gradio CLI Example](https://github.com/ngrok/ngrok-py/tree/main/examples/gradio/gradio-ngrok.py) sharing machine learning apps
 * [Gunicorn](https://gunicorn.org/) - Use the `ngrok-asgi` ASGI Runner discussed above
+* [Tornado](https://www.tornadoweb.org) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/tornado-ngrok.py)
 * [Uvicorn](https://www.uvicorn.org/) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/uvicorn-ngrok.py), or use the `ngrok-asgi` ASGI Runner discussed above
+
+## Machine Learning
+* [Gradio](https://gradio.app/) - [ngrok-asgi Example](https://github.com/ngrok/ngrok-py/tree/main/examples/gradio/gradio-asgi.py), [gradio CLI Example](https://github.com/ngrok/ngrok-py/tree/main/examples/gradio/gradio-ngrok.py) sharing machine learning apps
+* [OpenPlayground](https://github.com/nat/openplayground) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/openplayground/run.py) of an LLM playground you can run on your laptop
 
 ## Tunnel Types
 * HTTP - [Minimal Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-http-minimal.py), [Full Configuration Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-http-full.py)
