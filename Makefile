@@ -15,10 +15,10 @@ venv:
 	: # Create venv if it doesn't exist
 	test -d $(VENV) || ($(PY) -m venv $(VENV) && $(BIN)/pip install -r requirements.txt)
 
-install:
+install: venv
 	. $(BIN)/activate && pip install -r requirements.txt
 
-examples-install:
+examples-install: venv
 	. $(BIN)/activate && pip install -r examples/requirements.txt --quiet
 
 develop: venv
@@ -70,10 +70,12 @@ run-ngrok-asgi: develop examples-install
 run-flask: develop examples-install
 	. $(BIN)/activate && python ./examples/flask-ngrok.py
 
-run-gradio: develop examples-install
+run-gradio: develop
+	. $(BIN)/activate && pip install -r examples/gradio/requirements.txt
 	. $(BIN)/activate && gradio ./examples/gradio/gradio-ngrok.py
 
-run-gradio-asgi: develop examples-install
+run-gradio-asgi: develop
+	. $(BIN)/activate && pip install -r examples/gradio/requirements.txt
 	. $(BIN)/activate && ngrok-asgi uvicorn examples.gradio.gradio-asgi:demo.app --port 7860 --reload
 
 run-tornado: develop examples-install
@@ -84,6 +86,10 @@ run-full: develop
 
 run-labeled: develop
 	. $(BIN)/activate && ./examples/ngrok-labeled.py
+
+run-openplayground: develop
+	. $(BIN)/activate && pip install -r examples/openplayground/requirements.txt
+	. $(BIN)/activate && python examples/openplayground/run.py
 
 run-tcp: develop
 	. $(BIN)/activate && ./examples/ngrok-tcp.py
