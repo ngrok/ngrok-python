@@ -19,7 +19,7 @@ install:
 	. $(BIN)/activate && pip install -r requirements.txt
 
 examples-install:
-	. $(BIN)/activate && pip install -r examples/requirements.txt
+	. $(BIN)/activate && pip install -r examples/requirements.txt --quiet
 
 develop: venv
 	. $(BIN)/activate && maturin develop
@@ -75,6 +75,9 @@ run-gradio: develop examples-install
 
 run-gradio-asgi: develop examples-install
 	. $(BIN)/activate && ngrok-asgi uvicorn examples.gradio.gradio-asgi:demo.app --port 7860 --reload
+
+run-tornado: develop examples-install
+	. $(BIN)/activate && python ./examples/tornado-ngrok.py
 
 run-full: develop
 	. $(BIN)/activate && ./examples/ngrok-http-full.py
