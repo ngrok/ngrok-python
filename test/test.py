@@ -155,7 +155,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
         tunnel.forward_tcp(http_server.listen_to)
 
-        config = {"auth": ("ngrok","online1line")}
+        config = {"auth": ("ngrok", "online1line")}
         response = await self.forward_validate_shutdown(
             http_server, tunnel, tunnel.url(), config
         )

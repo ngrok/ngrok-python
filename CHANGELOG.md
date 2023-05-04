@@ -1,3 +1,9 @@
+## 0.6.0:
+
+* Add `ngrok.connect(options)` convenience function.
+* Add [Gradio](https://gradio.app/) example.
+* Consolidate multiple tunnel classes into one.
+
 ## 0.5.0:
 
 * Add ngrok-asgi ASGI runner.

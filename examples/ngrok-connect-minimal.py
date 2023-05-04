@@ -4,6 +4,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import logging, ngrok, os
 import asyncio
 
+
 class HelloHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         body = bytes("Hello", "utf-8")
