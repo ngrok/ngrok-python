@@ -23,6 +23,7 @@ use pyo3::{
     pymethods,
     types::PyByteArray,
     PyAny,
+    PyErr,
     PyObject,
     PyRefMut,
     PyResult,
@@ -96,6 +97,11 @@ impl NgrokSessionBuilder {
                 },
             )
         });
+    }
+
+    pub async fn async_connect<'a>(&self) -> Result<NgrokSession, PyErr> {
+        let builder = self.raw_builder.lock().clone();
+        do_connect(builder).await
     }
 }
 
@@ -325,20 +331,22 @@ impl NgrokSessionBuilder {
     /// Attempt to establish an ngrok session using the current configuration.
     pub fn connect<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
         let builder = self.raw_builder.lock().clone();
-        pyo3_asyncio::tokio::future_into_py(py, async move {
-            builder
-                .expect("session builder is always set")
-                .connect()
-                .await
-                .map(|s| {
-                    info!("Session created");
-                    NgrokSession {
-                        raw_session: Arc::new(SyncMutex::new(s)),
-                    }
-                })
-                .map_err(|e| py_err(format!("failed to connect session, {e:?}")))
-        })
+        pyo3_asyncio::tokio::future_into_py(py, async move { do_connect(builder).await })
     }
+}
+
+async fn do_connect(builder: Option<SessionBuilder>) -> Result<NgrokSession, PyErr> {
+    builder
+        .expect("session builder is always set")
+        .connect()
+        .await
+        .map(|s| {
+            info!("Session created");
+            NgrokSession {
+                raw_session: Arc::new(SyncMutex::new(s)),
+            }
+        })
+        .map_err(|e| py_err(format!("failed to connect session, {e:?}")))
 }
 
 impl Drop for NgrokSessionBuilder {

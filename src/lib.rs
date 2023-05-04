@@ -21,6 +21,10 @@ use tunnel_builder::{
 };
 
 use crate::{
+    connect::{
+        async_connect,
+        connect as connect_fn,
+    },
     logging::log_level,
     wrapper::{
         default,
@@ -32,6 +36,7 @@ use crate::{
     },
 };
 
+pub mod connect;
 pub mod http;
 pub mod logging;
 pub mod session;
@@ -48,6 +53,8 @@ pub mod wrapper;
 /// The ngrok Agent SDK for Python
 #[pymodule]
 fn ngrok(py: Python<'_>, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(async_connect, m)?)?;
+    m.add_function(wrap_pyfunction!(connect_fn, m)?)?;
     m.add_function(wrap_pyfunction!(default, m)?)?;
     m.add_function(wrap_pyfunction!(fd, m)?)?;
     m.add_function(wrap_pyfunction!(getsockname, m)?)?;
