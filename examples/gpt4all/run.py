@@ -2,10 +2,15 @@
 
 import argparse
 import logging
+import os
 
+import gradio as gr
 import ngrok
+from pygpt4all.models.gpt4all import GPT4All
 
-default_port = 5000
+logging.basicConfig(level=logging.INFO)
+
+default_port = 7860
 
 def create_ngrok_tunnel():
     parser = argparse.ArgumentParser()
@@ -13,14 +18,24 @@ def create_ngrok_tunnel():
     parser.add_argument("--port", help="Port number", type=int, default=default_port)
 
     args, _ = parser.parse_known_args()
-    logging.basicConfig(level=logging.INFO)
 
     return ngrok.connect(f"{args.host}:{args.port}", authtoken_from_env=True)
 
 # setup ngrok
-tunnel = create_ngrok_tunnel()
+tunnel = create_ngrok_tunnel()    
 
-# import server after tunnel creation because Flask will override our logger
-from server import run_server
+# Load model path from environment.
+if "MODEL_PATH" not in os.environ:
+    raise Exception("MODEL_PATH environment variable not found. Please set it to the path of your model.")
 
-run_server(tunnel.url())
+model_path = os.environ["MODEL_PATH"]
+model = GPT4All(model_path)
+
+# Create model function
+def gpt4all(prompt):
+    resp = [token for token in model.generate(prompt)]
+    return "".join(resp).strip()
+
+# Create a Gradio interface
+demo = gr.Interface(fn=gpt4all, inputs="text", outputs="text")
+demo.launch()
