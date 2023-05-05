@@ -60,6 +60,13 @@ async def create_tunnel():
     tunnel.forward_tcp("localhost:9000")
 ```
 
+Or with [the 'connect' convenience function](https://github.com/ngrok/ngrok-py/blob/main/examples/ngrok-connect-minimal.py):
+
+```python
+tunnel = ngrok.connect(9000, authtoken_from_env=True)
+print (f"Ingress established at {tunnel.url()}")
+```
+
 # ASGI Runner - Tunnels to Uvicorn, Gunicorn, Django and More, With No Code
 
 Prefix the command line which starts up a Uvicorn or Gunicorn web server with either `ngrok-asgi` or `python -m ngrok`. Any TCP or Unix Domain Socket arguments will be used to establish connectivity automatically. There are many command line arguments to configure the Tunnel used, for instance adding `--basic-auth ngrok online1line` will introduce basic authentication to the ingress tunnel.

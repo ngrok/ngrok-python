@@ -61,6 +61,18 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         )
         self.validate_shutdown(http_server, tunnel, tunnel.url())
 
+    def test_connect_addr_protocol(self):
+        http_server = test.make_http()
+        tunnel = ngrok.connect(
+            f"http://{http_server.listen_to}",  # http:// should be ignored
+            authtoken_from_env=True,
+            authtoken=None,  # None's should be ignored
+            basic_auth=None,
+            circuit_breaker=None,
+            mutual_tls_cas=None,
+        )
+        self.validate_shutdown(http_server, tunnel, tunnel.url())
+
     def test_connect_vectorize(self):
         http_server = test.make_http()
         tunnel = ngrok.connect(
