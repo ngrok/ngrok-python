@@ -1,0 +1,2 @@
+pygpt4all==1.1.0
+Flask==2.2.3

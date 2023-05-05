@@ -101,6 +101,8 @@ python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorke
 ## Machine Learning
 * [Gradio](https://gradio.app/) - [ngrok-asgi Example](https://github.com/ngrok/ngrok-py/tree/main/examples/gradio/gradio-asgi.py), [gradio CLI Example](https://github.com/ngrok/ngrok-py/tree/main/examples/gradio/gradio-ngrok.py) sharing machine learning apps
 * [OpenPlayground](https://github.com/nat/openplayground) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/openplayground/run.py) of an LLM playground you can run on your laptop
+* [GPT4ALL](https://github.com/nomic-ai/gpt4all) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/gpt4all/run.py) of running the [GPT4All-L Snoozy 13B](https://gpt4all.io/index.html) model locally fronted behind a simple Flask server
+
 
 ## Tunnel Types
 * HTTP - [Minimal Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-http-minimal.py), [Full Configuration Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-http-full.py)

@@ -91,6 +91,10 @@ run-openplayground: develop
 	. $(BIN)/activate && pip install -r examples/openplayground/requirements.txt
 	. $(BIN)/activate && python examples/openplayground/run.py
 
+run-gpt4all: develop
+	. $(BIN)/activate && pip install -r examples/gpt4all/requirements.txt --quiet
+	. $(BIN)/activate && python examples/gpt4all/run.py
+
 run-tcp: develop
 	. $(BIN)/activate && ./examples/ngrok-tcp.py
 
