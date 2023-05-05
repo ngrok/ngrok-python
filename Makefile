@@ -2,6 +2,7 @@
 PY = python3
 VENV = .env
 BIN=$(VENV)/bin
+SHELL=/bin/bash
 
 # make it work on windows too
 ifeq ($(OS), Windows_NT)
@@ -80,6 +81,9 @@ run-gradio-asgi: develop
 
 run-tornado: develop examples-install
 	. $(BIN)/activate && python ./examples/tornado-ngrok.py
+
+run-streamlit: develop examples-install
+	. $(BIN)/activate && pushd ./examples/streamlit && python streamlit-ngrok.py
 
 run-full: develop
 	. $(BIN)/activate && ./examples/ngrok-http-full.py
