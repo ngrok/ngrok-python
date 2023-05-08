@@ -5,7 +5,7 @@ import test
 
 
 def shutdown(url, http_server):
-    # ngrok.disconnect(url)
+    ngrok.disconnect(url)
     http_server.shutdown()
     http_server.server_close()
 
@@ -19,7 +19,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
     def validate_shutdown(self, http_server, tunnel, url, requests_config=dict()):
         response = self.validate_http_request(url, requests_config)
-        shutdown(tunnel, http_server)
+        shutdown(url, http_server)
         return response
 
     async def test_https_tunnel_async(self):

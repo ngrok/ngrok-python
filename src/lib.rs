@@ -23,7 +23,10 @@ use tunnel_builder::{
 use crate::{
     connect::{
         async_connect,
+        async_disconnect,
         connect as connect_fn,
+        disconnect,
+        kill,
     },
     logging::log_level,
     wrapper::{
@@ -54,10 +57,13 @@ pub mod wrapper;
 #[pymodule]
 fn ngrok(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(async_connect, m)?)?;
+    m.add_function(wrap_pyfunction!(async_disconnect, m)?)?;
     m.add_function(wrap_pyfunction!(connect_fn, m)?)?;
     m.add_function(wrap_pyfunction!(default, m)?)?;
+    m.add_function(wrap_pyfunction!(disconnect, m)?)?;
     m.add_function(wrap_pyfunction!(fd, m)?)?;
     m.add_function(wrap_pyfunction!(getsockname, m)?)?;
+    m.add_function(wrap_pyfunction!(kill, m)?)?;
     m.add_function(wrap_pyfunction!(listen, m)?)?;
     m.add_function(wrap_pyfunction!(log_level, m)?)?;
     m.add_function(wrap_pyfunction!(pipe_name, m)?)?;

@@ -52,6 +52,7 @@ use crate::{
     },
 };
 
+/// Python dictionary of id's to sockets.
 static SOCK_CELL: GILOnceCell<Py<PyDict>> = GILOnceCell::new();
 
 lazy_static! {
@@ -444,6 +445,7 @@ pub(crate) async fn remove_global_tunnel(id: &String) -> PyResult<()> {
             // close socket if it exists
             let existing = dict.get_item(id);
             if let Some(existing) = existing {
+                debug!("closing socket: {}", id);
                 existing.call_method0("close")?;
 
                 // delete reference
