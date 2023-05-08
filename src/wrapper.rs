@@ -188,6 +188,8 @@ pub fn werkzeug_develop(py: Python, tunnel: Option<Py<PyAny>>) -> PyResult<Py<Py
     if input is None:
         session = await NgrokSessionBuilder().authtoken_from_env().connect()
         input = await session.http_endpoint().listen()
+
+    import os
     os.environ["WERKZEUG_SERVER_FD"] = str(input.fd)
     os.environ["WERKZEUG_RUN_MAIN"] = "true"
     return input
@@ -202,7 +204,6 @@ pub(crate) fn loop_wrap(py: Python, input: Option<Py<PyAny>>, work: &str) -> PyR
 import asyncio
 import ngrok
 from ngrok import NgrokSessionBuilder
-import os
 
 async def wrap(input=None):
 {work}
@@ -214,8 +215,7 @@ def run(input=None):
     except RuntimeError:
         pass
 
-    tunnel = asyncio.run(wrap(input))
-    return tunnel
+    return asyncio.run(wrap(input))
     "###
     );
 
@@ -224,7 +224,8 @@ def run(input=None):
 
 /// Call the given code, returning the required 'retval' attribute from it.
 fn call_code(py: Python, input: Option<Py<PyAny>>, code: &str) -> PyResult<Py<PyAny>> {
-    let run = PyModule::from_code(py, code, "", "")?.getattr("run")?;
+    // give fake filename and module name to not interfere with other projects' empty-string module
+    let run = PyModule::from_code(py, code, "ngrok_wrapper", "ngrok_wrapper")?.getattr("run")?;
 
     let res = match input {
         Some(input) => {
