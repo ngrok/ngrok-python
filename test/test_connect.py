@@ -73,6 +73,12 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         )
         self.validate_shutdown(http_server, tunnel, tunnel.url())
 
+    def test_connect_dots(self):
+        http_server = test.make_http()
+        options = {"authtoken.from.env": True}
+        tunnel = ngrok.connect(http_server.listen_to, **options)
+        self.validate_shutdown(http_server, tunnel, tunnel.url())
+
     def test_connect_vectorize(self):
         http_server = test.make_http()
         tunnel = ngrok.connect(

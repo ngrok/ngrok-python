@@ -197,6 +197,10 @@ pub fn connect(
         if let Some(v) = kwargs.get_item(k) {
             if v.is_none() {
                 kwargs.del_item(k)?;
+            } else if get_string(k)?.contains('.') {
+                // handle cases like "oauth.provider" -> "oauth_provider"
+                kwargs.del_item(k)?;
+                kwargs.set_item(get_string(k)?.replace('.', "_"), v)?;
             }
         }
     }
