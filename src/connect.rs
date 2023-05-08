@@ -1,4 +1,5 @@
 use lazy_static::lazy_static;
+use log::info;
 use pyo3::{
     pyfunction,
     types::{
@@ -163,6 +164,23 @@ pub fn connect(
             addr_str = format!("localhost:{}", a.downcast::<PyInt>()?.extract::<i32>()?);
         } else if a.is_instance(py.get_type::<PyString>())? {
             addr_str = a.downcast::<PyString>()?.extract::<String>()?;
+
+            // Fix up an addr that mistakenly has a protocol or is missing a port
+            let mut assume_port = 80;
+            let original = addr_str.clone();
+            if addr_str.starts_with("http://") {
+                addr_str = addr_str.split_once("://").unwrap().1.to_string();
+            }
+            if addr_str.starts_with("https://") {
+                addr_str = addr_str.split_once("://").unwrap().1.to_string();
+                assume_port = 443;
+            }
+            if !addr_str.contains(':') {
+                addr_str = format!("{addr_str}:{assume_port}");
+            }
+            if original != addr_str {
+                info!("Converted addr '{original}' to '{addr_str}'");
+            }
         }
     }
 
@@ -172,6 +190,15 @@ pub fn connect(
     }
     if proto.is_some() {
         kwargs.set_item("proto", proto)?;
+    }
+
+    // Remove all None's from kwargs to avoid casting problems on keys we will ignore
+    for k in kwargs.keys() {
+        if let Some(v) = kwargs.get_item(k) {
+            if v.is_none() {
+                kwargs.del_item(k)?;
+            }
+        }
     }
 
     // move to async, handling if there is an async loop running or not

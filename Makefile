@@ -120,7 +120,7 @@ testpublish:
 	. $(BIN)/activate && maturin publish --repository testpypi
 
 docs: develop black
-	. $(BIN)/activate && sphinx-build -b html doc_source/ docs/
+	. $(BIN)/activate && sphinx-build -a -E -b html doc_source/ docs/
 
 black: develop
 	. $(BIN)/activate && black examples/ test/ python/
