@@ -1,3 +1,10 @@
+## 0.7.0:
+
+* Add `ngrok.disconnect(url)` and `ngrok.kill()` convenience functions.
+* Add examples for [Tornado](https://www.tornadoweb.org), [OpenPlayground](https://github.com/nat/openplayground), [Streamlit](https://streamlit.io/), [GPT4All](https://github.com/nomic-ai/gpt4all).
+* Handle protocols in `addr`, and dots in `connect` option keys, for ease-of-use.
+* [Docs](https://ngrok.github.io/ngrok-py/) improvements
+
 ## 0.6.0:
 
 * Add `ngrok.connect(options)` convenience function.
