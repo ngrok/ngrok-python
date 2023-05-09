@@ -6,9 +6,10 @@
 import asyncio, ngrok
 import click
 
-from streamlit.web.bootstrap import run 
+from streamlit.web.bootstrap import run
 
 app_port = 8501
+
 
 async def setup_tunnel():
     listen = f"localhost:{app_port}"
@@ -18,7 +19,11 @@ async def setup_tunnel():
         # .domain('<name>.ngrok.app') # if on a paid plan, set a custom static domain
         .listen()
     )
-    click.secho(f"Forwarding to {listen} from ingress url: {tunnel.url()}", fg="green", bold=True)
+    click.secho(
+        f"Forwarding to {listen} from ingress url: {tunnel.url()}",
+        fg="green",
+        bold=True,
+    )
     tunnel.forward_tcp(listen)
 
 
@@ -30,4 +35,4 @@ except RuntimeError:
     # No existing loop is running, so we can run the ngrok tunnel on a new loop.
     asyncio.run(setup_tunnel())
 
-run('streamlit-demo.py', command_line=None, args=[], flag_options={})
+run("streamlit-demo.py", command_line=None, args=[], flag_options={})
