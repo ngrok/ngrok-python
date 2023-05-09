@@ -197,6 +197,10 @@ pub fn connect(
         if let Some(v) = kwargs.get_item(k) {
             if v.is_none() {
                 kwargs.del_item(k)?;
+            } else if get_string(k)?.contains('.') {
+                // handle cases like "oauth.provider" -> "oauth_provider"
+                kwargs.del_item(k)?;
+                kwargs.set_item(get_string(k)?.replace('.', "_"), v)?;
             }
         }
     }
@@ -415,4 +419,39 @@ async fn forward(tunnel: NgrokTunnel, addr: String) -> PyResult<NgrokTunnel> {
         .map(|_| ())
     });
     Ok(tunnel)
+}
+
+/// Shut down all tunnels and sessions.
+#[pyfunction]
+pub fn kill(py: Python) -> PyResult<Py<PyAny>> {
+    disconnect(py, None)
+}
+
+/// Shut down tunnel with the given url, or if no url is given, shut down all tunnels.
+///
+/// :param str or None url: The url of the NgrokTunnel to disconnect, or None to disconnect all tunnels.
+#[pyfunction]
+#[pyo3(text_signature = "(url=None)")]
+pub fn disconnect(py: Python, url: Option<Py<PyString>>) -> PyResult<Py<PyAny>> {
+    // move to async, handling if there is an async loop running or not
+    wrapper::loop_wrap(
+        py,
+        url.map(|u| u.into()),
+        "    return await ngrok.async_disconnect(input)",
+    )
+}
+
+#[pyfunction]
+pub fn async_disconnect(py: Python, url: Option<String>) -> PyResult<&PyAny> {
+    info!("async Disconnecting");
+    pyo3_asyncio::tokio::future_into_py(py, async move {
+        tunnel::close_url(url.clone()).await?;
+
+        // if closing every tunnel, remove any stored session
+        if url.is_none() {
+            SESSION.lock().await.take();
+        }
+
+        Ok(())
+    })
 }

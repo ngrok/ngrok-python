@@ -5,7 +5,7 @@ import test
 
 
 def shutdown(url, http_server):
-    # ngrok.disconnect(url)
+    ngrok.disconnect(url)
     http_server.shutdown()
     http_server.server_close()
 
@@ -19,7 +19,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
     def validate_shutdown(self, http_server, tunnel, url, requests_config=dict()):
         response = self.validate_http_request(url, requests_config)
-        shutdown(tunnel, http_server)
+        shutdown(url, http_server)
         return response
 
     async def test_https_tunnel_async(self):
@@ -71,6 +71,12 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
             circuit_breaker=None,
             mutual_tls_cas=None,
         )
+        self.validate_shutdown(http_server, tunnel, tunnel.url())
+
+    def test_connect_dots(self):
+        http_server = test.make_http()
+        options = {"authtoken.from.env": True}
+        tunnel = ngrok.connect(http_server.listen_to, **options)
         self.validate_shutdown(http_server, tunnel, tunnel.url())
 
     def test_connect_vectorize(self):
