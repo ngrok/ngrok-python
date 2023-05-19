@@ -244,6 +244,17 @@ the server_addr call.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">client_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Add client type and version information for a client application.</p>
+<p>This is a way for applications and library consumers of this crate
+identify themselves.</p>
+<p>This will add a new entry to the <cite>User-Agent</cite> field in the “most significant”
+(first) position. Comments must follow [RFC 7230] or a connection error may occur.</p>
+<p>[RFC 7230]: <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6">https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>Attempt to establish an ngrok session using the current configuration.</p>
 </dd></dl>

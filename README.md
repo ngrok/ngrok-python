@@ -11,11 +11,11 @@
 [ver-badge]: https://img.shields.io/pypi/pyversions/ngrok.svg
 [ver-url]: https://pypi.org/project/ngrok
 [mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
-[mit-url]: https://github.com/ngrok/ngrok-rs/blob/main/LICENSE-MIT
+[mit-url]: https://github.com/ngrok/ngrok-rust/blob/main/LICENSE-MIT
 [apache-badge]: https://img.shields.io/badge/license-Apache_2.0-blue.svg
-[apache-url]: https://github.com/ngrok/ngrok-rs/blob/main/LICENSE-APACHE
-[ci-badge]: https://github.com/ngrok/ngrok-py/actions/workflows/ci.yml/badge.svg
-[ci-url]: https://github.com/ngrok/ngrok-py/actions/workflows/ci.yml
+[apache-url]: https://github.com/ngrok/ngrok-rust/blob/main/LICENSE-APACHE
+[ci-badge]: https://github.com/ngrok/ngrok-python/actions/workflows/ci.yml/badge.svg
+[ci-url]: https://github.com/ngrok/ngrok-python/actions/workflows/ci.yml
 
 **Note: This is beta-quality software. Interfaces may change without warning.**
 
@@ -38,18 +38,18 @@ The published library is available on
 python -m pip install ngrok
 ```
 
-ngrok-py officially supports Python 3.7+.
+ngrok-python officially supports Python 3.7+.
 
 # Documentation
 
-A quickstart guide and a full API reference are included in the [ngrok-py Python API documentation](https://ngrok.github.io/ngrok-py/).
+A quickstart guide and a full API reference are included in the [ngrok-python Python API documentation](https://ngrok.github.io/ngrok-python/).
 
 # Quickstart
 
 After you've installed the package, you'll need an Auth Token. Retrieve one on the
 [Auth Token page of your ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken)
 
-There are multiple examples in [the /examples directory](https://github.com/ngrok/ngrok-py/tree/main/examples).
+There are multiple examples in [the /examples directory](https://github.com/ngrok/ngrok-python/tree/main/examples).
 A minimal use-case looks like the following:
 
 ```python
@@ -60,7 +60,7 @@ async def create_tunnel():
     tunnel.forward_tcp("localhost:9000")
 ```
 
-Or with [the 'connect' convenience function](https://github.com/ngrok/ngrok-py/blob/main/examples/ngrok-connect-minimal.py):
+Or with [the 'connect' convenience function](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py):
 
 ```python
 tunnel = ngrok.connect(9000, authtoken_from_env=True)
@@ -98,24 +98,24 @@ python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorke
 # Examples
 
 ## Frameworks
-* [Aiohttp](https://docs.aiohttp.org) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/aiohttp-ngrok.py)
-* [Django](https://www.djangoproject.com/) - [Single File Example](https://github.com/ngrok/ngrok-py/tree/main/examples/django-single-file.py), [Modify manage.py Example](https://github.com/ngrok/ngrok-py/tree/main/examples/djangosite/manage.py), [Modify asgi.py Example](https://github.com/ngrok/ngrok-py/tree/main/examples/djangosite/djangosite/ngrok-asgi.py), or use the `ngrok-asgi` ASGI Runner discussed above
-* [Flask](https://flask.palletsprojects.com) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/flask-ngrok.py)
+* [Aiohttp](https://docs.aiohttp.org) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/aiohttp-ngrok.py)
+* [Django](https://www.djangoproject.com/) - [Single File Example](https://github.com/ngrok/ngrok-python/tree/main/examples/django-single-file.py), [Modify manage.py Example](https://github.com/ngrok/ngrok-python/tree/main/examples/djangosite/manage.py), [Modify asgi.py Example](https://github.com/ngrok/ngrok-python/tree/main/examples/djangosite/djangosite/ngrok-asgi.py), or use the `ngrok-asgi` ASGI Runner discussed above
+* [Flask](https://flask.palletsprojects.com) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/flask-ngrok.py)
 * [Gunicorn](https://gunicorn.org/) - Use the `ngrok-asgi` ASGI Runner discussed above
-* [Streamlit](https://streamlit.io) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/streamlit/streamlit-ngrok.py)
-* [Tornado](https://www.tornadoweb.org) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/tornado-ngrok.py)
-* [Uvicorn](https://www.uvicorn.org/) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/uvicorn-ngrok.py), or use the `ngrok-asgi` ASGI Runner discussed above
+* [Streamlit](https://streamlit.io) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/streamlit/streamlit-ngrok.py)
+* [Tornado](https://www.tornadoweb.org) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/tornado-ngrok.py)
+* [Uvicorn](https://www.uvicorn.org/) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/uvicorn-ngrok.py), or use the `ngrok-asgi` ASGI Runner discussed above
 
 ## Machine Learning
-* [Gradio](https://gradio.app/) - [ngrok-asgi Example](https://github.com/ngrok/ngrok-py/tree/main/examples/gradio/gradio-asgi.py), [gradio CLI Example](https://github.com/ngrok/ngrok-py/tree/main/examples/gradio/gradio-ngrok.py) sharing machine learning apps
-* [OpenPlayground](https://github.com/nat/openplayground) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/openplayground/run.py) of an LLM playground you can run on your laptop
-* [GPT4ALL](https://github.com/nomic-ai/gpt4all) - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/gpt4all/run.py) of running the [GPT4All-L Snoozy 13B](https://gpt4all.io/index.html) model with a Gradio frontend
+* [Gradio](https://gradio.app/) - [ngrok-asgi Example](https://github.com/ngrok/ngrok-python/tree/main/examples/gradio/gradio-asgi.py), [gradio CLI Example](https://github.com/ngrok/ngrok-python/tree/main/examples/gradio/gradio-ngrok.py) sharing machine learning apps
+* [OpenPlayground](https://github.com/nat/openplayground) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/openplayground/run.py) of an LLM playground you can run on your laptop
+* [GPT4ALL](https://github.com/nomic-ai/gpt4all) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/gpt4all/run.py) of running the [GPT4All-L Snoozy 13B](https://gpt4all.io/index.html) model with a Gradio frontend
 
 ## Tunnel Types
-* HTTP - [Minimal Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-http-minimal.py), [Full Configuration Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-http-full.py)
-* Labeled - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-labeled.py)
-* TCP - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-tcp.py)
-* TLS - [Example](https://github.com/ngrok/ngrok-py/tree/main/examples/ngrok-tls.py)
+* HTTP - [Minimal Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-http-minimal.py), [Full Configuration Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-http-full.py)
+* Labeled - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-labeled.py)
+* TCP - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tcp.py)
+* TLS - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tls.py)
 
 # Platform Support
 
@@ -129,7 +129,7 @@ Pre-built binaries are provided on PyPI for the following platforms:
 | Linux musl |      |  ✓  |    ✓    |     |
 | FreeBSD    |      |  *  |         |     |
 
-ngrok-py, and [ngrok-rs](https://github.com/ngrok/ngrok-rs/) which it depends on, are open source, so it may be possible to build them for other platforms.
+ngrok-python, and [ngrok-rust](https://github.com/ngrok/ngrok-rust/) which it depends on, are open source, so it may be possible to build them for other platforms.
 
 * Windows-aarch64 will be supported after the next release of [Ring](https://github.com/briansmith/ring/issues/1167).
 * FreeBSD-x64 is built by the release process, but PyPI won't accept BSD flavors.
@@ -142,7 +142,7 @@ Thank you to [OpenIoTHub](https://github.com/OpenIoTHub/ngrok) for handing over 
 
 # Change Log
 
-Changes are tracked in [CHANGELOG.md](https://github.com/ngrok/ngrok-py/blob/main/CHANGELOG.md).
+Changes are tracked in [CHANGELOG.md](https://github.com/ngrok/ngrok-python/blob/main/CHANGELOG.md).
 
 # License
 
