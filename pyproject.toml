@@ -28,8 +28,8 @@ license = {text = "MIT OR Apache-2.0"}
 [project.urls]
 homepage = "https://ngrok.com"
 # documentation = "readthedocs.org"
-repository = "https://github.com/ngrok/ngrok-py"
-changelog = "https://github.com/ngrok/ngrok-py/blob/main/CHANGELOG.md"
+repository = "https://github.com/ngrok/ngrok-python"
+changelog = "https://github.com/ngrok/ngrok-python/blob/main/CHANGELOG.md"
 
 [project.scripts]
 ngrok-asgi = "ngrok:__main__.asgi_cli"
