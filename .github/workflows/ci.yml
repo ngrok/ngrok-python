@@ -219,7 +219,7 @@ jobs:
       - uses: jrobsonchase/direnv-action@v0.7
       - name: Tag
         run: |
-          version="$(extract-crate-version ngrok)"
+          version="$(extract-crate-version ngrok-python)"
           git config user.name "GitHub Action"
           git config user.email noreply@ngrok.com
           git tag -a -m "Version ${version}" v${version}
