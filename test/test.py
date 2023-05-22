@@ -262,13 +262,13 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         http_server, session = await make_http_and_session()
         tunnel = (
             await session.tls_endpoint()
-            .forwards_to("tcp forwards to")
-            .metadata("tcp metadata")
+            .forwards_to("tls forwards to")
+            .metadata("tls metadata")
             .listen()
         )
 
-        self.assertEqual("tcp forwards to", tunnel.forwards_to())
-        self.assertEqual("tcp metadata", tunnel.metadata())
+        self.assertEqual("tls forwards to", tunnel.forwards_to())
+        self.assertEqual("tls metadata", tunnel.metadata())
 
         tunnel.forward_tcp(http_server.listen_to)
 

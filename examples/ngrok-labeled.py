@@ -21,6 +21,18 @@ async def create_tunnel():
     )
 
 
+# Example of using the ngrok.connect convenience function for labeled ingress
+def create_tunnel_connect(addr):
+    if addr.startswith("/"):
+        addr = f"pipe:{addr}"
+    ngrok.connect(
+        addr,
+        authtoken_from_env=True,
+        labels="edge:edghts_<edge_id>",
+        proto="labeled",
+    )
+
+
 class HelloHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         body = bytes("<html><body>Hello</body></html>", "utf-8")
@@ -43,6 +55,7 @@ if os.name != "nt":
     httpd = UnixSocketHttpServer((ngrok.pipe_name()), HelloHandler)
 
 logging.basicConfig(level=logging.INFO)
+# create_tunnel_connect(httpd.server_address)
 tunnel = asyncio.run(create_tunnel())
 ngrok.listen(httpd, tunnel)
 httpd.serve_forever()

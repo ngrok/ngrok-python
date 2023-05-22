@@ -47,6 +47,8 @@ lazy_static! {
     pub(crate) static ref SESSION: Mutex<Option<NgrokSession>> = Mutex::new(None);
 }
 
+const PIPE_PREFIX: &str = "pipe:";
+
 /// Single string configuration
 macro_rules! plumb {
     ($builder:tt, $self:tt, $config:tt, $name:tt) => {
@@ -175,7 +177,7 @@ pub fn connect(
                 addr_str = addr_str.split_once("://").unwrap().1.to_string();
                 assume_port = 443;
             }
-            if !addr_str.contains(':') {
+            if !addr_str.starts_with(PIPE_PREFIX) && !addr_str.contains(':') {
                 addr_str = format!("{addr_str}:{assume_port}");
             }
             if original != addr_str {
@@ -411,7 +413,7 @@ async fn forward(tunnel: NgrokTunnel, addr: String) -> PyResult<NgrokTunnel> {
     let id = tunnel.id();
     // move forwarding to another task
     tokio::spawn(async move {
-        if addr.starts_with("pipe:") {
+        if addr.starts_with(PIPE_PREFIX) {
             tunnel::forward_pipe(&id, addr.clone().split_off(5)).await
         } else {
             tunnel::forward_tcp(&id, addr).await

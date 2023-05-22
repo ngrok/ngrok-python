@@ -97,6 +97,47 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         response = self.validate_shutdown(http_server, tunnel, tunnel.url(), config)
         self.assertEqual("true2", response.headers["x-res-yup2"])
 
+    async def test_tcp_tunnel(self):
+        http_server = test.make_http()
+        tunnel = await ngrok.connect(
+            http_server.listen_to,
+            authtoken_from_env=True,
+            forwards_to="tcp forwards to",
+            metadata="tcp metadata",
+            proto="tcp",
+        )
+
+        self.assertEqual("tcp forwards to", tunnel.forwards_to())
+        self.assertEqual("tcp metadata", tunnel.metadata())
+
+        self.validate_shutdown(
+            http_server, tunnel, tunnel.url().replace("tcp:", "http:")
+        )
+
+    async def test_tls_tunnel(self):
+        http_server = test.make_http()
+        tunnel = await ngrok.connect(
+            http_server.listen_to,
+            authtoken_from_env=True,
+            forwards_to="tls forwards to",
+            metadata="tls metadata",
+            proto="tls",
+        )
+
+        self.assertEqual("tls forwards to", tunnel.forwards_to())
+        self.assertEqual("tls metadata", tunnel.metadata())
+
+        tunnel.forward_tcp(http_server.listen_to)
+
+        error = None
+        try:
+            response = requests.get(tunnel.url().replace("tls:", "https:"))
+        except requests.exceptions.SSLError as err:
+            error = err
+        self.assertIsInstance(error, requests.exceptions.SSLError)
+
+        shutdown(tunnel.url(), http_server)
+
 
 if __name__ == "__main__":
     unittest.main()
