@@ -1,3 +1,7 @@
+## 0.8.1:
+
+* Cleanly return from a tunnel forward call after a `session.close()`
+
 ## 0.8.0:
 
 * Add `NgrokSession.client_info()`
