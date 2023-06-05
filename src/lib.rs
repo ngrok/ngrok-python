@@ -29,6 +29,10 @@ use crate::{
         kill,
     },
     logging::log_level,
+    tunnel::{
+        async_tunnels,
+        tunnels,
+    },
     wrapper::{
         default,
         fd,
@@ -58,6 +62,7 @@ pub mod wrapper;
 fn ngrok(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(async_connect, m)?)?;
     m.add_function(wrap_pyfunction!(async_disconnect, m)?)?;
+    m.add_function(wrap_pyfunction!(async_tunnels, m)?)?;
     m.add_function(wrap_pyfunction!(connect_fn, m)?)?;
     m.add_function(wrap_pyfunction!(default, m)?)?;
     m.add_function(wrap_pyfunction!(disconnect, m)?)?;
@@ -67,6 +72,7 @@ fn ngrok(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(listen, m)?)?;
     m.add_function(wrap_pyfunction!(log_level, m)?)?;
     m.add_function(wrap_pyfunction!(pipe_name, m)?)?;
+    m.add_function(wrap_pyfunction!(tunnels, m)?)?;
     m.add_function(wrap_pyfunction!(werkzeug_develop, m)?)?;
 
     m.add_class::<NgrokSessionBuilder>()?;

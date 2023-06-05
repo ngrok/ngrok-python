@@ -52,6 +52,8 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(tunnel.url().startswith("https://"))
         self.assertEqual("http forwards to", tunnel.forwards_to())
         self.assertEqual("http metadata", tunnel.metadata())
+        self.assertTrue(len(ngrok.tunnels()) >= 1)
+
         self.validate_shutdown(http_server, tunnel, tunnel.url())
 
     def test_connect_number(self):
