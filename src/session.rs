@@ -36,7 +36,10 @@ use tracing::{
 
 use crate::{
     py_err,
-    tunnel::remove_global_tunnel,
+    tunnel::{
+        list_tunnels,
+        remove_global_tunnel,
+    },
     tunnel_builder::{
         NgrokHttpTunnelBuilder,
         NgrokLabeledTunnelBuilder,
@@ -411,6 +414,12 @@ impl NgrokSession {
     pub fn labeled_tunnel(&self) -> NgrokLabeledTunnelBuilder {
         let session = self.raw_session.lock().clone();
         NgrokLabeledTunnelBuilder::new(session.clone(), session.labeled_tunnel())
+    }
+
+    /// Retrieve a list of this session's non-closed tunnels, in no particular order.
+    pub fn tunnels<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+        let session_id = self.raw_session.lock().id();
+        pyo3_asyncio::tokio::future_into_py(py, async move { list_tunnels(Some(session_id)).await })
     }
 
     /// Close a tunnel with the given ID.

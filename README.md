@@ -99,6 +99,7 @@ python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorke
 
 ## Frameworks
 * [Aiohttp](https://docs.aiohttp.org) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/aiohttp-ngrok.py)
+* [AWS App Runner](https://aws.amazon.com/apprunner/) - See the [ngrok SDK Serverless Example](https://github.com/ngrok/ngrok-sdk-serverless-example) repository, making the necessary [changes to use Python](https://docs.aws.amazon.com/apprunner/latest/dg/service-source-code-python.html) instead of NodeJS
 * [Django](https://www.djangoproject.com/) - [Single File Example](https://github.com/ngrok/ngrok-python/tree/main/examples/django-single-file.py), [Modify manage.py Example](https://github.com/ngrok/ngrok-python/tree/main/examples/djangosite/manage.py), [Modify asgi.py Example](https://github.com/ngrok/ngrok-python/tree/main/examples/djangosite/djangosite/ngrok-asgi.py), or use the `ngrok-asgi` ASGI Runner discussed above
 * [Flask](https://flask.palletsprojects.com) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/flask-ngrok.py)
 * [Gunicorn](https://gunicorn.org/) - Use the `ngrok-asgi` ASGI Runner discussed above
