@@ -104,7 +104,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(tunnel.url().startswith("https://"))
         self.assertEqual("http forwards to", tunnel.forwards_to())
         self.assertEqual("http metadata", tunnel.metadata())
-        tunnel_list = await session.tunnels()
+        tunnel_list = await session.get_tunnels()
         self.assertEqual(1, len(tunnel_list))
         self.assertEqual(tunnel.id(), tunnel_list[0].id())
         self.assertEqual(tunnel.url(), tunnel_list[0].url())
@@ -375,9 +375,9 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         tunnel3.forward_tcp(http_server.listen_to)
         tunnel4.forward_tcp(http_server.listen_to)
 
-        self.assertEqual(2, len(await session1.tunnels()))
-        self.assertEqual(2, len(await session2.tunnels()))
-        self.assertTrue(len(await ngrok.tunnels()) > 4)
+        self.assertEqual(2, len(await session1.get_tunnels()))
+        self.assertEqual(2, len(await session2.get_tunnels()))
+        self.assertTrue(len(await ngrok.get_tunnels()) > 4)
 
         await self.validate_http_request(tunnel1.url())
         await self.validate_http_request(tunnel2.url())

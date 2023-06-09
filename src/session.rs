@@ -1,4 +1,5 @@
 use std::{
+    borrow::BorrowMut,
     sync::Arc,
     time::Duration,
 };
@@ -8,6 +9,7 @@ use std::{
 use ::ngrok::session::Session;
 use async_rustls::rustls::ClientConfig;
 use bytes::Bytes;
+use lazy_static::lazy_static;
 use ngrok::{
     session::{
         default_connect,
@@ -20,6 +22,7 @@ use ngrok::{
 use parking_lot::Mutex as SyncMutex;
 use pyo3::{
     pyclass,
+    pyfunction,
     pymethods,
     types::PyByteArray,
     PyAny,
@@ -51,15 +54,42 @@ use crate::{
 const CLIENT_TYPE: &str = "ngrok-python";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+lazy_static! {
+    // Allow user to store a default auth token to use for all sessions
+    static ref AUTH_TOKEN: SyncMutex<Option<String>> = SyncMutex::new(None);
+}
+
+/// Set the default auth token to use for any future sessions.
+#[pyfunction]
+#[allow(dead_code)]
+pub fn set_auth_token(authtoken: String) {
+    let mut token = AUTH_TOKEN.lock();
+    token.replace(authtoken);
+}
+
 /// The builder for an ngrok session.
 #[pyclass]
 #[allow(dead_code)]
 pub(crate) struct NgrokSessionBuilder {
     raw_builder: Arc<SyncMutex<Option<SessionBuilder>>>,
     disconnect_handler: Option<PyObject>,
+    auth_token_set: bool,
 }
 
 impl NgrokSessionBuilder {
+    /// Mark that the auth token has been set on this builder.
+    fn auth_token_set(&mut self) {
+        self.auth_token_set = true;
+    }
+
+    /// set default auth token if it exists
+    fn handle_default_auth_token(&self) {
+        let default_auth_token = AUTH_TOKEN.lock();
+        if default_auth_token.is_some() && !self.auth_token_set {
+            self.set(|b| b.authtoken(default_auth_token.as_ref().unwrap()));
+        }
+    }
+
     /// Handle the locking and Option management
     fn set<F>(&self, f: F)
     where
@@ -103,6 +133,7 @@ impl NgrokSessionBuilder {
     }
 
     pub async fn async_connect<'a>(&self) -> Result<NgrokSession, PyErr> {
+        self.handle_default_auth_token();
         let builder = self.raw_builder.lock().clone();
         do_connect(builder).await
     }
@@ -124,6 +155,7 @@ impl NgrokSessionBuilder {
                 None::<String>,
             )))),
             disconnect_handler: None,
+            auth_token_set: false,
         }
     }
 
@@ -136,15 +168,17 @@ impl NgrokSessionBuilder {
     /// [find your existing authtoken]: https://dashboard.ngrok.com/get-started/your-authtoken
     /// [create a new one]: https://dashboard.ngrok.com/tunnels/authtokens
     /// [authtoken parameter in the ngrok docs]: https://ngrok.com/docs/ngrok-agent/config#authtoken
-    pub fn authtoken(self_: PyRefMut<Self>, authtoken: String) -> PyRefMut<Self> {
+    pub fn authtoken(mut self_: PyRefMut<Self>, authtoken: String) -> PyRefMut<Self> {
         self_.set(|b| b.authtoken(authtoken));
+        self_.borrow_mut().auth_token_set();
         self_
     }
 
     /// Shortcut for calling [SessionBuilder::authtoken] with the value of the
     /// NGROK_AUTHTOKEN environment variable.
-    pub fn authtoken_from_env(self_: PyRefMut<Self>) -> PyRefMut<Self> {
+    pub fn authtoken_from_env(mut self_: PyRefMut<Self>) -> PyRefMut<Self> {
         self_.set(|b| b.authtoken_from_env());
+        self_.borrow_mut().auth_token_set();
         self_
     }
 
@@ -354,6 +388,7 @@ impl NgrokSessionBuilder {
 
     /// Attempt to establish an ngrok session using the current configuration.
     pub fn connect<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+        self.handle_default_auth_token();
         let builder = self.raw_builder.lock().clone();
         pyo3_asyncio::tokio::future_into_py(py, async move { do_connect(builder).await })
     }
@@ -417,7 +452,7 @@ impl NgrokSession {
     }
 
     /// Retrieve a list of this session's non-closed tunnels, in no particular order.
-    pub fn tunnels<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+    pub fn get_tunnels<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
         let session_id = self.raw_session.lock().id();
         pyo3_asyncio::tokio::future_into_py(py, async move { list_tunnels(Some(session_id)).await })
     }
