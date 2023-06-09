@@ -38,33 +38,153 @@ The published library is available on
 python -m pip install ngrok
 ```
 
-ngrok-python officially supports Python 3.7+.
+To verify that the library is correctly installed use the following code, which forwards to `localhost` port `80`:
+```python
+import ngrok
+tunnel = ngrok.connect()
+```
+
+`ngrok-python` officially supports Python 3.7+.
 
 # Documentation
 
-A quickstart guide and a full API reference are included in the [ngrok-python Python API documentation](https://ngrok.github.io/ngrok-python/).
+A quickstart guide and a full API reference are included in the [ngrok-python API documentation](https://ngrok.github.io/ngrok-python/).
 
 # Quickstart
 
 After you've installed the package, you'll need an Auth Token. Retrieve one on the
 [Auth Token page of your ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken)
 
-There are multiple examples in [the /examples directory](https://github.com/ngrok/ngrok-python/tree/main/examples).
-A minimal use-case looks like the following:
-
-```python
-async def create_tunnel():
-    session = await ngrok.NgrokSessionBuilder().authtoken_from_env().connect()
-    tunnel = await session.http_endpoint().listen()
-    print (f"Ingress established at {tunnel.url()}")
-    tunnel.forward_tcp("localhost:9000")
-```
-
-Or with [the 'connect' convenience function](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py):
+Here is a minimal code block [using the 'connect' convenience function](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py), with `authtoken_from_env=True` to use an Auth Token from the `NGROK_AUTHTOKEN` environment variable, and making a connection to `localhost` port `9000`:
 
 ```python
 tunnel = ngrok.connect(9000, authtoken_from_env=True)
 print (f"Ingress established at {tunnel.url()}")
+```
+
+There are multiple examples in [the /examples directory](https://github.com/ngrok/ngrok-python/tree/main/examples).
+
+## Authorization
+
+To use most features of ngrok, you need to obtain an Auth Token. You can get an Auth Token by signing up for free at [ngrok.com](https://dashboard.ngrok.com/signup) and then retrieving it from the [Auth Token page of your ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken). Once you have an Auth Token, you can reference it in several ways.
+
+You can set the authtoken in the environment variable `NGROK_AUTHTOKEN` and then pass `authtoken_from_env=True` to the [connect](https://ngrok.github.io/ngrok-python/module.html) function:
+
+```python
+ngrok.connect(authtoken_from_env=True, ...)
+```
+
+You can also set the default Auth Token to use for all connections by calling the [set_auth_token](https://ngrok.github.io/ngrok-python/module.html) function:
+
+```python
+ngrok.set_auth_token(token)
+```
+
+Or the Auth Token can be passed directly to the [connect](https://ngrok.github.io/ngrok-python/module.html) function:
+
+```python
+ngrok.connect(authtoken=token, ...)
+```
+
+## Connection
+
+The [connect](https://ngrok.github.io/ngrok-python/module.html) function is the most common way to use this library. It will start an ngrok session if it is not already running, and then establish a tunnel to the specified address. If there is an asynchronous runtime running the [connect](https://ngrok.github.io/ngrok-python/module.html) function returns a promise that resolves to the public tunnel object.
+
+With just an integer, the `connect` function will forward to `localhost` on the specified port, or the host can be specified as a string:
+
+```python
+tunnel = ngrok.connect(4242);
+tunnel = ngrok.connect("localhost:4242");
+```
+
+More options can be passed to the `connect` function to customize the connection:
+
+```python
+tunnel = ngrok.connect(8080, basic_auth="ngrok:online1line"})
+tunnel = ngrok.connect(8080, oauth_provider="google", oauth_allow_domains="example.com")
+```
+
+The second (optional) argument is the tunnel type, with defaults to `http`. To create a TCP tunnel:
+
+```python
+tunnel = ngrok.connect(25565, "tcp")
+```
+
+Since the options are kwargs, you can also use the `**` operator to pass a dictionary of configuration:
+
+```python
+options = {"authtoken_from_env":True, "response_header_add":"X-Awesome:yes"}
+tunnel = ngrok.connect(8080, **options)
+```
+
+## Disconnection
+
+To close a tunnel use the [disconnect](https://ngrok.github.io/ngrok-python/module.html) function with the `url` of the tunnel to close. If there is an asynchronous runtime running the [disconnect](https://ngrok.github.io/ngrok-python/module.html) function returns a promise that resolves when the call is complete.
+
+```python
+ngrok.disconnect(url)
+```
+
+Or omit the URL to close all tunnels:
+
+```python
+ngrok.disconnect()
+```
+
+The [close](https://ngrok.github.io/ngrok-python/ngrok_tunnel.html) method on a tunnel will shut it down, and also stop the ngrok session if it is no longer needed. This method returns a promise that resolves when the tunnel is closed.
+
+```python
+await tunnel.close()
+```
+
+## Listing Tunnels
+
+To list all current non-closed tunnels use the [get_tunnels](https://ngrok.github.io/ngrok-python/module.html) function. If there is an asynchronous runtime running the [get_tunnels](https://ngrok.github.io/ngrok-python/module.html) function returns a promise that resolves to the list of tunnel objects.
+
+```python
+tunnels = ngrok.get_tunnels()
+```
+
+# Full Configuration
+
+This example shows [all the possible configuration items ngrok.connect](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-full.py):
+
+```python
+tunnel = ngrok.connect(
+    # session configuration
+    addr="localhost:8080",
+    authtoken="<authtoken>",
+    authtoken_from_env=True,
+    session_metadata="Online in One Line",
+    # tunnel configuration
+    basic_auth=["ngrok:online1line"],
+    circuit_breaker=0.1,
+    compression=True,
+    domain="<domain>",
+    ip_restriction_allow_cidrs="0.0.0.0/0",
+    ip_restriction_deny_cidrs="10.1.1.1/32",
+    metadata="example tunnel metadata from python",
+    mutual_tls_cas=load_file("ca.crt"),
+    oauth_provider="google",
+    oauth_allow_domains=["<domain>"],
+    oauth_allow_emails=["<email>"],
+    oauth_scopes=["<scope>"],
+    oidc_issuer_url="<url>",
+    oidc_client_id="<id>",
+    oidc_client_secret="<secret>",
+    oidc_allow_domains=["<domain>"],
+    oidc_allow_emails=["<email>"],
+    oidc_scopes=["<scope>"],
+    proxy_proto="",  # One of: "", "1", "2"
+    request_header_remove="X-Req-Nope",
+    response_header_remove="X-Res-Nope",
+    request_header_add="X-Req-Yup:true",
+    response_header_add="X-Res-Yup:true",
+    schemes=["HTTPS"],
+    verify_webhook_provider="twilio",
+    verify_webhook_secret="asdf",
+    websocket_tcp_converter=True,
+)
 ```
 
 # ASGI Runner - Tunnels to Uvicorn, Gunicorn, Django and More, With No Code
@@ -117,6 +237,22 @@ python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorke
 * Labeled - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-labeled.py)
 * TCP - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tcp.py)
 * TLS - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tls.py)
+
+# Builders
+
+For more control over Sessions and Tunnels, the builder classes can be used.
+
+A minimal builder use-case looks like [the following](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-minimal.py):
+
+```python
+async def create_tunnel():
+    session = await ngrok.NgrokSessionBuilder().authtoken_from_env().connect()
+    tunnel = await session.http_endpoint().listen()
+    print (f"Ingress established at {tunnel.url()}")
+    tunnel.forward_tcp("localhost:9000")
+```
+
+See here for a [Full Configuration Example](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-full.py)
 
 # Platform Support
 
