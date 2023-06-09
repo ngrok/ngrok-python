@@ -1,4 +1,5 @@
 import ngrok
+import os
 import requests
 import unittest
 import test
@@ -40,9 +41,9 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
     def test_https_tunnel(self):
         http_server = test.make_http()
+        ngrok.set_auth_token(os.environ["NGROK_AUTHTOKEN"])
         tunnel = ngrok.connect(
             http_server.listen_to,
-            authtoken_from_env=True,
             forwards_to="http forwards to",
             metadata="http metadata",
         )
@@ -52,7 +53,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(tunnel.url().startswith("https://"))
         self.assertEqual("http forwards to", tunnel.forwards_to())
         self.assertEqual("http metadata", tunnel.metadata())
-        self.assertTrue(len(ngrok.tunnels()) >= 1)
+        self.assertTrue(len(ngrok.get_tunnels()) >= 1)
 
         self.validate_shutdown(http_server, tunnel, tunnel.url())
 

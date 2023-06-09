@@ -537,7 +537,7 @@ pub(crate) async fn list_tunnels(session_id: Option<String>) -> PyResult<Vec<Ngr
 
 /// Retrieve a list of non-closed tunnels, in no particular order.
 #[pyfunction]
-pub fn tunnels(py: Python) -> PyResult<Py<PyAny>> {
+pub fn get_tunnels(py: Python) -> PyResult<Py<PyAny>> {
     // move to async, handling if there is an async loop running or not
     wrapper::loop_wrap(py, None, "    return await ngrok.async_tunnels()")
 }

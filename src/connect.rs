@@ -1,5 +1,8 @@
 use lazy_static::lazy_static;
-use log::info;
+use log::{
+    debug,
+    info,
+};
 use pyo3::{
     pyfunction,
     types::{
@@ -445,7 +448,7 @@ pub fn disconnect(py: Python, url: Option<Py<PyString>>) -> PyResult<Py<PyAny>> 
 
 #[pyfunction]
 pub fn async_disconnect(py: Python, url: Option<String>) -> PyResult<&PyAny> {
-    info!("async Disconnecting");
+    debug!("Disconnecting. url: {url:?}");
     pyo3_asyncio::tokio::future_into_py(py, async move {
         tunnel::close_url(url.clone()).await?;
 

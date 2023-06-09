@@ -29,9 +29,10 @@ use crate::{
         kill,
     },
     logging::log_level,
+    session::set_auth_token,
     tunnel::{
         async_tunnels,
-        tunnels,
+        get_tunnels,
     },
     wrapper::{
         default,
@@ -72,7 +73,8 @@ fn ngrok(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(listen, m)?)?;
     m.add_function(wrap_pyfunction!(log_level, m)?)?;
     m.add_function(wrap_pyfunction!(pipe_name, m)?)?;
-    m.add_function(wrap_pyfunction!(tunnels, m)?)?;
+    m.add_function(wrap_pyfunction!(set_auth_token, m)?)?;
+    m.add_function(wrap_pyfunction!(get_tunnels, m)?)?;
     m.add_function(wrap_pyfunction!(werkzeug_develop, m)?)?;
 
     m.add_class::<NgrokSessionBuilder>()?;
