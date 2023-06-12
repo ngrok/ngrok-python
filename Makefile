@@ -1,4 +1,4 @@
-# system python interpreter. used only to create virtual environment
+# system python interpreter. used only to create virtual environment!
 PY = python3
 VENV = .env
 BIN=$(VENV)/bin
