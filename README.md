@@ -97,7 +97,7 @@ tunnel = ngrok.connect(4242);
 tunnel = ngrok.connect("localhost:4242");
 ```
 
-More options can be passed to the `connect` function to customize the connection:
+More options can be passed to the `connect` method to customize the connection:
 
 ```python
 tunnel = ngrok.connect(8080, basic_auth="ngrok:online1line"})
