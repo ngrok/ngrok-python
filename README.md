@@ -17,8 +17,6 @@
 [ci-badge]: https://github.com/ngrok/ngrok-python/actions/workflows/ci.yml/badge.svg
 [ci-url]: https://github.com/ngrok/ngrok-python/actions/workflows/ci.yml
 
-**Note: This is beta-quality software. Interfaces may change without warning.**
-
 [ngrok](https://ngrok.com) is a globally distributed reverse proxy commonly used for quickly getting a public URL to a
 service running inside a private network, such as on your local laptop. The ngrok agent is usually
 deployed inside a private network and is used to communicate with the ngrok cloud service.
@@ -29,40 +27,30 @@ to manage.
 
 If you're looking for the previous agent downloader project, it's over [here](https://github.com/OpenIoTHub/ngrok).
 
-# Installation
-
-The published library is available on
-[PyPI](https://pypi.org/project/ngrok).
-
-```shell
-python -m pip install ngrok
-```
-
-To verify that the library is correctly installed use the following code, which forwards to `localhost` port `80`:
-```python
-import ngrok
-tunnel = ngrok.connect()
-```
-
-`ngrok-python` officially supports Python 3.7+.
-
 # Documentation
 
 A quickstart guide and a full API reference are included in the [ngrok-python API documentation](https://ngrok.github.io/ngrok-python/).
 
 # Quickstart
 
-After you've installed the package, you'll need an Auth Token. Retrieve one on the
-[Auth Token page of your ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken)
+1. Install the `ngrok-python` package from [PyPI](https://pypi.org/project/ngrok) using `pip`:
 
-Here is a minimal code block [using the 'connect' convenience function](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py), with `authtoken_from_env=True` to use an Auth Token from the `NGROK_AUTHTOKEN` environment variable, and making a connection to `localhost` port `9000`:
+```shell
+python -m pip install ngrok
+```
+
+2. After you've installed the package, you'll need an Auth Token. Retrieve one on the
+[Auth Token page of your ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken).
+
+3. Add the following code block using the [connect method](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py) to expose your python application at port `9000` on `localhost`:
 
 ```python
+import ngrok
 tunnel = ngrok.connect(9000, authtoken_from_env=True)
 print (f"Ingress established at {tunnel.url()}")
 ```
 
-There are multiple examples in [the /examples directory](https://github.com/ngrok/ngrok-python/tree/main/examples).
+There are many more examples in [the /examples directory](https://github.com/ngrok/ngrok-python/tree/main/examples).
 
 ## Authorization
 
@@ -74,26 +62,37 @@ You can set it in the `NGROK_AUTHTOKEN` environment variable and pass `authtoken
 ngrok.connect(authtoken_from_env=True, ...)
 ```
 
-Or for all connections with the [set_auth_token](https://ngrok.github.io/ngrok-python/module.html) method:
-
-```python
-ngrok.set_auth_token(token)
-```
-
 Or pass the authtoken directly to the [connect](https://ngrok.github.io/ngrok-python/module.html) method:
 
 ```python
 ngrok.connect(authtoken=token, ...)
 ```
 
+Or set it for all connections with the [set_auth_token](https://ngrok.github.io/ngrok-python/module.html) method:
+
+```python
+ngrok.set_auth_token(token)
+```
+
 ## Connection
 
-The [connect](https://ngrok.github.io/ngrok-python/module.html) method is the easiest way to start an ngrok session and establish a tunnel to a specified address. If an asynchronous runtime is running, the [connect](https://ngrok.github.io/ngrok-python/module.html) function returns a promise that resolves to the public tunnel object.
+The [connect](https://ngrok.github.io/ngrok-python/module.html) method is the easiest way to start an ngrok session and establish a tunnel to a specified address. If an asynchronous runtime is running, the [connect](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves to the public tunnel object.
 
-With just an integer, the `connect` function will forward to `localhost` on the specified port, or the host can be specified as a string:
+With no arguments, the [connect](https://ngrok.github.io/ngrok-python/module.html) method will start an HTTP tunnel to `localhost` port `80`:
+
+```python
+tunnel = ngrok.connect()
+```
+
+You can pass the port number to forward on `localhost`:
 
 ```python
 tunnel = ngrok.connect(4242);
+```
+
+Or you can specify the host and port via a string:
+
+```python
 tunnel = ngrok.connect("localhost:4242");
 ```
 
@@ -139,7 +138,7 @@ await tunnel.close()
 
 ## Listing Tunnels
 
-To list all current non-closed tunnels use the [get_tunnels](https://ngrok.github.io/ngrok-python/module.html) method. If there is an asynchronous runtime running the [get_tunnels](https://ngrok.github.io/ngrok-python/module.html) function returns a promise that resolves to the list of tunnel objects.
+To list all current non-closed tunnels use the [get_tunnels](https://ngrok.github.io/ngrok-python/module.html) method. If there is an asynchronous runtime running the [get_tunnels](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves to the list of tunnel objects.
 
 ```python
 tunnels = ngrok.get_tunnels()
