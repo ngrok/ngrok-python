@@ -242,7 +242,7 @@ python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorke
 
 For more control over Sessions and Tunnels, the builder classes can be used.
 
-A minimal builder use-case looks like [the following](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-minimal.py):
+A minimal example using the builder class looks like [the following](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-minimal.py):
 
 ```python
 async def create_tunnel():
