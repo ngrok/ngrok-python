@@ -139,7 +139,7 @@ await tunnel.close()
 
 ## Listing Tunnels
 
-To list all current non-closed tunnels use the [get_tunnels](https://ngrok.github.io/ngrok-python/module.html) function. If there is an asynchronous runtime running the [get_tunnels](https://ngrok.github.io/ngrok-python/module.html) function returns a promise that resolves to the list of tunnel objects.
+To list all current non-closed tunnels use the [get_tunnels](https://ngrok.github.io/ngrok-python/module.html) method. If there is an asynchronous runtime running the [get_tunnels](https://ngrok.github.io/ngrok-python/module.html) function returns a promise that resolves to the list of tunnel objects.
 
 ```python
 tunnels = ngrok.get_tunnels()
