@@ -80,7 +80,7 @@ You can also set the default Auth Token to use for all connections by calling th
 ngrok.set_auth_token(token)
 ```
 
-Or the Auth Token can be passed directly to the [connect](https://ngrok.github.io/ngrok-python/module.html) function:
+Or pass the authtoken directly to the [connect](https://ngrok.github.io/ngrok-python/module.html) method:
 
 ```python
 ngrok.connect(authtoken=token, ...)
