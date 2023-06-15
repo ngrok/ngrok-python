@@ -74,7 +74,7 @@ You can set it in the `NGROK_AUTHTOKEN` environment variable and pass `authtoken
 ngrok.connect(authtoken_from_env=True, ...)
 ```
 
-You can also set the default Auth Token to use for all connections by calling the [set_auth_token](https://ngrok.github.io/ngrok-python/module.html) function:
+Or for all connections with the [set_auth_token](https://ngrok.github.io/ngrok-python/module.html) method:
 
 ```python
 ngrok.set_auth_token(token)
