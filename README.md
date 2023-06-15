@@ -110,7 +110,7 @@ The second (optional) argument is the tunnel type, with defaults to `http`. To c
 tunnel = ngrok.connect(25565, "tcp")
 ```
 
-Since the options are kwargs, you can also use the `**` operator to pass a dictionary of configuration:
+Since the options are kwargs, you can also use the `**` operator to pass a dictionary for configuration:
 
 ```python
 options = {"authtoken_from_env":True, "response_header_add":"X-Awesome:yes"}
