@@ -119,7 +119,7 @@ tunnel = ngrok.connect(8080, **options)
 
 ## Disconnection
 
-To close a tunnel use the [disconnect](https://ngrok.github.io/ngrok-python/module.html) function with the `url` of the tunnel to close. If there is an asynchronous runtime running the [disconnect](https://ngrok.github.io/ngrok-python/module.html) function returns a promise that resolves when the call is complete.
+To close a tunnel use the [disconnect](https://ngrok.github.io/ngrok-python/module.html) method with the `url` of the tunnel to close. If there is an asynchronous runtime running the [disconnect](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves when the call is complete.
 
 ```python
 ngrok.disconnect(url)
