@@ -88,7 +88,7 @@ ngrok.connect(authtoken=token, ...)
 
 ## Connection
 
-The [connect](https://ngrok.github.io/ngrok-python/module.html) function is the most common way to use this library. It will start an ngrok session if it is not already running, and then establish a tunnel to the specified address. If there is an asynchronous runtime running the [connect](https://ngrok.github.io/ngrok-python/module.html) function returns a promise that resolves to the public tunnel object.
+The [connect](https://ngrok.github.io/ngrok-python/module.html) method is the easiest way to start an ngrok session and establish a tunnel to a specified address. If an asynchronous runtime is running, the [connect](https://ngrok.github.io/ngrok-python/module.html) function returns a promise that resolves to the public tunnel object.
 
 With just an integer, the `connect` function will forward to `localhost` on the specified port, or the host can be specified as a string:
 
