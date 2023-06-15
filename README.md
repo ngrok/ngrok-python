@@ -68,7 +68,7 @@ There are multiple examples in [the /examples directory](https://github.com/ngro
 
 To use most of ngrok's features, you'll need an authtoken. To obtain one, sign up for free at [ngrok.com](https://dashboard.ngrok.com/signup) and retrieve it from the [authtoken page in your ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken). Once you have copied your authtoken, you can reference it in several ways.
 
-You can set the authtoken in the environment variable `NGROK_AUTHTOKEN` and then pass `authtoken_from_env=True` to the [connect](https://ngrok.github.io/ngrok-python/module.html) function:
+You can set it in the `NGROK_AUTHTOKEN` environment variable and pass `authtoken_from_env=True` to the [connect](https://ngrok.github.io/ngrok-python/module.html) method:
 
 ```python
 ngrok.connect(authtoken_from_env=True, ...)
