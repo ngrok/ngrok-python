@@ -87,13 +87,13 @@ tunnel = ngrok.connect()
 You can pass the port number to forward on `localhost`:
 
 ```python
-tunnel = ngrok.connect(4242);
+tunnel = ngrok.connect(4242)
 ```
 
 Or you can specify the host and port via a string:
 
 ```python
-tunnel = ngrok.connect("localhost:4242");
+tunnel = ngrok.connect("localhost:4242")
 ```
 
 More options can be passed to the `connect` method to customize the connection:
