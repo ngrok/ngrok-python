@@ -39,8 +39,8 @@ A quickstart guide and a full API reference are included in the [ngrok-python AP
 python -m pip install ngrok
 ```
 
-2. After you've installed the package, you'll need an Auth Token. Retrieve one on the
-[Auth Token page of your ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken).
+2. After you've installed the package, you'll need an authtoken. Retrieve one on the
+[authtoken page of your ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken).
 
 3. Add the following code block using the [connect method](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py) to expose your python application at port `9000` on `localhost`:
 
