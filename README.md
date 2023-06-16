@@ -50,7 +50,7 @@ tunnel = ngrok.connect(9000, authtoken_from_env=True)
 print (f"Ingress established at {tunnel.url()}")
 ```
 
-There are many more examples in [the /examples directory](https://github.com/ngrok/ngrok-python/tree/main/examples).
+You can find more examples in [the /examples directory](https://github.com/ngrok/ngrok-python/tree/main/examples).
 
 ## Authorization
 
