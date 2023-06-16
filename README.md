@@ -103,7 +103,7 @@ tunnel = ngrok.connect(8080, basic_auth="ngrok:online1line"})
 tunnel = ngrok.connect(8080, oauth_provider="google", oauth_allow_domains="example.com")
 ```
 
-The second (optional) argument is the tunnel type, with defaults to `http`. To create a TCP tunnel:
+The second (optional) argument is the tunnel type, which defaults to `http`. To create a TCP tunnel:
 
 ```python
 tunnel = ngrok.connect(25565, "tcp")
@@ -124,7 +124,7 @@ To close a tunnel use the [disconnect](https://ngrok.github.io/ngrok-python/modu
 ngrok.disconnect(url)
 ```
 
-Or omit the URL to close all tunnels:
+Or omit the `url` to close all tunnels:
 
 ```python
 ngrok.disconnect()
@@ -146,7 +146,7 @@ tunnels = ngrok.get_tunnels()
 
 # Full Configuration
 
-This example shows [all the possible configuration items ngrok.connect](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-full.py):
+This example shows [all the possible configuration items of ngrok.connect](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-full.py):
 
 ```python
 tunnel = ngrok.connect(
