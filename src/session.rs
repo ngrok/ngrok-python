@@ -1,4 +1,8 @@
-use std::{borrow::BorrowMut, sync::Arc, time::Duration};
+use std::{
+    borrow::BorrowMut,
+    sync::Arc,
+    time::Duration,
+};
 
 // the lib.name and the pymodule below need to be 'ngrok' for that to be the python library
 // name, so this has to explicitly set this as a crate with the '::' prefix
@@ -7,21 +11,42 @@ use async_rustls::rustls::ClientConfig;
 use bytes::Bytes;
 use lazy_static::lazy_static;
 use ngrok::{
-    session::{default_connect, ConnectError, SessionBuilder, Update},
+    session::{
+        default_connect,
+        ConnectError,
+        SessionBuilder,
+        Update,
+    },
     tunnel::AcceptError,
 };
 use parking_lot::Mutex as SyncMutex;
 use pyo3::{
-    pyclass, pyfunction, pymethods, types::PyByteArray, PyAny, PyErr, PyObject, PyRefMut, PyResult,
+    pyclass,
+    pyfunction,
+    pymethods,
+    types::PyByteArray,
+    PyAny,
+    PyErr,
+    PyObject,
+    PyRefMut,
+    PyResult,
     Python,
 };
-use tracing::{debug, info};
+use tracing::{
+    debug,
+    info,
+};
 
 use crate::{
     py_err,
-    tunnel::{list_tunnels, remove_global_tunnel},
+    tunnel::{
+        list_tunnels,
+        remove_global_tunnel,
+    },
     tunnel_builder::{
-        NgrokHttpTunnelBuilder, NgrokLabeledTunnelBuilder, NgrokTcpTunnelBuilder,
+        NgrokHttpTunnelBuilder,
+        NgrokLabeledTunnelBuilder,
+        NgrokTcpTunnelBuilder,
         NgrokTlsTunnelBuilder,
     },
 };
