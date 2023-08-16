@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Ngrok Session" href="ngrok_session.html" /><link rel="prev" title="The ngrok Agent SDK for Python" href="index.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Ngrok Session" href="ngrok_session.html" /><link rel="prev" title="The ngrok agent SDK for Python" href="index.html" />
 
     <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
         <title>Ngrok Session Builder - ngrok documentation</title>
@@ -215,18 +215,15 @@
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">authtoken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">authtoken</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Configures the session to authenticate with the provided authtoken. You
-can [find your existing authtoken] or [create a new one] in the ngrok
+can <a class="reference external" href="https://dashboard.ngrok.com/get-started/your-authtoken">find your existing authtoken</a> or <a class="reference external" href="https://dashboard.ngrok.com/tunnels/authtokens">create a new one</a> in the ngrok
 dashboard.</p>
-<p>See the [authtoken parameter in the ngrok docs] for additional details.</p>
-<p>[find your existing authtoken]: <a class="reference external" href="https://dashboard.ngrok.com/get-started/your-authtoken">https://dashboard.ngrok.com/get-started/your-authtoken</a>
-[create a new one]: <a class="reference external" href="https://dashboard.ngrok.com/tunnels/authtokens">https://dashboard.ngrok.com/tunnels/authtokens</a>
-[authtoken parameter in the ngrok docs]: <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#authtoken">https://ngrok.com/docs/ngrok-agent/config#authtoken</a></p>
+<p>See the <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#authtoken">authtoken parameter in the ngrok docs</a> for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">authtoken_from_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Shortcut for calling [SessionBuilder::authtoken] with the value of the
+<dd><p>Shortcut for calling <a class="reference external" href="https://docs.rs/ngrok/0.11.0/ngrok/session/struct.SessionBuilder.html#method.authtoken">SessionBuilder::authtoken</a> with the value of the
 NGROK_AUTHTOKEN environment variable.</p>
 </dd></dl>
 
@@ -238,8 +235,7 @@ establishing the session. Use this option only if you are connecting through
 a man-in-the-middle or deep packet inspection proxy. Pass in the bytes of the certificate
 to be used to validate the connection, then override the address to connect to via
 the server_addr call.</p>
-<p>Roughly corresponds to the [root_cas parameter in the ngrok docs].</p>
-<p>[root_cas parameter in the ngrok docs]: <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#root_cas">https://ngrok.com/docs/ngrok-agent/config#root_cas</a></p>
+<p>Roughly corresponds to the <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#root_cas">root_cas parameter in the ngrok docs</a>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -249,8 +245,7 @@ the server_addr call.</p>
 <p>This is a way for applications and library consumers of this crate
 identify themselves.</p>
 <p>This will add a new entry to the <cite>User-Agent</cite> field in the “most significant”
-(first) position. Comments must follow [RFC 7230] or a connection error may occur.</p>
-<p>[RFC 7230]: <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6">https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6</a></p>
+(first) position. Comments must follow <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6">RFC 7230</a> or a connection error may occur.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -283,13 +278,13 @@ in the session eventually dying as well.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">handle_restart_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Configures a function which is called when the ngrok service requests
-that this [Session] updates. Your application may choose to interpret
-this callback as a request to restart the [Session] or the entire
+that this <a class="reference external" href="https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html">Session</a> updates. Your application may choose to interpret
+this callback as a request to restart the <a class="reference external" href="https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html">Session</a> or the entire
 process.</p>
 <p>Errors returned by this function will be visible to the ngrok dashboard or
 API as the response to the Restart operation.</p>
 <p>Do not block inside this callback. It will cause the Dashboard or API
-stop operation to time out. Do not call [std::process::exit] inside this
+stop operation to time out. Do not call <a class="reference external" href="https://doc.rust-lang.org/std/process/fn.exit.html">std::process::exit</a> inside this
 callback, it will also cause the operation to time out.</p>
 </dd></dl>
 
@@ -297,12 +292,12 @@ callback, it will also cause the operation to time out.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">handle_stop_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Configures a function which is called when the ngrok service requests that
-this [Session] stops. Your application may choose to interpret this callback
-as a request to terminate the [Session] or the entire process.</p>
+this <a class="reference external" href="https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html">Session</a> stops. Your application may choose to interpret this callback
+as a request to terminate the <a class="reference external" href="https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html">Session</a> or the entire process.</p>
 <p>Errors returned by this function will be visible to the ngrok dashboard or
 API as the response to the Stop operation.</p>
 <p>Do not block inside this callback. It will cause the Dashboard or API
-stop operation to time out. Do not call [std::process::exit] inside this
+stop operation to time out. Do not call <a class="reference external" href="https://doc.rust-lang.org/std/process/fn.exit.html">std::process::exit</a> inside this
 callback, it will also cause the operation to time out.</p>
 </dd></dl>
 
@@ -310,13 +305,13 @@ callback, it will also cause the operation to time out.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">handle_update_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Configures a function which is called when the ngrok service requests
-that this [Session] updates. Your application may choose to interpret
+that this <a class="reference external" href="https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html">Session</a> updates. Your application may choose to interpret
 this callback as a request to update its configuration, itself, or to
 invoke some other application-specific behavior.</p>
 <p>Errors returned by this function will be visible to the ngrok dashboard or
 API as the response to the Restart operation.</p>
 <p>Do not block inside this callback. It will cause the Dashboard or API
-stop operation to time out. Do not call [std::process::exit] inside this
+stop operation to time out. Do not call <a class="reference external" href="https://doc.rust-lang.org/std/process/fn.exit.html">std::process::exit</a> inside this
 callback, it will also cause the operation to time out.</p>
 </dd></dl>
 
@@ -325,9 +320,8 @@ callback, it will also cause the operation to time out.</p>
 <span class="sig-name descname"><span class="pre">heartbeat_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heartbeat_interval</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Configures how often the session will send heartbeat messages to the ngrok
 service to check session liveness.</p>
-<p>See the [heartbeat_interval parameter in the ngrok docs] for additional
+<p>See the <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#heartbeat_interval">heartbeat_interval parameter in the ngrok docs</a> for additional
 details.</p>
-<p>[heartbeat_interval parameter in the ngrok docs]: <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#heartbeat_interval">https://ngrok.com/docs/ngrok-agent/config#heartbeat_interval</a></p>
 </dd></dl>
 
 <dl class="py method">
@@ -335,9 +329,8 @@ details.</p>
 <span class="sig-name descname"><span class="pre">heartbeat_tolerance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heartbeat_tolerance</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Configures the duration to wait for a response to a heartbeat before
 assuming the session connection is dead and attempting to reconnect.</p>
-<p>See the [heartbeat_tolerance parameter in the ngrok docs] for additional
+<p>See the <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#heartbeat_tolerance">heartbeat_tolerance parameter in the ngrok docs</a> for additional
 details.</p>
-<p>[heartbeat_tolerance parameter in the ngrok docs]: <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#heartbeat_tolerance">https://ngrok.com/docs/ngrok-agent/config#heartbeat_tolerance</a></p>
 </dd></dl>
 
 <dl class="py method">
@@ -347,8 +340,7 @@ details.</p>
 Metadata is made available to you in the ngrok dashboard and the Agents API
 resource. It is a useful way to allow you to uniquely identify sessions. We
 suggest encoding the value in a structured format like JSON.</p>
-<p>See the [metdata parameter in the ngrok docs] for additional details.</p>
-<p>[metdata parameter in the ngrok docs]: <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#metadata">https://ngrok.com/docs/ngrok-agent/config#metadata</a></p>
+<p>See the <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#metadata">metdata parameter in the ngrok docs</a> for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -356,8 +348,7 @@ suggest encoding the value in a structured format like JSON.</p>
 <span class="sig-name descname"><span class="pre">server_addr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Configures the network address to dial to connect to the ngrok service.
 Use this option only if you are connecting to a custom agent ingress.</p>
-<p>See the [server_addr parameter in the ngrok docs] for additional details.</p>
-<p>[server_addr parameter in the ngrok docs]: <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#server_addr">https://ngrok.com/docs/ngrok-agent/config#server_addr</a></p>
+<p>See the <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#server_addr">server_addr parameter in the ngrok docs</a> for additional details.</p>
 </dd></dl>
 
 </dd></dl>

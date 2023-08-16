@@ -1,10 +1,11 @@
-# The ngrok Agent SDK for Python
+# The ngrok agent SDK for Python
 
 [![PyPI][pypi-badge]][pypi-url]
 [![Supported Versions][ver-badge]][ver-url]
 [![MIT licensed][mit-badge]][mit-url]
 [![Apache-2.0 licensed][apache-badge]][apache-url]
 [![Continuous integration][ci-badge]][ci-url]
+![Status](https://img.shields.io/badge/Status-Beta-yellow)
 
 [pypi-badge]: https://img.shields.io/pypi/v/ngrok
 [pypi-url]: https://pypi.org/project/ngrok
@@ -19,7 +20,7 @@
 
 **Note: This is beta-quality software. Interfaces may change without warning.**
 
-[ngrok](https://ngrok.com) is a globally distributed reverse proxy commonly used for quickly getting a public URL to a
+[ngrok](https://ngrok.com/) is a globally distributed reverse proxy commonly used for quickly getting a public URL to a
 service running inside a private network, such as on your local laptop. The ngrok agent is usually
 deployed inside a private network and is used to communicate with the ngrok cloud service.
 

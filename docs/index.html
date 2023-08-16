@@ -205,14 +205,15 @@
         </div>
         <article role="main">
           <section id="the-ngrok-agent-sdk-for-python">
-<h1>The ngrok Agent SDK for Python<a class="headerlink" href="#the-ngrok-agent-sdk-for-python" title="Permalink to this heading">#</a></h1>
+<h1>The ngrok agent SDK for Python<a class="headerlink" href="#the-ngrok-agent-sdk-for-python" title="Permalink to this heading">#</a></h1>
 <p><a class="reference external" href="https://pypi.org/project/ngrok"><img alt="PyPI" src="https://img.shields.io/pypi/v/ngrok" /></a>
 <a class="reference external" href="https://pypi.org/project/ngrok"><img alt="Supported Versions" src="https://img.shields.io/pypi/pyversions/ngrok.svg" /></a>
 <a class="reference external" href="https://github.com/ngrok/ngrok-rust/blob/main/LICENSE-MIT"><img alt="MIT licensed" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
 <a class="reference external" href="https://github.com/ngrok/ngrok-rust/blob/main/LICENSE-APACHE"><img alt="Apache-2.0 licensed" src="https://img.shields.io/badge/license-Apache_2.0-blue.svg" /></a>
-<a class="reference external" href="https://github.com/ngrok/ngrok-python/actions/workflows/ci.yml"><img alt="Continuous integration" src="https://github.com/ngrok/ngrok-python/actions/workflows/ci.yml/badge.svg" /></a></p>
+<a class="reference external" href="https://github.com/ngrok/ngrok-python/actions/workflows/ci.yml"><img alt="Continuous integration" src="https://github.com/ngrok/ngrok-python/actions/workflows/ci.yml/badge.svg" /></a>
+<img alt="Status" src="https://img.shields.io/badge/Status-Beta-yellow" /></p>
 <p><strong>Note: This is beta-quality software. Interfaces may change without warning.</strong></p>
-<p><a class="reference external" href="https://ngrok.com">ngrok</a> is a globally distributed reverse proxy commonly used for quickly getting a public URL to a
+<p><a class="reference external" href="https://ngrok.com/">ngrok</a> is a globally distributed reverse proxy commonly used for quickly getting a public URL to a
 service running inside a private network, such as on your local laptop. The ngrok agent is usually
 deployed inside a private network and is used to communicate with the ngrok cloud service.</p>
 <p>This is the ngrok agent in library form, suitable for integrating directly into Python
@@ -220,35 +221,136 @@ applications. This allows you to quickly build ngrok into your application with 
 to manage.</p>
 <p>If you’re looking for the previous agent downloader project, it’s over <a class="reference external" href="https://github.com/OpenIoTHub/ngrok">here</a>.</p>
 </section>
-<section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h1>
-<p>The published library is available on
-<a class="reference external" href="https://pypi.org/project/ngrok">PyPI</a>.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>ngrok
-</pre></div>
-</div>
-<p>ngrok-python officially supports Python 3.7+.</p>
-</section>
 <section id="documentation">
 <h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">#</a></h1>
-<p>A quickstart guide and a full API reference are included in the <a class="reference external" href="https://ngrok.github.io/ngrok-python/">ngrok-python Python API documentation</a>.</p>
+<p>A quickstart guide and a full API reference are included in the <a class="reference external" href="https://ngrok.github.io/ngrok-python/">ngrok-python API documentation</a>.</p>
 </section>
 <section id="quickstart">
 <h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading">#</a></h1>
-<p>After you’ve installed the package, you’ll need an Auth Token. Retrieve one on the
-<a class="reference external" href="https://dashboard.ngrok.com/get-started/your-authtoken">Auth Token page of your ngrok dashboard</a></p>
-<p>There are multiple examples in <a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples">the /examples directory</a>.
-A minimal use-case looks like the following:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">create_tunnel</span><span class="p">():</span>
-    <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">NgrokSessionBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">authtoken_from_env</span><span class="p">()</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-    <span class="n">tunnel</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">http_endpoint</span><span class="p">()</span><span class="o">.</span><span class="n">listen</span><span class="p">()</span>
-    <span class="nb">print</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ingress established at </span><span class="si">{</span><span class="n">tunnel</span><span class="o">.</span><span class="n">url</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">tunnel</span><span class="o">.</span><span class="n">forward_tcp</span><span class="p">(</span><span class="s2">&quot;localhost:9000&quot;</span><span class="p">)</span>
+<ol class="arabic simple">
+<li><p>Install the <code class="docutils literal notranslate"><span class="pre">ngrok-python</span></code> package from <a class="reference external" href="https://pypi.org/project/ngrok">PyPI</a> using <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p></li>
+</ol>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>ngrok
 </pre></div>
 </div>
-<p>Or with <a class="reference external" href="https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py">the ‘connect’ convenience function</a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tunnel</span> <span class="o">=</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="mi">9000</span><span class="p">,</span> <span class="n">authtoken_from_env</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<ol class="arabic simple" start="2">
+<li><p>After you’ve installed the package, you’ll need an authtoken. Retrieve one on the
+<a class="reference external" href="https://dashboard.ngrok.com/get-started/your-authtoken">authtoken page of your ngrok dashboard</a>.</p></li>
+<li><p>Add the following code block using the <a class="reference external" href="https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py">connect method</a> to expose your python application at port <code class="docutils literal notranslate"><span class="pre">9000</span></code> on <code class="docutils literal notranslate"><span class="pre">localhost</span></code>:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ngrok</span>
+<span class="n">tunnel</span> <span class="o">=</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="mi">9000</span><span class="p">,</span> <span class="n">authtoken_from_env</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nb">print</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ingress established at </span><span class="si">{</span><span class="n">tunnel</span><span class="o">.</span><span class="n">url</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can find more examples in <a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples">the /examples directory</a>.</p>
+<section id="authorization">
+<h2>Authorization<a class="headerlink" href="#authorization" title="Permalink to this heading">#</a></h2>
+<p>To use most of ngrok’s features, you’ll need an authtoken. To obtain one, sign up for free at <a class="reference external" href="https://dashboard.ngrok.com/signup">ngrok.com</a> and retrieve it from the <a class="reference external" href="https://dashboard.ngrok.com/get-started/your-authtoken">authtoken page in your ngrok dashboard</a>. Once you have copied your authtoken, you can reference it in several ways.</p>
+<p>You can set it in the <code class="docutils literal notranslate"><span class="pre">NGROK_AUTHTOKEN</span></code> environment variable and pass <code class="docutils literal notranslate"><span class="pre">authtoken_from_env=True</span></code> to the <a class="reference external" href="https://ngrok.github.io/ngrok-python/module.html">connect</a> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ngrok</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">authtoken_from_env</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or pass the authtoken directly to the <a class="reference external" href="https://ngrok.github.io/ngrok-python/module.html">connect</a> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ngrok</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">authtoken</span><span class="o">=</span><span class="n">token</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or set it for all connections with the <a class="reference external" href="https://ngrok.github.io/ngrok-python/module.html">set_auth_token</a> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ngrok</span><span class="o">.</span><span class="n">set_auth_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="connection">
+<h2>Connection<a class="headerlink" href="#connection" title="Permalink to this heading">#</a></h2>
+<p>The <a class="reference external" href="https://ngrok.github.io/ngrok-python/module.html">connect</a> method is the easiest way to start an ngrok session and establish a tunnel to a specified address. If an asynchronous runtime is running, the <a class="reference external" href="https://ngrok.github.io/ngrok-python/module.html">connect</a> method returns a promise that resolves to the public tunnel object.</p>
+<p>With no arguments, the <a class="reference external" href="https://ngrok.github.io/ngrok-python/module.html">connect</a> method will start an HTTP tunnel to <code class="docutils literal notranslate"><span class="pre">localhost</span></code> port <code class="docutils literal notranslate"><span class="pre">80</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tunnel</span> <span class="o">=</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You can pass the port number to forward on <code class="docutils literal notranslate"><span class="pre">localhost</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tunnel</span> <span class="o">=</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="mi">4242</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or you can specify the host and port via a string:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tunnel</span> <span class="o">=</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;localhost:4242&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>More options can be passed to the <code class="docutils literal notranslate"><span class="pre">connect</span></code> method to customize the connection:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tunnel</span> <span class="o">=</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="mi">8080</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="s2">&quot;ngrok:online1line&quot;</span><span class="p">})</span>
+<span class="n">tunnel</span> <span class="o">=</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="mi">8080</span><span class="p">,</span> <span class="n">oauth_provider</span><span class="o">=</span><span class="s2">&quot;google&quot;</span><span class="p">,</span> <span class="n">oauth_allow_domains</span><span class="o">=</span><span class="s2">&quot;example.com&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The second (optional) argument is the tunnel type, which defaults to <code class="docutils literal notranslate"><span class="pre">http</span></code>. To create a TCP tunnel:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tunnel</span> <span class="o">=</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="mi">25565</span><span class="p">,</span> <span class="s2">&quot;tcp&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Since the options are kwargs, you can also use the <code class="docutils literal notranslate"><span class="pre">**</span></code> operator to pass a dictionary for configuration:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;authtoken_from_env&quot;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;response_header_add&quot;</span><span class="p">:</span><span class="s2">&quot;X-Awesome:yes&quot;</span><span class="p">}</span>
+<span class="n">tunnel</span> <span class="o">=</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="mi">8080</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="disconnection">
+<h2>Disconnection<a class="headerlink" href="#disconnection" title="Permalink to this heading">#</a></h2>
+<p>To close a tunnel use the <a class="reference external" href="https://ngrok.github.io/ngrok-python/module.html">disconnect</a> method with the <code class="docutils literal notranslate"><span class="pre">url</span></code> of the tunnel to close. If there is an asynchronous runtime running the <a class="reference external" href="https://ngrok.github.io/ngrok-python/module.html">disconnect</a> method returns a promise that resolves when the call is complete.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ngrok</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or omit the <code class="docutils literal notranslate"><span class="pre">url</span></code> to close all tunnels:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ngrok</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <a class="reference external" href="https://ngrok.github.io/ngrok-python/ngrok_tunnel.html">close</a> method on a tunnel will shut it down, and also stop the ngrok session if it is no longer needed. This method returns a promise that resolves when the tunnel is closed.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="n">tunnel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="listing-tunnels">
+<h2>Listing Tunnels<a class="headerlink" href="#listing-tunnels" title="Permalink to this heading">#</a></h2>
+<p>To list all current non-closed tunnels use the <a class="reference external" href="https://ngrok.github.io/ngrok-python/module.html">get_tunnels</a> method. If there is an asynchronous runtime running the <a class="reference external" href="https://ngrok.github.io/ngrok-python/module.html">get_tunnels</a> method returns a promise that resolves to the list of tunnel objects.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tunnels</span> <span class="o">=</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">get_tunnels</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="full-configuration">
+<h1>Full Configuration<a class="headerlink" href="#full-configuration" title="Permalink to this heading">#</a></h1>
+<p>This example shows <a class="reference external" href="https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-full.py">all the possible configuration items of ngrok.connect</a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tunnel</span> <span class="o">=</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+    <span class="c1"># session configuration</span>
+    <span class="n">addr</span><span class="o">=</span><span class="s2">&quot;localhost:8080&quot;</span><span class="p">,</span>
+    <span class="n">authtoken</span><span class="o">=</span><span class="s2">&quot;&lt;authtoken&gt;&quot;</span><span class="p">,</span>
+    <span class="n">authtoken_from_env</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">session_metadata</span><span class="o">=</span><span class="s2">&quot;Online in One Line&quot;</span><span class="p">,</span>
+    <span class="c1"># tunnel configuration</span>
+    <span class="n">basic_auth</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ngrok:online1line&quot;</span><span class="p">],</span>
+    <span class="n">circuit_breaker</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">compression</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">domain</span><span class="o">=</span><span class="s2">&quot;&lt;domain&gt;&quot;</span><span class="p">,</span>
+    <span class="n">ip_restriction_allow_cidrs</span><span class="o">=</span><span class="s2">&quot;0.0.0.0/0&quot;</span><span class="p">,</span>
+    <span class="n">ip_restriction_deny_cidrs</span><span class="o">=</span><span class="s2">&quot;10.1.1.1/32&quot;</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="o">=</span><span class="s2">&quot;example tunnel metadata from python&quot;</span><span class="p">,</span>
+    <span class="n">mutual_tls_cas</span><span class="o">=</span><span class="n">load_file</span><span class="p">(</span><span class="s2">&quot;ca.crt&quot;</span><span class="p">),</span>
+    <span class="n">oauth_provider</span><span class="o">=</span><span class="s2">&quot;google&quot;</span><span class="p">,</span>
+    <span class="n">oauth_allow_domains</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;domain&gt;&quot;</span><span class="p">],</span>
+    <span class="n">oauth_allow_emails</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;email&gt;&quot;</span><span class="p">],</span>
+    <span class="n">oauth_scopes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;scope&gt;&quot;</span><span class="p">],</span>
+    <span class="n">oidc_issuer_url</span><span class="o">=</span><span class="s2">&quot;&lt;url&gt;&quot;</span><span class="p">,</span>
+    <span class="n">oidc_client_id</span><span class="o">=</span><span class="s2">&quot;&lt;id&gt;&quot;</span><span class="p">,</span>
+    <span class="n">oidc_client_secret</span><span class="o">=</span><span class="s2">&quot;&lt;secret&gt;&quot;</span><span class="p">,</span>
+    <span class="n">oidc_allow_domains</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;domain&gt;&quot;</span><span class="p">],</span>
+    <span class="n">oidc_allow_emails</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;email&gt;&quot;</span><span class="p">],</span>
+    <span class="n">oidc_scopes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;scope&gt;&quot;</span><span class="p">],</span>
+    <span class="n">proxy_proto</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># One of: &quot;&quot;, &quot;1&quot;, &quot;2&quot;</span>
+    <span class="n">request_header_remove</span><span class="o">=</span><span class="s2">&quot;X-Req-Nope&quot;</span><span class="p">,</span>
+    <span class="n">response_header_remove</span><span class="o">=</span><span class="s2">&quot;X-Res-Nope&quot;</span><span class="p">,</span>
+    <span class="n">request_header_add</span><span class="o">=</span><span class="s2">&quot;X-Req-Yup:true&quot;</span><span class="p">,</span>
+    <span class="n">response_header_add</span><span class="o">=</span><span class="s2">&quot;X-Res-Yup:true&quot;</span><span class="p">,</span>
+    <span class="n">schemes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;HTTPS&quot;</span><span class="p">],</span>
+    <span class="n">verify_webhook_provider</span><span class="o">=</span><span class="s2">&quot;twilio&quot;</span><span class="p">,</span>
+    <span class="n">verify_webhook_secret</span><span class="o">=</span><span class="s2">&quot;asdf&quot;</span><span class="p">,</span>
+    <span class="n">websocket_tcp_converter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -288,6 +390,7 @@ python<span class="w"> </span>-m<span class="w"> </span>ngrok<span class="w"> </
 <h2>Frameworks<a class="headerlink" href="#frameworks" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://docs.aiohttp.org">Aiohttp</a> - <a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples/aiohttp-ngrok.py">Example</a></p></li>
+<li><p><a class="reference external" href="https://aws.amazon.com/apprunner/">AWS App Runner</a> - See the <a class="reference external" href="https://github.com/ngrok/ngrok-sdk-serverless-example">ngrok SDK Serverless Example</a> repository, making the necessary <a class="reference external" href="https://docs.aws.amazon.com/apprunner/latest/dg/service-source-code-python.html">changes to use Python</a> instead of NodeJS</p></li>
 <li><p><a class="reference external" href="https://www.djangoproject.com/">Django</a> - <a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples/django-single-file.py">Single File Example</a>, <a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples/djangosite/manage.py">Modify manage.py Example</a>, <a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples/djangosite/djangosite/ngrok-asgi.py">Modify asgi.py Example</a>, or use the <code class="docutils literal notranslate"><span class="pre">ngrok-asgi</span></code> ASGI Runner discussed above</p></li>
 <li><p><a class="reference external" href="https://flask.palletsprojects.com">Flask</a> - <a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples/flask-ngrok.py">Example</a></p></li>
 <li><p><a class="reference external" href="https://gunicorn.org/">Gunicorn</a> - Use the <code class="docutils literal notranslate"><span class="pre">ngrok-asgi</span></code> ASGI Runner discussed above</p></li>
@@ -313,6 +416,19 @@ python<span class="w"> </span>-m<span class="w"> </span>ngrok<span class="w"> </
 <li><p>TLS - <a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tls.py">Example</a></p></li>
 </ul>
 </section>
+</section>
+<section id="builders">
+<h1>Builders<a class="headerlink" href="#builders" title="Permalink to this heading">#</a></h1>
+<p>For more control over Sessions and Tunnels, the builder classes can be used.</p>
+<p>A minimal example using the builder class looks like <a class="reference external" href="https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-minimal.py">the following</a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">create_tunnel</span><span class="p">():</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">NgrokSessionBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">authtoken_from_env</span><span class="p">()</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+    <span class="n">tunnel</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">http_endpoint</span><span class="p">()</span><span class="o">.</span><span class="n">listen</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ingress established at </span><span class="si">{</span><span class="n">tunnel</span><span class="o">.</span><span class="n">url</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">tunnel</span><span class="o">.</span><span class="n">forward_tcp</span><span class="p">(</span><span class="s2">&quot;localhost:9000&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See here for a <a class="reference external" href="https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-full.py">Full Configuration Example</a></p>
 </section>
 <section id="platform-support">
 <h1>Platform Support<a class="headerlink" href="#platform-support" title="Permalink to this heading">#</a></h1>
