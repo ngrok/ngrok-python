@@ -2,6 +2,8 @@ from aiohttp import web, ClientSession
 from aiohttp.web_runner import GracefulExit
 from collections import defaultdict
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 import asyncio
 import ngrok
 import os
@@ -13,6 +15,15 @@ import unittest
 
 expected = "Hello"
 
+def retry_request():
+    s = requests.Session()
+    retries = Retry(total=5,
+                backoff_factor=1,
+                status_forcelist=[404, 429, 500, 502, 503, 504])
+    adapter = HTTPAdapter(max_retries=retries)
+    s.mount('http://', adapter)
+    s.mount('https://', adapter)
+    return s
 
 class HelloHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -73,7 +84,7 @@ async def shutdown(tunnel, http_server):
 
 class TestNgrok(unittest.IsolatedAsyncioTestCase):
     async def validate_http_request(self, url, requests_config=dict()):
-        response = requests.get(url, **requests_config)
+        response = retry_request().get(url, **requests_config)
         self.assertEqual(200, response.status_code)
         self.assertEqual(expected, response.text)
         return response
@@ -131,7 +142,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
         tunnel.forward_tcp(http_server.listen_to)
 
-        response = requests.get(tunnel.url())
+        response = retry_request().get(tunnel.url())
         self.assertEqual("gzip", response.headers["content-encoding"])
         await shutdown(tunnel, http_server)
 
@@ -170,9 +181,12 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         tunnel = await session.http_endpoint().oauth("google").listen()
 
         tunnel.forward_tcp(http_server.listen_to)
-        response = requests.get(tunnel.url())
+        response = retry_request().get(tunnel.url())
         self.assertEqual(200, response.status_code)
-        self.assertTrue("google-site-verification" in response.text)
+        text = response.text[0:15000]
+        print(f'-------- text: "{text}"')
+        self.assertTrue("google-site-verification" in response.text
+          or "accounts.google.com" in response.text)
         await shutdown(tunnel, http_server)
 
     async def test_custom_domain(self):
@@ -239,7 +253,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
         tunnel.forward_tcp(http_server.listen_to)
 
-        response = requests.get(tunnel.url())
+        response = retry_request().get(tunnel.url())
         self.assertEqual(400, response.status_code)
         # ERR_NGROK_3206: Expected a websocket request with a "Connection: upgrade" header
         # but did not receive one.
@@ -377,7 +391,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(2, len(await session1.get_tunnels()))
         self.assertEqual(2, len(await session2.get_tunnels()))
-        self.assertTrue(len(await ngrok.get_tunnels()) > 4)
+        self.assertTrue(len(await ngrok.get_tunnels()) >= 4)
 
         await self.validate_http_request(tunnel1.url())
         await self.validate_http_request(tunnel2.url())

@@ -3,6 +3,7 @@ import os
 import requests
 import unittest
 import test
+from test import retry_request
 
 
 def shutdown(url, http_server):
@@ -13,7 +14,7 @@ def shutdown(url, http_server):
 
 class TestNgrok(unittest.IsolatedAsyncioTestCase):
     def validate_http_request(self, url, requests_config=dict()):
-        response = requests.get(url, **requests_config)
+        response = retry_request().get(url, **requests_config)
         self.assertEqual(200, response.status_code)
         self.assertEqual(test.expected, response.text)
         return response
