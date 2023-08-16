@@ -5,6 +5,7 @@
 [![MIT licensed][mit-badge]][mit-url]
 [![Apache-2.0 licensed][apache-badge]][apache-url]
 [![Continuous integration][ci-badge]][ci-url]
+![Status](https://img.shields.io/badge/Status-Beta-yellow)
 
 [pypi-badge]: https://img.shields.io/pypi/v/ngrok
 [pypi-url]: https://pypi.org/project/ngrok

@@ -160,21 +160,21 @@ impl NgrokSessionBuilder {
     }
 
     /// Configures the session to authenticate with the provided authtoken. You
-    /// can [find your existing authtoken] or [create a new one] in the ngrok
+    /// can `find your existing authtoken`_ or `create a new one`_ in the ngrok
     /// dashboard.
     ///
-    /// See the [authtoken parameter in the ngrok docs] for additional details.
+    /// See the `authtoken parameter in the ngrok docs`_ for additional details.
     ///
-    /// [find your existing authtoken]: https://dashboard.ngrok.com/get-started/your-authtoken
-    /// [create a new one]: https://dashboard.ngrok.com/tunnels/authtokens
-    /// [authtoken parameter in the ngrok docs]: https://ngrok.com/docs/ngrok-agent/config#authtoken
+    /// .. _find your existing authtoken: https://dashboard.ngrok.com/get-started/your-authtoken
+    /// .. _create a new one: https://dashboard.ngrok.com/tunnels/authtokens
+    /// .. _authtoken parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#authtoken
     pub fn authtoken(mut self_: PyRefMut<Self>, authtoken: String) -> PyRefMut<Self> {
         self_.set(|b| b.authtoken(authtoken));
         self_.borrow_mut().auth_token_set();
         self_
     }
 
-    /// Shortcut for calling [SessionBuilder::authtoken] with the value of the
+    /// Shortcut for calling `SessionBuilder::authtoken <https://docs.rs/ngrok/0.11.0/ngrok/session/struct.SessionBuilder.html#method.authtoken>`_ with the value of the
     /// NGROK_AUTHTOKEN environment variable.
     pub fn authtoken_from_env(mut self_: PyRefMut<Self>) -> PyRefMut<Self> {
         self_.set(|b| b.authtoken_from_env());
@@ -188,9 +188,9 @@ impl NgrokSessionBuilder {
     /// identify themselves.
     ///
     /// This will add a new entry to the `User-Agent` field in the "most significant"
-    /// (first) position. Comments must follow [RFC 7230] or a connection error may occur.
+    /// (first) position. Comments must follow `RFC 7230`_ or a connection error may occur.
     ///
-    /// [RFC 7230]: https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6
+    /// .. _RFC 7230: https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6
     pub fn client_info(
         self_: PyRefMut<Self>,
         client_type: String,
@@ -204,10 +204,10 @@ impl NgrokSessionBuilder {
     /// Configures how often the session will send heartbeat messages to the ngrok
     /// service to check session liveness.
     ///
-    /// See the [heartbeat_interval parameter in the ngrok docs] for additional
+    /// See the `heartbeat_interval parameter in the ngrok docs`_ for additional
     /// details.
     ///
-    /// [heartbeat_interval parameter in the ngrok docs]: https://ngrok.com/docs/ngrok-agent/config#heartbeat_interval
+    /// .. _heartbeat_interval parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#heartbeat_interval
     pub fn heartbeat_interval(self_: PyRefMut<Self>, heartbeat_interval: u32) -> PyRefMut<Self> {
         self_.set(|b| b.heartbeat_interval(Duration::new(heartbeat_interval.into(), 0)));
         self_
@@ -216,10 +216,10 @@ impl NgrokSessionBuilder {
     /// Configures the duration to wait for a response to a heartbeat before
     /// assuming the session connection is dead and attempting to reconnect.
     ///
-    /// See the [heartbeat_tolerance parameter in the ngrok docs] for additional
+    /// See the `heartbeat_tolerance parameter in the ngrok docs`_ for additional
     /// details.
     ///
-    /// [heartbeat_tolerance parameter in the ngrok docs]: https://ngrok.com/docs/ngrok-agent/config#heartbeat_tolerance
+    /// .. _heartbeat_tolerance parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#heartbeat_tolerance
     pub fn heartbeat_tolerance(self_: PyRefMut<Self>, heartbeat_tolerance: u32) -> PyRefMut<Self> {
         self_.set(|b| b.heartbeat_tolerance(Duration::new(heartbeat_tolerance.into(), 0)));
         self_
@@ -230,9 +230,9 @@ impl NgrokSessionBuilder {
     /// resource. It is a useful way to allow you to uniquely identify sessions. We
     /// suggest encoding the value in a structured format like JSON.
     ///
-    /// See the [metdata parameter in the ngrok docs] for additional details.
+    /// See the `metdata parameter in the ngrok docs`_ for additional details.
     ///
-    /// [metdata parameter in the ngrok docs]: https://ngrok.com/docs/ngrok-agent/config#metadata
+    /// .. _metdata parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#metadata
     pub fn metadata(self_: PyRefMut<Self>, metadata: String) -> PyRefMut<Self> {
         self_.set(|b| b.metadata(metadata));
         self_
@@ -241,9 +241,9 @@ impl NgrokSessionBuilder {
     /// Configures the network address to dial to connect to the ngrok service.
     /// Use this option only if you are connecting to a custom agent ingress.
     ///
-    /// See the [server_addr parameter in the ngrok docs] for additional details.
+    /// See the `server_addr parameter in the ngrok docs`_ for additional details.
     ///
-    /// [server_addr parameter in the ngrok docs]: https://ngrok.com/docs/ngrok-agent/config#server_addr
+    /// .. _server_addr parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#server_addr
     pub fn server_addr(self_: PyRefMut<Self>, addr: String) -> PyRefMut<Self> {
         self_.set(|b| b.server_addr(addr));
         self_
@@ -255,9 +255,9 @@ impl NgrokSessionBuilder {
     /// to be used to validate the connection, then override the address to connect to via
     /// the server_addr call.
     ///
-    /// Roughly corresponds to the [root_cas parameter in the ngrok docs].
+    /// Roughly corresponds to the `root_cas parameter in the ngrok docs`_.
     ///
-    /// [root_cas parameter in the ngrok docs]: https://ngrok.com/docs/ngrok-agent/config#root_cas
+    /// .. _root_cas parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#root_cas
     pub fn ca_cert<'a>(self_: PyRefMut<'a, Self>, cert_bytes: &PyByteArray) -> PyRefMut<'a, Self> {
         self_.set(|b| b.ca_cert(Bytes::from(cert_bytes.to_vec())));
         self_
@@ -276,15 +276,17 @@ impl NgrokSessionBuilder {
     }
 
     /// Configures a function which is called when the ngrok service requests that
-    /// this [Session] stops. Your application may choose to interpret this callback
-    /// as a request to terminate the [Session] or the entire process.
+    /// this `Session`_ stops. Your application may choose to interpret this callback
+    /// as a request to terminate the `Session`_ or the entire process.
     ///
     /// Errors returned by this function will be visible to the ngrok dashboard or
     /// API as the response to the Stop operation.
     ///
     /// Do not block inside this callback. It will cause the Dashboard or API
-    /// stop operation to time out. Do not call [std::process::exit] inside this
+    /// stop operation to time out. Do not call `std::process::exit <https://doc.rust-lang.org/std/process/fn.exit.html>`_ inside this
     /// callback, it will also cause the operation to time out.
+    ///
+    /// .. _Session: https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html
     pub fn handle_stop_command(self_: PyRefMut<'_, Self>, handler: PyObject) -> PyRefMut<'_, Self> {
         self_.set(|b| {
             b.handle_stop_command(move |_req| {
@@ -301,16 +303,18 @@ impl NgrokSessionBuilder {
     }
 
     /// Configures a function which is called when the ngrok service requests
-    /// that this [Session] updates. Your application may choose to interpret
-    /// this callback as a request to restart the [Session] or the entire
+    /// that this `Session`_ updates. Your application may choose to interpret
+    /// this callback as a request to restart the `Session`_ or the entire
     /// process.
     ///
     /// Errors returned by this function will be visible to the ngrok dashboard or
     /// API as the response to the Restart operation.
     ///
     /// Do not block inside this callback. It will cause the Dashboard or API
-    /// stop operation to time out. Do not call [std::process::exit] inside this
+    /// stop operation to time out. Do not call `std::process::exit <https://doc.rust-lang.org/std/process/fn.exit.html>`_ inside this
     /// callback, it will also cause the operation to time out.
+    ///
+    /// .. _Session: https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html
     pub fn handle_restart_command(
         self_: PyRefMut<'_, Self>,
         handler: PyObject,
@@ -330,7 +334,7 @@ impl NgrokSessionBuilder {
     }
 
     /// Configures a function which is called when the ngrok service requests
-    /// that this [Session] updates. Your application may choose to interpret
+    /// that this `Session`_ updates. Your application may choose to interpret
     /// this callback as a request to update its configuration, itself, or to
     /// invoke some other application-specific behavior.
     ///
@@ -338,8 +342,10 @@ impl NgrokSessionBuilder {
     /// API as the response to the Restart operation.
     ///
     /// Do not block inside this callback. It will cause the Dashboard or API
-    /// stop operation to time out. Do not call [std::process::exit] inside this
+    /// stop operation to time out. Do not call `std::process::exit <https://doc.rust-lang.org/std/process/fn.exit.html>`_ inside this
     /// callback, it will also cause the operation to time out.
+    ///
+    /// .. _Session: https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html
     pub fn handle_update_command(
         self_: PyRefMut<'_, Self>,
         handler: PyObject,

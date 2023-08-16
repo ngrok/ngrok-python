@@ -221,8 +221,8 @@ impl NgrokTunnel {
     }
 
     /// Returns a human-readable string presented in the ngrok dashboard
-    /// and the Tunnels API. Use the [HttpTunnelBuilder::forwards_to],
-    /// [TcpTunnelBuilder::forwards_to], etc. to set this value
+    /// and the Tunnels API. Use the `HttpTunnelBuilder::forwards_to <https://docs.rs/ngrok/0.11.0/ngrok/config/struct.HttpTunnelBuilder.html#method.forwards_to>`_,
+    /// `TcpTunnelBuilder::forwards_to <https://docs.rs/ngrok/0.11.0/ngrok/config/struct.TcpTunnelBuilder.html#method.forwards_to>`_, etc. to set this value
     /// explicitly.
     pub fn forwards_to(&self) -> String {
         self.tun_meta.forwards_to.clone()
