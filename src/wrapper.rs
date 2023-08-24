@@ -137,7 +137,7 @@ pub fn listen(
         {
             let address: &PyTuple = server_address_attr.downcast(py)?;
             format!(
-                "input.forward_tcp('{}:{}')",
+                "input.forward('{}:{}')",
                 address.get_item(0)?,
                 address.get_item(1)?
             )
@@ -146,7 +146,7 @@ pub fn listen(
             .is_instance(py.get_type::<PyString>())?
         {
             let address: &PyString = server_address_attr.downcast(py)?;
-            format!("input.forward_pipe('{address}')")
+            format!("input.forward('{address}')")
         } else {
             return Err(py_err(format!(
                 "Unhandled server_address type: {address_type}"

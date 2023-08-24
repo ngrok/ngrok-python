@@ -27,7 +27,7 @@ if os.name == "nt":  # windows
 
     async def setup():
         tunnel = await ngrok.default()
-        tunnel.forward_tcp("localhost:8000")
+        tunnel.forward("localhost:8000")
 
     asyncio.run(setup())
     uvicorn.run(app=app)

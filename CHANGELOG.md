@@ -1,3 +1,6 @@
+## 0.9.0
+* Flattened `tunnel.foward_pipe()` and `tunnel.foward_tcp()` into `tunnel.foward()`. Determination will be made based on `addr` input.
+
 ## 0.8.1:
 
 * Cleanly return from a tunnel forward call after a `session.close()`

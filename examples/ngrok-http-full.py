@@ -70,9 +70,11 @@ async def create_tunnel(httpd):
         .metadata("example tunnel metadata from python").listen()
     )
     sock = httpd.server_address
-    tunnel.forward_pipe(sock) if os.name != "nt" else tunnel.forward_tcp(
-        f"localhost:{sock[1]}"
-    )
+    if os.name != "nt":
+        # Set up a unix socket wrapper around standard http server
+        tunnel.foward(sock)
+    else:
+        tunnel.forward(f"localhost:{sock[1]}")
 
 
 def load_file(name):

@@ -26,7 +26,7 @@ async def setup_tunnel():
         .listen()
     )
     print(f"Forwarding to {listen} from ingress url: {tunnel.url()}")
-    tunnel.forward_tcp(listen)
+    tunnel.forward(listen)
 
 
 try:

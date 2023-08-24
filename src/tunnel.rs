@@ -50,6 +50,7 @@ use tracing::{
 #[cfg(target_os = "windows")]
 use crate::wrapper::wrap_object;
 use crate::{
+    connect::PIPE_PREFIX,
     py_err,
     wrapper::{
         self,
@@ -233,18 +234,12 @@ impl NgrokTunnel {
         self.tun_meta.metadata.clone()
     }
 
-    /// Forward incoming tunnel connections to the provided TCP address.
-    pub fn forward_tcp<'a>(&self, py: Python<'a>, addr: String) -> PyResult<&'a PyAny> {
+    /// Forward incoming tunnel connections. This can be either a TCP address or a file socket path.
+    /// For file socket paths on Linux/Darwin, addr can be a unix domain socket path, e.g. "/tmp/ngrok.sock"
+    ///     On Windows, addr can be a named pipe, e.e. "\\\\.\\pipe\\an_ngrok_pipe"
+    pub fn forward<'a>(&self, py: Python<'a>, addr: String) -> PyResult<&'a PyAny> {
         let id = self.tun_meta.id.clone();
-        pyo3_asyncio::tokio::future_into_py(py, async move { forward_tcp(&id, addr).await })
-    }
-
-    /// Forward incoming tunnel connections to the provided file socket path.
-    /// On Linux/Darwin addr can be a unix domain socket path, e.g. "/tmp/ngrok.sock"
-    /// On Windows addr can be a named pipe, e.e. "\\\\.\\pipe\\an_ngrok_pipe"
-    pub fn forward_pipe<'a>(&self, py: Python<'a>, addr: String) -> PyResult<&'a PyAny> {
-        let id = self.tun_meta.id.clone();
-        pyo3_asyncio::tokio::future_into_py(py, async move { forward_pipe(&id, addr).await })
+        pyo3_asyncio::tokio::future_into_py(py, async move { forward(&id, addr).await })
     }
 
     /// Close the tunnel.
@@ -331,13 +326,13 @@ impl NgrokTunnel {
             if self.get_family(py)?.as_ref(py).eq(af_unix)? {
                 // pipe
                 let sockname_str: &PyString = sockname.downcast(py)?;
-                self.forward_pipe(py, sockname_str.to_string())?;
+                self.forward(py, format!("pipe:{sockname_str}"))?;
                 return result;
             }
         }
         // fallback to tcp
         let sockname_tuple: &PyTuple = sockname.downcast(py)?;
-        self.forward_tcp(py, format!("localhost:{}", sockname_tuple.get_item(1)?))?;
+        self.forward(py, format!("localhost:{}", sockname_tuple.get_item(1)?))?;
         result
     }
 
@@ -413,31 +408,34 @@ make_tunnel_type! {
     NgrokLabeledTunnel, LabeledTunnel, label
 }
 
-pub async fn forward_tcp(id: &String, addr: String) -> PyResult<()> {
-    info!("Tunnel {id:?} TCP forwarding to {addr:?}");
-    let res = get_storage_by_id(id)
-        .await?
-        .tunnel
-        .lock()
-        .await
-        .fwd_tcp(addr)
-        .await;
+pub async fn forward(id: &String, addr: String) -> PyResult<()> {
+    let tun = &get_storage_by_id(id).await?.tunnel;
+    let is_pipe =
+        addr.starts_with(PIPE_PREFIX) || addr.starts_with("unix:") || addr.starts_with("tun-");
 
-    debug!("forward_tcp returning");
-    canceled_is_ok(res)
-}
+    let res = if is_pipe {
+        let mut tun_addr = addr.clone();
+        tun_addr = tun_addr
+            .strip_prefix(PIPE_PREFIX)
+            .unwrap_or(&tun_addr)
+            .to_string();
+        tun_addr = tun_addr
+            .strip_prefix("unix:")
+            .unwrap_or(&tun_addr)
+            .to_string();
 
-pub async fn forward_pipe(id: &String, addr: String) -> PyResult<()> {
-    info!("Tunnel {id:?} Pipe forwarding to {addr:?}");
-    let res = get_storage_by_id(id)
-        .await?
-        .tunnel
-        .lock()
-        .await
-        .fwd_pipe(addr)
-        .await;
+        info!("Tunnel {id:?} Pipe forwarding to {tun_addr:?}");
+        tun.lock().await.fwd_pipe(tun_addr).await
+    } else {
+        info!("Tunnel {id:?} TCP forwarding to {addr:?}");
+        tun.lock().await.fwd_tcp(addr).await
+    };
 
-    debug!("forward_pipe returning");
+    if is_pipe {
+        debug!("forward_pipe returning");
+    } else {
+        debug!("forward_tcp returning");
+    }
     canceled_is_ok(res)
 }
 

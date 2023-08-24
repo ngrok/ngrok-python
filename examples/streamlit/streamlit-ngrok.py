@@ -24,7 +24,7 @@ async def setup_tunnel():
         fg="green",
         bold=True,
     )
-    tunnel.forward_tcp(listen)
+    tunnel.forward(listen)
 
 
 try:

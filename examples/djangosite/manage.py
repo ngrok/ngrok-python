@@ -16,7 +16,7 @@ def main():
             listen = sys.argv[2] if len(sys.argv) > 2 else "localhost:8000"
             tunnel = await ngrok.default()
             print(f"Forwarding to {listen} from ingress url: {tunnel.url()}")
-            tunnel.forward_tcp(listen)
+            tunnel.forward(listen)
 
         asyncio.run(setup())
     """End added by ngrok"""

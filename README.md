@@ -251,7 +251,7 @@ async def create_tunnel():
     session = await ngrok.NgrokSessionBuilder().authtoken_from_env().connect()
     tunnel = await session.http_endpoint().listen()
     print (f"Ingress established at {tunnel.url()}")
-    tunnel.forward_tcp("localhost:9000")
+    tunnel.forward("localhost:9000")
 ```
 
 See here for a [Full Configuration Example](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-full.py)
