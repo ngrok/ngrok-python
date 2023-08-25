@@ -2,9 +2,11 @@
 
 import asyncio, logging, ngrok, os, socketserver, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from typing import Union
+from socketserver import TCPServer, UnixStreamServer
 
 
-async def create_tunnel():
+async def create_tunnel() -> ngrok.NgrokTunnel:
     # create session
     session = (
         await ngrok.NgrokSessionBuilder()
@@ -44,7 +46,7 @@ class HelloHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
 
-httpd = ThreadingHTTPServer(("localhost", 0), HelloHandler)
+httpd: Union[TCPServer, UnixStreamServer] = ThreadingHTTPServer(("localhost", 0), HelloHandler)
 if os.name != "nt":
     # Set up a unix socket wrapper around standard http server
     class UnixSocketHttpServer(socketserver.UnixStreamServer):

@@ -125,14 +125,14 @@ impl NgrokHttpTunnelBuilder {
     /// OIDC configuration.
     /// If not called, OIDC is disabled.
     ///
-    /// :param str provider: The name of the OIDC provider to use.
+    /// :param str issuer_url: The name of the OIDC issuer URL to use.
     /// :param str client_id: The OIDC client ID.
     /// :param str client_secret: The OIDC client secret.
     /// :param list or None allow_emails: A list of email addresses to allow.
     /// :param list or None allow_domains: A list of domain names to allow.
     /// :param list or None scopes: A list of scopes.
     #[pyo3(
-        text_signature = "(provider, client_id, client_secret, allow_emails=None, allow_domains=None, scopes=None)"
+        text_signature = "(issuer_url, client_id, client_secret, allow_emails=None, allow_domains=None, scopes=None)"
     )]
     pub fn oidc(
         self_: PyRefMut<Self>,

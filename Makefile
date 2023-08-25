@@ -108,6 +108,15 @@ run-tls: develop
 run-uvicorn: develop examples-install
 	. $(BIN)/activate && python ./examples/uvicorn-ngrok.py
 
+mypy: develop
+	. $(BIN)/activate && mypy ./examples/ngrok-connect-minimal.py
+	. $(BIN)/activate && mypy ./examples/ngrok-connect-full.py
+	. $(BIN)/activate && mypy ./examples/ngrok-http-minimal.py
+	. $(BIN)/activate && mypy ./examples/ngrok-http-full.py
+	. $(BIN)/activate && mypy ./examples/ngrok-labeled.py
+	. $(BIN)/activate && mypy ./examples/ngrok-tcp.py
+	. $(BIN)/activate && mypy ./examples/ngrok-tls.py
+
 # e.g.: make test='-k TestNgrok.test_gzip_tunnel' test
 test: develop
 	. $(BIN)/activate && python -m unittest discover test $(test)
