@@ -51,6 +51,7 @@ use tracing::{
 use crate::wrapper::wrap_object;
 use crate::{
     py_err,
+    py_ngrok_err,
     wrapper::{
         self,
         bound_default_pipe_socket,
@@ -263,7 +264,7 @@ impl NgrokTunnel {
             let res = session
                 .close_tunnel(id.clone())
                 .await
-                .map_err(|e| py_err(format!("error closing tunnel: {e:?}")));
+                .map_err(|e| py_ngrok_err("error closing tunnel", &e));
 
             // drop our internal reference to the tunnel after awaiting close
             remove_global_tunnel(&id).await?;
@@ -506,7 +507,7 @@ pub(crate) async fn close_url(url: Option<String>) -> PyResult<()> {
                 .session
                 .close_tunnel(id)
                 .await
-                .map_err(|e| py_err(format!("error closing tunnel: {e:?}")))?;
+                .map_err(|e| py_ngrok_err("error closing tunnel", &e))?;
             close_ids.push(id.clone());
         }
     }

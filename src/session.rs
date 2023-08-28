@@ -38,7 +38,7 @@ use tracing::{
 };
 
 use crate::{
-    py_err,
+    py_ngrok_err,
     tunnel::{
         list_tunnels,
         remove_global_tunnel,
@@ -411,7 +411,7 @@ async fn do_connect(builder: Option<SessionBuilder>) -> Result<NgrokSession, PyE
                 raw_session: Arc::new(SyncMutex::new(s)),
             }
         })
-        .map_err(|e| py_err(format!("failed to connect session, {e:?}")))
+        .map_err(|e| py_ngrok_err("failed to connect session", &e))
 }
 
 impl Drop for NgrokSessionBuilder {
@@ -470,7 +470,7 @@ impl NgrokSession {
             let res = session
                 .close_tunnel(id.clone())
                 .await
-                .map_err(|e| py_err(format!("failed to close tunnel, {e:?}")));
+                .map_err(|e| py_ngrok_err("failed to connect session", &e));
 
             if res.is_ok() {
                 // remove our reference to allow it to drop
@@ -487,7 +487,7 @@ impl NgrokSession {
             session
                 .close()
                 .await
-                .map_err(|e| py_err(format!("failed to close tunnel, {e:?}")))
+                .map_err(|e| py_ngrok_err("failed to close tunnel", &e))
         })
     }
 }
