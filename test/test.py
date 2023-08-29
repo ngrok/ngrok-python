@@ -138,7 +138,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         tunnel = await session.http_endpoint().listen()
         self.assertTrue(http_server.listen_to.startswith("tun-"))
 
-        tunnel.forward(f"pipe:{http_server.listen_to}")
+        tunnel.forward(f"unix:{http_server.listen_to}")
 
         await self.validate_http_request(tunnel.url())
         await shutdown(tunnel, http_server)
@@ -152,6 +152,16 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         response = retry_request().get(tunnel.url())
         self.assertEqual("gzip", response.headers["content-encoding"])
         await shutdown(tunnel, http_server)
+
+    async def test_tls_backend(self):
+        session = await make_session()
+        tunnel = await session.http_endpoint().listen()
+        tunnel.forward("https://dashboard.ngrok.com")
+
+        response = retry_request().get(tunnel.url())
+        self.assertEqual(421, response.status_code)
+        self.assertTrue(response.headers["ngrok-trace-id"])
+        await tunnel.close()
 
     async def test_http_headers(self):
         http_server, session = await make_http_and_session()
@@ -410,7 +420,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         await tunnel3.close()
         await tunnel4.close()
 
-    async def test_pipe_multipass(self):
+    async def test_unix_multipass(self):
         http_server, session1 = await make_http_and_session(use_unix_socket=True)
         session2 = await make_session()
         tunnel1 = await session1.http_endpoint().listen()
@@ -418,10 +428,10 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         tunnel3 = await session2.http_endpoint().listen()
         tunnel4 = await session2.tcp_endpoint().listen()
 
-        tunnel1.forward(f"pipe:{http_server.listen_to}")
-        tunnel2.forward(f"pipe:{http_server.listen_to}")
-        tunnel3.forward(f"pipe:{http_server.listen_to}")
-        tunnel4.forward(f"pipe:{http_server.listen_to}")
+        tunnel1.forward(f"unix:{http_server.listen_to}")
+        tunnel2.forward(f"unix:{http_server.listen_to}")
+        tunnel3.forward(f"unix:{http_server.listen_to}")
+        tunnel4.forward(f"unix:{http_server.listen_to}")
 
         await self.validate_http_request(tunnel1.url())
         await self.validate_http_request(tunnel2.url())

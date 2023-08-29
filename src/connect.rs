@@ -50,8 +50,6 @@ lazy_static! {
     pub(crate) static ref SESSION: Mutex<Option<NgrokSession>> = Mutex::new(None);
 }
 
-pub(crate) const PIPE_PREFIX: &str = "pipe:";
-
 /// Single string configuration
 macro_rules! plumb {
     ($builder:tt, $self:tt, $config:tt, $name:tt) => {
@@ -163,25 +161,20 @@ pub fn connect(
 ) -> PyResult<Py<PyAny>> {
     let kwargs: &PyDict = options.unwrap_or(PyDict::new(py));
     // decode address string
-    let mut addr_str = "localhost:80".to_string();
+    let mut addr_str = "tcp://localhost:80".to_string();
     if let Some(a) = addr {
         if a.is_instance(py.get_type::<PyInt>())? {
-            addr_str = format!("localhost:{}", a.downcast::<PyInt>()?.extract::<i32>()?);
+            addr_str = format!(
+                "tcp://localhost:{}",
+                a.downcast::<PyInt>()?.extract::<i32>()?
+            );
         } else if a.is_instance(py.get_type::<PyString>())? {
             addr_str = a.downcast::<PyString>()?.extract::<String>()?;
 
-            // Fix up an addr that mistakenly has a protocol or is missing a port
-            let mut assume_port = 80;
+            // Fix up an addr that is missing a port
             let original = addr_str.clone();
-            if addr_str.starts_with("http://") {
-                addr_str = addr_str.split_once("://").unwrap().1.to_string();
-            }
-            if addr_str.starts_with("https://") {
-                addr_str = addr_str.split_once("://").unwrap().1.to_string();
-                assume_port = 443;
-            }
-            if !addr_str.starts_with(PIPE_PREFIX) && !addr_str.contains(':') {
-                addr_str = format!("{addr_str}:{assume_port}");
+            if !addr_str.contains(':') {
+                addr_str = format!("tcp://{addr_str}:80");
             }
             if original != addr_str {
                 info!("Converted addr '{original}' to '{addr_str}'");

@@ -12,7 +12,9 @@ use crate::tunnel_builder::NgrokTlsTunnelBuilder;
 impl NgrokTlsTunnelBuilder {
     /// The domain to request for this edge.
     pub fn domain(self_: PyRefMut<Self>, domain: String) -> PyRefMut<Self> {
-        self_.set(|b| b.domain(domain));
+        self_.set(|b| {
+            b.domain(domain);
+        });
         self_
     }
     /// Certificates to use for client authentication at the ngrok edge.
@@ -20,7 +22,9 @@ impl NgrokTlsTunnelBuilder {
         self_: PyRefMut<'a, Self>,
         mutual_tlsca: &PyByteArray,
     ) -> PyRefMut<'a, Self> {
-        self_.set(|b| b.mutual_tlsca(Bytes::from(mutual_tlsca.to_vec())));
+        self_.set(|b| {
+            b.mutual_tlsca(Bytes::from(mutual_tlsca.to_vec()));
+        });
         self_
     }
     /// The key to use for TLS termination at the ngrok edge in PEM format.
@@ -33,7 +37,7 @@ impl NgrokTlsTunnelBuilder {
             b.termination(
                 Bytes::from(cert_pem.to_vec()),
                 Bytes::from(key_pem.to_vec()),
-            )
+            );
         });
         self_
     }
