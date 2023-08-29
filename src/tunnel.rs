@@ -413,31 +413,18 @@ make_tunnel_type! {
 pub async fn forward(id: &String, addr: String) -> PyResult<()> {
     let tun = &get_storage_by_id(id).await?.tunnel;
 
-    // You can force a tunnel to be a pipe by prepending "pipe:" to the address.
+    // You can force a tunnel to be piped by prepending "pipe:" or "unix:" to the address.
     let is_pipe =
         addr.starts_with(PIPE_PREFIX) || addr.starts_with(UNIX_PREFIX) || addr.contains('/');
 
     let res = if is_pipe {
-        let mut tun_addr = addr.clone();
-        // Remove any prefix text before '/'
-        if let Some((_, suffix)) = tun_addr.split_once('/') {
-            if !suffix.is_empty() {
-                tun_addr = format!("/{suffix}")
-            }
-        }
-        // remove the "pipe:" prefix
-        tun_addr = tun_addr
-            .strip_prefix(PIPE_PREFIX)
-            .unwrap_or(&tun_addr)
-            .to_string();
-        // remove the "unix:" prefix
-        tun_addr = tun_addr
-            .strip_prefix(UNIX_PREFIX)
-            .unwrap_or(&tun_addr)
-            .to_string();
+        let mut tun_addr: &str = addr.as_str();
+        // remove the "pipe:" and "unix:" prefix
+        tun_addr = tun_addr.strip_prefix(PIPE_PREFIX).unwrap_or(&tun_addr);
+        tun_addr = tun_addr.strip_prefix(UNIX_PREFIX).unwrap_or(&tun_addr);
 
         info!("Tunnel {id:?} Pipe forwarding to {tun_addr:?}");
-        tun.lock().await.fwd_pipe(tun_addr).await
+        tun.lock().await.fwd_pipe(tun_addr.to_string()).await
     } else {
         info!("Tunnel {id:?} TCP forwarding to {addr:?}");
         tun.lock().await.fwd_tcp(addr).await
