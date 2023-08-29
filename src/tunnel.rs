@@ -415,12 +415,12 @@ pub async fn forward(id: &String, addr: String) -> PyResult<()> {
 
     // You can force a tunnel to be a pipe by prepending "pipe:" to the address.
     let is_pipe =
-        addr.starts_with(PIPE_PREFIX) || addr.starts_with(UNIX_PREFIX) || addr.contains("/");
+        addr.starts_with(PIPE_PREFIX) || addr.starts_with(UNIX_PREFIX) || addr.contains('/');
 
     let res = if is_pipe {
         let mut tun_addr = addr.clone();
-        // Remove any prefix text before "/"
-        if let Some((_, suffix)) = tun_addr.split_once("/") {
+        // Remove any prefix text before '/'
+        if let Some((_, suffix)) = tun_addr.split_once('/') {
             if !suffix.is_empty() {
                 tun_addr = format!("/{suffix}")
             }
