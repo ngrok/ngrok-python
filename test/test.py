@@ -138,7 +138,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         tunnel = await session.http_endpoint().listen()
         self.assertTrue(http_server.listen_to.startswith("tun-"))
 
-        tunnel.forward(http_server.listen_to)
+        tunnel.forward(f"pipe:{http_server.listen_to}")
 
         await self.validate_http_request(tunnel.url())
         await shutdown(tunnel, http_server)
@@ -418,10 +418,10 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         tunnel3 = await session2.http_endpoint().listen()
         tunnel4 = await session2.tcp_endpoint().listen()
 
-        tunnel1.forward(http_server.listen_to)
-        tunnel2.forward(http_server.listen_to)
-        tunnel3.forward(http_server.listen_to)
-        tunnel4.forward(http_server.listen_to)
+        tunnel1.forward(f"pipe:{http_server.listen_to}")
+        tunnel2.forward(f"pipe:{http_server.listen_to}")
+        tunnel3.forward(f"pipe:{http_server.listen_to}")
+        tunnel4.forward(f"pipe:{http_server.listen_to}")
 
         await self.validate_http_request(tunnel1.url())
         await self.validate_http_request(tunnel2.url())

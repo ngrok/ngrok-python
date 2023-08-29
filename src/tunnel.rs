@@ -62,6 +62,8 @@ use crate::{
 /// Python dictionary of id's to sockets.
 static SOCK_CELL: GILOnceCell<Py<PyDict>> = GILOnceCell::new();
 
+pub(crate) const UNIX_PREFIX: &str = "unix:";
+
 lazy_static! {
     // tunnel references to be kept until explicit close to prevent python gc from dropping them.
     // the tunnel wrapper object, and the underlying tunnel, both have references to the Session
@@ -410,17 +412,27 @@ make_tunnel_type! {
 
 pub async fn forward(id: &String, addr: String) -> PyResult<()> {
     let tun = &get_storage_by_id(id).await?.tunnel;
+
+    // You can force a tunnel to be a pipe by prepending "pipe:" to the address.
     let is_pipe =
-        addr.starts_with(PIPE_PREFIX) || addr.starts_with("unix:") || addr.starts_with("tun-");
+        addr.starts_with(PIPE_PREFIX) || addr.starts_with(UNIX_PREFIX) || addr.contains("/");
 
     let res = if is_pipe {
         let mut tun_addr = addr.clone();
+        // Remove any prefix text before "/"
+        if let Some((_, suffix)) = tun_addr.split_once("/") {
+            if !suffix.is_empty() {
+                tun_addr = format!("/{suffix}")
+            }
+        }
+        // remove the "pipe:" prefix
         tun_addr = tun_addr
             .strip_prefix(PIPE_PREFIX)
             .unwrap_or(&tun_addr)
             .to_string();
+        // remove the "unix:" prefix
         tun_addr = tun_addr
-            .strip_prefix("unix:")
+            .strip_prefix(UNIX_PREFIX)
             .unwrap_or(&tun_addr)
             .to_string();
 
@@ -431,11 +443,7 @@ pub async fn forward(id: &String, addr: String) -> PyResult<()> {
         tun.lock().await.fwd_tcp(addr).await
     };
 
-    if is_pipe {
-        debug!("forward_pipe returning");
-    } else {
-        debug!("forward_tcp returning");
-    }
+    debug!("forward returning");
     canceled_is_ok(res)
 }
 

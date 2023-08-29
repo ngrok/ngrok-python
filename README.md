@@ -240,6 +240,11 @@ python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorke
 * TCP - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tcp.py)
 * TLS - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tls.py)
 
+## Unix Sockets
+You may also choose to use Unix Sockets instead of TCP. You can view an example of this [here](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-full.py).
+
+A socket address may be passed directly into the tunnel `forward()` call as well by prefixing the address with `unix:`, for example `unix:/tmp/socket-123`.
+
 # Builders
 
 For more control over Sessions and Tunnels, the builder classes can be used.
