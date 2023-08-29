@@ -420,8 +420,8 @@ pub async fn forward(id: &String, addr: String) -> PyResult<()> {
     let res = if is_pipe {
         let mut tun_addr: &str = addr.as_str();
         // remove the "pipe:" and "unix:" prefix
-        tun_addr = tun_addr.strip_prefix(PIPE_PREFIX).unwrap_or(&tun_addr);
-        tun_addr = tun_addr.strip_prefix(UNIX_PREFIX).unwrap_or(&tun_addr);
+        tun_addr = tun_addr.strip_prefix(PIPE_PREFIX).unwrap_or(tun_addr);
+        tun_addr = tun_addr.strip_prefix(UNIX_PREFIX).unwrap_or(tun_addr);
 
         info!("Tunnel {id:?} Pipe forwarding to {tun_addr:?}");
         tun.lock().await.fwd_pipe(tun_addr.to_string()).await
