@@ -137,18 +137,18 @@ def get_tcp_string(args):
 
 def setup_forwarding(tunnel, args, tcp_string=None):
     if tcp_string:
-        tunnel.forward_tcp(tcp_string)
+        tunnel.forward(tcp_string)
         return True
 
     # prefer pipe over tcp
     pipe_string = get_pipe_string(args)
     if pipe_string:
-        tunnel.forward_pipe(pipe_string)
+        tunnel.forward(pipe_string)
     else:
         tcp_string = get_tcp_string(args)
         if not tcp_string:
             return False
-        tunnel.forward_tcp(tcp_string)
+        tunnel.forward(tcp_string)
 
     return True
 

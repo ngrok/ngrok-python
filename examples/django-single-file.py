@@ -14,7 +14,7 @@ if os.getenv("NGROK_TUNNEL_RUNNING") is None:
 
     async def setup():
         tunnel = await ngrok.default()
-        tunnel.forward_tcp("localhost:8080")
+        tunnel.forward("localhost:8080")
 
     asyncio.run(setup())
 

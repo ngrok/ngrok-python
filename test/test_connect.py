@@ -131,11 +131,11 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("tls forwards to", tunnel.forwards_to())
         self.assertEqual("tls metadata", tunnel.metadata())
 
-        tunnel.forward_tcp(http_server.listen_to)
+        tunnel.forward(http_server.listen_to)
 
         error = None
         try:
-            response = requests.get(tunnel.url().replace("tls:", "https:"))
+            requests.get(tunnel.url().replace("tls:", "https:"))
         except requests.exceptions.SSLError as err:
             error = err
         self.assertIsInstance(error, requests.exceptions.SSLError)

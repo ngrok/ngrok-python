@@ -3,7 +3,6 @@
 import asyncio, logging, ngrok, os, socketserver, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-pipe = ngrok.pipe_name()
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)-15s %(levelname)s %(name)s %(filename)s:%(lineno)d %(message)s",
@@ -70,9 +69,10 @@ async def create_tunnel(httpd):
         .metadata("example tunnel metadata from python").listen()
     )
     sock = httpd.server_address
-    tunnel.forward_pipe(sock) if os.name != "nt" else tunnel.forward_tcp(
-        f"localhost:{sock[1]}"
-    )
+    if os.name != "nt":
+        tunnel.forward(sock)
+    else:
+        tunnel.forward(f"localhost:{sock[1]}")
 
 
 def load_file(name):
@@ -99,7 +99,8 @@ if os.name != "nt":
             request, client_address = super(UnixSocketHttpServer, self).get_request()
             return (request, ["local", 0])
 
-    httpd = UnixSocketHttpServer((ngrok.pipe_name()), HelloHandler)
+    pipe_name = ngrok.pipe_name()
+    httpd = UnixSocketHttpServer((pipe_name), HelloHandler)
 
 # To enable more verbose logging:
 # logging.getLogger().setLevel(5)

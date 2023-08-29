@@ -425,7 +425,7 @@ python<span class="w"> </span>-m<span class="w"> </span>ngrok<span class="w"> </
     <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ngrok</span><span class="o">.</span><span class="n">NgrokSessionBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">authtoken_from_env</span><span class="p">()</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
     <span class="n">tunnel</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">http_endpoint</span><span class="p">()</span><span class="o">.</span><span class="n">listen</span><span class="p">()</span>
     <span class="nb">print</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ingress established at </span><span class="si">{</span><span class="n">tunnel</span><span class="o">.</span><span class="n">url</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">tunnel</span><span class="o">.</span><span class="n">forward_tcp</span><span class="p">(</span><span class="s2">&quot;localhost:9000&quot;</span><span class="p">)</span>
+    <span class="n">tunnel</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="s2">&quot;localhost:9000&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>See here for a <a class="reference external" href="https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-full.py">Full Configuration Example</a></p>

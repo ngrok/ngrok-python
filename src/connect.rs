@@ -50,7 +50,7 @@ lazy_static! {
     pub(crate) static ref SESSION: Mutex<Option<NgrokSession>> = Mutex::new(None);
 }
 
-const PIPE_PREFIX: &str = "pipe:";
+pub(crate) const PIPE_PREFIX: &str = "pipe:";
 
 /// Single string configuration
 macro_rules! plumb {
@@ -415,14 +415,7 @@ async fn labeled_tunnel(
 async fn forward(tunnel: NgrokTunnel, addr: String) -> PyResult<NgrokTunnel> {
     let id = tunnel.id();
     // move forwarding to another task
-    tokio::spawn(async move {
-        if addr.starts_with(PIPE_PREFIX) {
-            tunnel::forward_pipe(&id, addr.clone().split_off(5)).await
-        } else {
-            tunnel::forward_tcp(&id, addr).await
-        }
-        .map(|_| ())
-    });
+    tokio::spawn(async move { tunnel::forward(&id, addr).await.map(|_| ()) });
     Ok(tunnel)
 }
 

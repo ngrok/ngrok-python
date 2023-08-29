@@ -12,18 +12,23 @@ import requests
 import socketserver
 import threading
 import unittest
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 expected = "Hello"
 
+
 def retry_request():
     s = requests.Session()
-    retries = Retry(total=5,
-                backoff_factor=1,
-                status_forcelist=[404, 429, 500, 502, 503, 504])
+    retries = Retry(
+        total=5, backoff_factor=1, status_forcelist=[404, 429, 500, 502, 503, 504]
+    )
     adapter = HTTPAdapter(max_retries=retries)
-    s.mount('http://', adapter)
-    s.mount('https://', adapter)
+    s.mount("http://", adapter)
+    s.mount("https://", adapter)
     return s
+
 
 class HelloHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -43,7 +48,7 @@ class HelloHandler(BaseHTTPRequestHandler):
 
 class UnixSocketHttpServer(socketserver.UnixStreamServer):
     def get_request(self):
-        request, client_address = super(UnixSocketHttpServer, self).get_request()
+        request, _ = super(UnixSocketHttpServer, self).get_request()
         return (request, ["local", 0])
 
     def server_close(self):
@@ -92,7 +97,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
     async def forward_validate_shutdown(
         self, http_server, tunnel, url, requests_config=dict()
     ):
-        tunnel.forward_tcp(http_server.listen_to)
+        tunnel.forward(http_server.listen_to)
         response = await self.validate_http_request(url, requests_config)
         await shutdown(tunnel, http_server)
         return response
@@ -129,18 +134,20 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         await self.forward_validate_shutdown(http_server, tunnel, tunnel.url())
 
     async def test_pipe_socket(self):
-        http_server, session = await make_http_and_session(True)
+        http_server, session = await make_http_and_session(use_unix_socket=True)
         tunnel = await session.http_endpoint().listen()
         self.assertTrue(http_server.listen_to.startswith("tun-"))
-        tunnel.forward_pipe(http_server.listen_to)
-        response = await self.validate_http_request(tunnel.url())
+
+        tunnel.forward(f"pipe:{http_server.listen_to}")
+
+        await self.validate_http_request(tunnel.url())
         await shutdown(tunnel, http_server)
 
     async def test_gzip_tunnel(self):
         http_server, session = await make_http_and_session()
         tunnel = await session.http_endpoint().compression().listen()
 
-        tunnel.forward_tcp(http_server.listen_to)
+        tunnel.forward(http_server.listen_to)
 
         response = retry_request().get(tunnel.url())
         self.assertEqual("gzip", response.headers["content-encoding"])
@@ -168,8 +175,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         tunnel = (
             await session.http_endpoint().basic_auth("ngrok", "online1line").listen()
         )
-
-        tunnel.forward_tcp(http_server.listen_to)
+        tunnel.forward(http_server.listen_to)
 
         config = {"auth": ("ngrok", "online1line")}
         response = await self.forward_validate_shutdown(
@@ -180,13 +186,15 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         http_server, session = await make_http_and_session()
         tunnel = await session.http_endpoint().oauth("google").listen()
 
-        tunnel.forward_tcp(http_server.listen_to)
+        tunnel.forward(http_server.listen_to)
         response = retry_request().get(tunnel.url())
         self.assertEqual(200, response.status_code)
         text = response.text[0:15000]
         print(f'-------- text: "{text}"')
-        self.assertTrue("google-site-verification" in response.text
-          or "accounts.google.com" in response.text)
+        self.assertTrue(
+            "google-site-verification" in response.text
+            or "accounts.google.com" in response.text
+        )
         await shutdown(tunnel, http_server)
 
     async def test_custom_domain(self):
@@ -213,7 +221,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
         addr = tcp_server.server_address
         tcp_server.listen_to = "{}:{}".format(addr[0], addr[1])
-        tunnel.forward_tcp(tcp_server.listen_to)
+        tunnel.forward(tcp_server.listen_to)
         try:
             resp = requests.get(tunnel.url(), timeout=1)
         except requests.exceptions.ReadTimeout as err:
@@ -238,7 +246,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
             .listen()
         )
 
-        tunnel.forward_tcp(http_server.listen_to)
+        tunnel.forward(http_server.listen_to)
         error = None
         try:
             error = requests.get(tunnel.url().replace("tcp:", "http:"))
@@ -251,7 +259,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         http_server, session = await make_http_and_session()
         tunnel = await session.http_endpoint().websocket_tcp_conversion().listen()
 
-        tunnel.forward_tcp(http_server.listen_to)
+        tunnel.forward(http_server.listen_to)
 
         response = retry_request().get(tunnel.url())
         self.assertEqual(400, response.status_code)
@@ -289,7 +297,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("tls forwards to", tunnel.forwards_to())
         self.assertEqual("tls metadata", tunnel.metadata())
 
-        tunnel.forward_tcp(http_server.listen_to)
+        tunnel.forward(http_server.listen_to)
 
         error = None
         try:
@@ -384,10 +392,10 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         tunnel3 = await session2.http_endpoint().listen()
         tunnel4 = await session2.tcp_endpoint().listen()
 
-        tunnel1.forward_tcp(http_server.listen_to)
-        tunnel2.forward_tcp(http_server.listen_to)
-        tunnel3.forward_tcp(http_server.listen_to)
-        tunnel4.forward_tcp(http_server.listen_to)
+        tunnel1.forward(http_server.listen_to)
+        tunnel2.forward(http_server.listen_to)
+        tunnel3.forward(http_server.listen_to)
+        tunnel4.forward(http_server.listen_to)
 
         self.assertEqual(2, len(await session1.get_tunnels()))
         self.assertEqual(2, len(await session2.get_tunnels()))
@@ -403,22 +411,23 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         await tunnel4.close()
 
     async def test_pipe_multipass(self):
-        http_server, session1 = await make_http_and_session(True)
+        http_server, session1 = await make_http_and_session(use_unix_socket=True)
         session2 = await make_session()
         tunnel1 = await session1.http_endpoint().listen()
         tunnel2 = await session1.http_endpoint().listen()
         tunnel3 = await session2.http_endpoint().listen()
         tunnel4 = await session2.tcp_endpoint().listen()
 
-        tunnel1.forward_pipe(http_server.listen_to)
-        tunnel2.forward_pipe(http_server.listen_to)
-        tunnel3.forward_pipe(http_server.listen_to)
-        tunnel4.forward_pipe(http_server.listen_to)
+        tunnel1.forward(f"pipe:{http_server.listen_to}")
+        tunnel2.forward(f"pipe:{http_server.listen_to}")
+        tunnel3.forward(f"pipe:{http_server.listen_to}")
+        tunnel4.forward(f"pipe:{http_server.listen_to}")
 
         await self.validate_http_request(tunnel1.url())
         await self.validate_http_request(tunnel2.url())
         await self.validate_http_request(tunnel3.url())
         await self.validate_http_request(tunnel4.url().replace("tcp:", "http:"))
+
         await shutdown(tunnel1, http_server)
         await tunnel2.close()
         await tunnel3.close()

@@ -26,7 +26,7 @@ if os.getenv("NGROK_TUNNEL_RUNNING") is None:
         listen = "localhost:8000"
         tunnel = await ngrok.default()
         print(f"Forwarding to {listen} from ingress url: {tunnel.url()}")
-        tunnel.forward_tcp(listen)
+        tunnel.forward(listen)
 
     try:
         running_loop = asyncio.get_running_loop()
