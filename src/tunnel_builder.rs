@@ -26,7 +26,7 @@ use pyo3::{
 use tracing::debug;
 
 use crate::{
-    py_err,
+    py_ngrok_err,
     tunnel::{
         NgrokHttpTunnel,
         NgrokLabeledTunnel,
@@ -96,7 +96,7 @@ macro_rules! make_tunnel_builder {
                 let result = builder.expect("tunnel builder is always set")
                             .listen()
                             .await
-                            .map_err(|e| py_err(format!("failed to start tunnel: {e:?}")));
+                            .map_err(|e| py_ngrok_err("failed to start tunnel", &e));
 
                 // create the wrapping tunnel object via its async new()
                 match result {

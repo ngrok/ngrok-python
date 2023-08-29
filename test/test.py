@@ -454,7 +454,26 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         except ValueError as err:
             error = err
         self.assertIsInstance(error, ValueError)
-        self.assertTrue("cert" in f"{error}")
+        self.assertTrue("tls" in f"{error}")
+
+    async def test_invalid_authtoken(self):
+        error = None
+        try:
+            await ngrok.NgrokSessionBuilder().authtoken("notvalid").connect()
+        except ValueError as err:
+            error = err
+        self.assertIsInstance(error, ValueError)
+        self.assertEqual("ERR_NGROK_105", error.args[2])
+
+    async def test_invalid_domain(self):
+        session = await make_session()
+        error = None
+        try:
+            await session.http_endpoint().domain("1.21 gigawatts").listen()
+        except ValueError as err:
+            error = err
+        self.assertIsInstance(error, ValueError)
+        self.assertEqual("ERR_NGROK_326", error.args[2])
 
 
 if __name__ == "__main__":
