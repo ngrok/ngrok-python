@@ -1,4 +1,4 @@
-# ngrok Documentation Code of Conduct
+# ngrok Code of Conduct
 
 ## Our Pledge
 
