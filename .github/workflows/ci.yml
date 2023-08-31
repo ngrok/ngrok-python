@@ -58,6 +58,7 @@ jobs:
       - uses: ./.github/workflows/rust-cache
       - name: Run Tests
         run: |
+          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
           NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
   decide:
     name: Decide on Publishing
