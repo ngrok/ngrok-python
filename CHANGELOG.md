@@ -1,6 +1,10 @@
 ## 0.9.0
 
 - Flattened `tunnel.forward_pipe()` and `tunnel.forward_tcp()` into `tunnel.forward()`. Determination will be made based on `addr` input.
+- Added [Mypy](https://mypy.readthedocs.io/en/stable/) static typing information.
+- Added `session.get_tunnels()` to get a list of current non-closed tunnels for the session.
+- Added `ngrok.set_auth_token(<token>)` to set a default auth token to use for sessions.
+- Added [ngrok error codes](https://ngrok.com/docs/errors/reference/) as 3rd argument to thrown Errors, when available.
 
 ## 0.8.1:
 

@@ -37,7 +37,9 @@ class HelloHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
 
-httpd: Union[TCPServer, UnixStreamServer] = ThreadingHTTPServer(("localhost", 0), HelloHandler)
+httpd: Union[TCPServer, UnixStreamServer] = ThreadingHTTPServer(
+    ("localhost", 0), HelloHandler
+)
 if os.name != "nt":
     # Set up a unix socket wrapper around standard http server
     class UnixSocketHttpServer(UnixStreamServer):

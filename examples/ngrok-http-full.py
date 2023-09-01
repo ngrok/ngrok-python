@@ -70,7 +70,7 @@ async def create_tunnel(httpd: Union[TCPServer, UnixStreamServer]) -> None:
         # .webhook_verification("twilio", "asdf")
         .metadata("example tunnel metadata from python").listen()
     )
-    sock = cast(tuple[str,int], httpd.server_address)
+    sock = cast(tuple[str, int], httpd.server_address)
     if os.name != "nt":
         tunnel.forward(cast(str, httpd.server_address))
     else:
@@ -93,7 +93,9 @@ class HelloHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
 
-httpd: Union[TCPServer, UnixStreamServer] = ThreadingHTTPServer(("localhost", 0), HelloHandler)
+httpd: Union[TCPServer, UnixStreamServer] = ThreadingHTTPServer(
+    ("localhost", 0), HelloHandler
+)
 if os.name != "nt":
     # Set up a unix socket wrapper around standard http server
     class UnixSocketHttpServer(UnixStreamServer):

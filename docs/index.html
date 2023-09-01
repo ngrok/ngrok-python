@@ -416,6 +416,11 @@ python<span class="w"> </span>-m<span class="w"> </span>ngrok<span class="w"> </
 <li><p>TLS - <a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tls.py">Example</a></p></li>
 </ul>
 </section>
+<section id="unix-sockets">
+<h2>Unix Sockets<a class="headerlink" href="#unix-sockets" title="Permalink to this heading">#</a></h2>
+<p>You may also choose to use Unix Sockets instead of TCP. You can view an example of this <a class="reference external" href="https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-full.py">here</a>.</p>
+<p>A socket address may be passed directly into the tunnel <code class="docutils literal notranslate"><span class="pre">forward()</span></code> call as well by prefixing the address with <code class="docutils literal notranslate"><span class="pre">unix:</span></code>, for example <code class="docutils literal notranslate"><span class="pre">unix:/tmp/socket-123</span></code>.</p>
+</section>
 </section>
 <section id="builders">
 <h1>Builders<a class="headerlink" href="#builders" title="Permalink to this heading">#</a></h1>
