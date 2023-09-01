@@ -239,7 +239,7 @@ impl NgrokTunnel {
 
     /// Forward incoming tunnel connections. This can be either a TCP address or a file socket path.
     /// For file socket paths on Linux/Darwin, addr can be a unix domain socket path, e.g. "/tmp/ngrok.sock"
-    ///     On Windows, addr can be a named pipe, e.e. "\\\\.\\pipe\\an_ngrok_pipe"
+    /// On Windows, addr can be a named pipe, e.e. "\\\\.\\pipe\\an_ngrok_pipe"
     pub fn forward<'a>(&self, py: Python<'a>, addr: String) -> PyResult<&'a PyAny> {
         let id = self.tun_meta.id.clone();
         pyo3_asyncio::tokio::future_into_py(py, async move { forward(&id, addr).await })
