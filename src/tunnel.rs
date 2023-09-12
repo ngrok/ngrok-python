@@ -340,7 +340,7 @@ impl NgrokTunnel {
             if self.get_family(py)?.as_ref(py).eq(af_unix)? {
                 // unix socket
                 let sockname_str: &PyString = sockname.downcast(py)?;
-                self.forward(py, format!("unix:{sockname_str}"))?;
+                self.forward(py, format!("{UNIX_PREFIX}{sockname_str}"))?;
                 return result;
             }
         }

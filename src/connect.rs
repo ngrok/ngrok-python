@@ -35,6 +35,7 @@ use crate::{
     tunnel::{
         self,
         NgrokTunnel,
+        TCP_PREFIX,
     },
     tunnel_builder::{
         NgrokHttpTunnelBuilder,
@@ -161,11 +162,11 @@ pub fn connect(
 ) -> PyResult<Py<PyAny>> {
     let kwargs: &PyDict = options.unwrap_or(PyDict::new(py));
     // decode address string
-    let mut addr_str = "tcp://localhost:80".to_string();
+    let mut addr_str = format!("{TCP_PREFIX}localhost:80");
     if let Some(a) = addr {
         if a.is_instance(py.get_type::<PyInt>())? {
             addr_str = format!(
-                "tcp://localhost:{}",
+                "{TCP_PREFIX}localhost:{}",
                 a.downcast::<PyInt>()?.extract::<i32>()?
             );
         } else if a.is_instance(py.get_type::<PyString>())? {
@@ -174,7 +175,7 @@ pub fn connect(
             // Fix up an addr that is missing a port
             let original = addr_str.clone();
             if !addr_str.contains(':') {
-                addr_str = format!("tcp://{addr_str}:80");
+                addr_str = format!("{TCP_PREFIX}{addr_str}:80");
             }
             if original != addr_str {
                 info!("Converted addr '{original}' to '{addr_str}'");

@@ -133,7 +133,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(tunnel.url().startswith("http://"))
         await self.forward_validate_shutdown(http_server, tunnel, tunnel.url())
 
-    async def test_pipe_socket(self):
+    async def test_unix_socket(self):
         http_server, session = await make_http_and_session(use_unix_socket=True)
         tunnel = await session.http_endpoint().listen()
         self.assertTrue(http_server.listen_to.startswith("tun-"))
