@@ -109,7 +109,7 @@ jobs:
         with:
           target: ${{ inputs.target }}
           args: --release -i python3.9 -m Cargo.toml
-          before-script-linux: apt-get install libssl-dev
+          before-script-linux: sudo apt-get install libssl-dev
       - name: Publish
         if: ${{ inputs.publish == 'true' && !inputs.docker && !contains(inputs.target,'android') }}
         uses: PyO3/maturin-action@v1
@@ -117,7 +117,7 @@ jobs:
           command: publish
           target: ${{ inputs.target }}
           args: --no-sdist -i python3.9 -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
-          before-script-linux: apt-get install libssl-dev
+          before-script-linux: sudo apt-get install libssl-dev
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
