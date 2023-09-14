@@ -12,7 +12,7 @@ def shutdown(url, http_server):
     http_server.server_close()
 
 
-class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
+class TestNgrok(unittest.IsolatedAsyncioTestCase):
     def validate_http_request(self, url, requests_config=dict()):
         response = retry_request().get(url, **requests_config)
         self.assertEqual(200, response.status_code)

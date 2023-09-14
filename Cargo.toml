@@ -12,21 +12,20 @@ crate-type = ["cdylib"]
 async-rustls = { version = "0.3.0" }
 async-trait = "0.1.59"
 bytes = "1.3.0"
+futures = "0.3.26"
 lazy_static = "1.4.0"
 log = "0.4"
 # pin mio until all dependencies are also on windows-sys 0.48
 # https://github.com/microsoft/windows-rs/issues/2410#issuecomment-1490802715
 mio = { version = "=0.8.6" }
-ngrok = { version = "0.14.0-pre.5" }
+ngrok = { version = "0.13.1" }
 pyo3 = { version = "0.18.1", features = ["abi3", "abi3-py37", "extension-module", "multiple-pymethods"]}
 pyo3-asyncio = { version = "0.18.0", features = ["attributes", "tokio-runtime"] }
 pyo3-log = { version = "0.8.1" }
 parking_lot = "0.12.1"
-regex = "1.9.5"
 rustls-pemfile = "1.0.1"
 tokio = { version = "1.23.0", features = ["sync"] }
 tracing = { version = "0.1.37", features = ["log", "log-always"] }
-url = "2.4.0"
 
 [build-dependencies]
 prost-build = "0.11.3"

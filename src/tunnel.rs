@@ -10,13 +10,15 @@ use std::{
 // name, so this has to explicitly set this as a crate with the '::' prefix
 use ::ngrok::{
     prelude::*,
-    tunnel::TcpTunnel,
+    tunnel::{
+        TcpTunnel,
+        UrlTunnel,
+    },
     Session,
 };
 use async_trait::async_trait;
 use lazy_static::lazy_static;
 use ngrok::{
-    forwarder::Forwarder,
     session::ConnectError,
     tunnel::{
         HttpTunnel,
@@ -39,35 +41,29 @@ use pyo3::{
     PyResult,
     Python,
 };
-use regex::Regex;
-use tokio::{
-    sync::Mutex,
-    task::JoinHandle,
-};
+use tokio::sync::Mutex;
 use tracing::{
     debug,
     info,
 };
-use url::Url;
 
 #[cfg(target_os = "windows")]
 use crate::wrapper::wrap_object;
 use crate::{
+    connect::PIPE_PREFIX,
     py_err,
     py_ngrok_err,
     wrapper::{
         self,
+        bound_default_pipe_socket,
         bound_default_tcp_socket,
-        bound_default_unix_socket,
     },
 };
 
 /// Python dictionary of id's to sockets.
 static SOCK_CELL: GILOnceCell<Py<PyDict>> = GILOnceCell::new();
 
-// no forward host section to allow for relative unix paths
 pub(crate) const UNIX_PREFIX: &str = "unix:";
-pub(crate) const TCP_PREFIX: &str = "tcp://";
 
 lazy_static! {
     // tunnel references to be kept until explicit close to prevent python gc from dropping them.
@@ -95,12 +91,9 @@ struct TunnelMetadata {
 /// The TunnelExt cannot be turned into an object since it contains generics, so implementing
 /// a proxy trait without generics which can be the dyn type stored in the global map.
 #[async_trait]
-pub trait ExtendedTunnel: Send {
-    async fn fwd(&mut self, url: Url) -> CoreResult<(), io::Error>;
-}
-
-pub trait ExtendedForwarder: Send {
-    fn get_join(&mut self) -> &mut JoinHandle<Result<(), io::Error>>;
+pub trait ExtendedTunnel: Tunnel {
+    async fn fwd_tcp(&mut self, addr: String) -> CoreResult<(), io::Error>;
+    async fn fwd_pipe(&mut self, addr: String) -> CoreResult<(), io::Error>;
 }
 
 /// An ngrok tunnel.
@@ -187,15 +180,11 @@ macro_rules! make_tunnel_type {
     ($wrapper:ident, $tunnel:tt) => {
         #[async_trait]
         impl ExtendedTunnel for $tunnel {
-            #[allow(deprecated)]
-            async fn fwd(&mut self, url: Url) -> CoreResult<(), io::Error> {
-                ngrok::prelude::TunnelExt::forward(self, url).await
+            async fn fwd_tcp(&mut self, addr: String) -> CoreResult<(), io::Error> {
+                self.forward_tcp(addr).await
             }
-        }
-
-        impl ExtendedForwarder for Forwarder<$tunnel> {
-            fn get_join(&mut self) -> &mut JoinHandle<Result<(), io::Error>> {
-                self.join()
+            async fn fwd_pipe(&mut self, addr: String) -> CoreResult<(), io::Error> {
+                self.forward_pipe(addr).await
             }
         }
     };
@@ -338,9 +327,9 @@ impl NgrokTunnel {
         let af_unix = socket.getattr(intern!(py, "AF_UNIX"));
         if let Ok(af_unix) = af_unix {
             if self.get_family(py)?.as_ref(py).eq(af_unix)? {
-                // unix socket
+                // pipe
                 let sockname_str: &PyString = sockname.downcast(py)?;
-                self.forward(py, format!("{UNIX_PREFIX}{sockname_str}"))?;
+                self.forward(py, format!("pipe:{sockname_str}"))?;
                 return result;
             }
         }
@@ -370,11 +359,11 @@ impl NgrokTunnel {
         Ok(match maybe_socket {
             Some(s) => s.into_py(py),
             None => {
-                // try unix first, fall back to tcp
-                let res = match bound_default_unix_socket(py) {
+                // try pipe first, fall back to tcp
+                let res = match bound_default_pipe_socket(py) {
                     Ok(res) => res,
                     Err(error) => {
-                        debug!("error binding to unix: {}", error);
+                        debug!("error binding to pipe: {}", error);
                         bound_default_tcp_socket(py)?
                     }
                 };
@@ -422,25 +411,25 @@ make_tunnel_type! {
     NgrokLabeledTunnel, LabeledTunnel, label
 }
 
-pub async fn forward(id: &String, mut addr: String) -> PyResult<()> {
+pub async fn forward(id: &String, addr: String) -> PyResult<()> {
     let tun = &get_storage_by_id(id).await?.tunnel;
-    // if addr is not a full url, choose a default protocol
-    lazy_static! {
-        static ref RE: Regex = Regex::new(r"^[a-z0-9\-\.]+:\d+$").unwrap();
-    }
-    if !addr.contains(':') || RE.find(&addr).is_some() {
-        if addr.contains('/') {
-            addr = format!("{UNIX_PREFIX}{addr}")
-        } else {
-            addr = format!("{TCP_PREFIX}{addr}")
-        }
-    }
-    // parse to a url
-    let url = Url::parse(addr.as_str())
-        .map_err(|e| py_err(format!("Cannot parse address: {addr}, error: {e}")))?;
 
-    info!("Tunnel {id:?} forwarding to {:?}", url.to_string());
-    let res = tun.lock().await.fwd(url).await;
+    // You can force a tunnel to be piped by prepending "pipe:" or "unix:" to the address.
+    let is_pipe =
+        addr.starts_with(PIPE_PREFIX) || addr.starts_with(UNIX_PREFIX) || addr.contains('/');
+
+    let res = if is_pipe {
+        let mut tun_addr: &str = addr.as_str();
+        // remove the "pipe:" and "unix:" prefix
+        tun_addr = tun_addr.strip_prefix(PIPE_PREFIX).unwrap_or(tun_addr);
+        tun_addr = tun_addr.strip_prefix(UNIX_PREFIX).unwrap_or(tun_addr);
+
+        info!("Tunnel {id:?} Pipe forwarding to {tun_addr:?}");
+        tun.lock().await.fwd_pipe(tun_addr.to_string()).await
+    } else {
+        info!("Tunnel {id:?} TCP forwarding to {addr:?}");
+        tun.lock().await.fwd_tcp(addr).await
+    };
 
     debug!("forward returning");
     canceled_is_ok(res)

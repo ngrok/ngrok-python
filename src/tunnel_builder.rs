@@ -43,7 +43,7 @@ macro_rules! make_tunnel_builder {
         #[allow(dead_code)]
         pub(crate) struct $wrapper {
             session: Arc<Mutex<Session>>,
-            pub(crate) tunnel_builder: Arc<Mutex<$builder>>,
+            pub(crate) tunnel_builder: Arc<Mutex<Option<$builder>>>,
         }
 
         #[pymethods]
@@ -51,7 +51,7 @@ macro_rules! make_tunnel_builder {
         impl $wrapper {
             /// Tunnel-specific opaque metadata. Viewable via the API.
             pub fn metadata(self_: PyRefMut<Self>, metadata: String) -> PyRefMut<Self> {
-                self_.set(|b| {b.metadata(metadata);});
+                self_.set(|b| b.metadata(metadata));
                 self_
             }
 
@@ -73,17 +73,17 @@ macro_rules! make_tunnel_builder {
             pub(crate) fn new(session: Session, raw_tunnel_builder: $builder) -> Self {
                 $wrapper {
                     session: Arc::new(Mutex::new(session)),
-                    tunnel_builder: Arc::new(Mutex::new(raw_tunnel_builder)),
+                    tunnel_builder: Arc::new(Mutex::new(Some(raw_tunnel_builder))),
                 }
             }
 
             /// Handle the locking and Option management
             pub(crate) fn set<F>(&self, f: F)
             where
-                F: FnOnce(&mut parking_lot::lock_api::MutexGuard<'_, parking_lot::RawMutex, $builder>),
+                F: FnOnce($builder) -> $builder,
             {
                 let mut builder = self.tunnel_builder.lock();
-                f(&mut builder);
+                *builder = builder.take().map(f);
             }
 
             pub(crate) async fn async_listen(&self) -> PyResult<NgrokTunnel> {
@@ -92,8 +92,8 @@ macro_rules! make_tunnel_builder {
                 $wrapper::do_listen(session, tun).await
             }
 
-            async fn do_listen(session: Session, builder: $builder) -> PyResult<NgrokTunnel> {
-                let result = builder
+            async fn do_listen(session: Session, builder: Option<$builder>) -> PyResult<NgrokTunnel> {
+                let result = builder.expect("tunnel builder is always set")
                             .listen()
                             .await
                             .map_err(|e| py_ngrok_err("failed to start tunnel", &e));
@@ -124,27 +124,27 @@ macro_rules! make_tunnel_builder {
             /// Restriction placed on the origin of incoming connections to the edge to only allow these CIDR ranges.
             /// Call multiple times to add additional CIDR ranges.
             pub fn allow_cidr(self_: PyRefMut<Self>, cidr: String) -> PyRefMut<Self> {
-                self_.set(|b| {b.allow_cidr(cidr);});
+                self_.set(|b| b.allow_cidr(cidr));
                 self_
             }
             /// Restriction placed on the origin of incoming connections to the edge to deny these CIDR ranges.
             /// Call multiple times to add additional CIDR ranges.
             pub fn deny_cidr(self_: PyRefMut<Self>, cidr: String) -> PyRefMut<Self> {
-                self_.set(|b| {b.deny_cidr(cidr);});
+                self_.set(|b| b.deny_cidr(cidr));
                 self_
             }
             /// The version of PROXY protocol to use with this tunnel "1", "2", or "" if not using.
             pub fn proxy_proto(self_: PyRefMut<Self>, proxy_proto: String) -> PyRefMut<Self> {
-                self_.set(|b| {b.proxy_proto(
+                self_.set(|b| b.proxy_proto(
                     ProxyProto::from_str(proxy_proto.as_str())
                         .unwrap_or_else(|_| panic!("Unknown proxy protocol: {:?}", proxy_proto)),
-                );});
+                ));
                 self_
             }
             /// Tunnel backend metadata. Viewable via the dashboard and API, but has no
             /// bearing on tunnel behavior.
             pub fn forwards_to(self_: PyRefMut<Self>, forwards_to: String) -> PyRefMut<Self> {
-                self_.set(|b| {b.forwards_to(forwards_to);});
+                self_.set(|b| b.forwards_to(forwards_to));
                 self_
             }
         }
@@ -156,7 +156,7 @@ macro_rules! make_tunnel_builder {
         impl $wrapper {
             /// Add a label, value pair for this tunnel.
             pub fn label(self_: PyRefMut<Self>, label: String, value: String) -> PyRefMut<Self> {
-                self_.set(|b| {b.label(label, value);});
+                self_.set(|b| b.label(label, value));
                 self_
             }
         }

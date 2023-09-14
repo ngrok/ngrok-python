@@ -71,7 +71,7 @@ pub fn set_auth_token(authtoken: String) {
 #[pyclass]
 #[allow(dead_code)]
 pub(crate) struct NgrokSessionBuilder {
-    raw_builder: Arc<SyncMutex<SessionBuilder>>,
+    raw_builder: Arc<SyncMutex<Option<SessionBuilder>>>,
     disconnect_handler: Option<PyObject>,
     auth_token_set: bool,
 }
@@ -86,21 +86,17 @@ impl NgrokSessionBuilder {
     fn handle_default_auth_token(&self) {
         let default_auth_token = AUTH_TOKEN.lock();
         if default_auth_token.is_some() && !self.auth_token_set {
-            self.set(|b| {
-                b.authtoken(default_auth_token.as_ref().unwrap());
-            });
+            self.set(|b| b.authtoken(default_auth_token.as_ref().unwrap()));
         }
     }
 
     /// Handle the locking and Option management
     fn set<F>(&self, f: F)
     where
-        F: FnOnce(
-            &mut parking_lot::lock_api::MutexGuard<'_, parking_lot::RawMutex, SessionBuilder>,
-        ),
+        F: FnOnce(SessionBuilder) -> SessionBuilder,
     {
         let mut builder = self.raw_builder.lock();
-        f(&mut builder);
+        *builder = builder.take().map(f);
     }
 
     /// Update the connector callback in the upstream rust sdk.
@@ -110,10 +106,7 @@ impl NgrokSessionBuilder {
 
         self.set(|b| {
             b.connector(
-                move |host: String,
-                      port: u16,
-                      tls_config: Arc<ClientConfig>,
-                      err: Option<AcceptError>| {
+                move |addr: String, tls_config: Arc<ClientConfig>, err: Option<AcceptError>| {
                     // clone for async move out of environment
                     let disconn_fn = disconnect_handler.clone();
                     async move {
@@ -122,20 +115,20 @@ impl NgrokSessionBuilder {
                             if let Some(err) = err.clone() {
                                 Python::with_gil(|py| -> PyResult<()> {
                                     handler
-                                        .call(py, (format!("{host}:{port}"), err.to_string()), None)
+                                        .call(py, (addr.clone(), err.to_string()), None)
                                         .map(|_o| ())
                                 })
                                 .map_err(|e| {
-                                    info!("Canceling connection to {host}:{port} due to {e}");
+                                    info!("Canceling connection to {addr} due to {e}");
                                     ConnectError::Canceled
                                 })?;
                             }
                         };
                         // call the upstream connector
-                        default_connect(host, port, tls_config, err).await
+                        default_connect(addr, tls_config, err).await
                     }
                 },
-            );
+            )
         });
     }
 
@@ -156,11 +149,11 @@ impl NgrokSessionBuilder {
     #[new]
     pub fn new() -> Self {
         NgrokSessionBuilder {
-            raw_builder: Arc::new(SyncMutex::new(
-                Session::builder()
-                    .client_info(CLIENT_TYPE, VERSION, None::<String>)
-                    .clone(),
-            )),
+            raw_builder: Arc::new(SyncMutex::new(Some(Session::builder().client_info(
+                CLIENT_TYPE,
+                VERSION,
+                None::<String>,
+            )))),
             disconnect_handler: None,
             auth_token_set: false,
         }
@@ -176,9 +169,7 @@ impl NgrokSessionBuilder {
     /// .. _create a new one: https://dashboard.ngrok.com/tunnels/authtokens
     /// .. _authtoken parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#authtoken
     pub fn authtoken(mut self_: PyRefMut<Self>, authtoken: String) -> PyRefMut<Self> {
-        self_.set(|b| {
-            b.authtoken(authtoken);
-        });
+        self_.set(|b| b.authtoken(authtoken));
         self_.borrow_mut().auth_token_set();
         self_
     }
@@ -186,9 +177,7 @@ impl NgrokSessionBuilder {
     /// Shortcut for calling `SessionBuilder::authtoken <https://docs.rs/ngrok/0.11.0/ngrok/session/struct.SessionBuilder.html#method.authtoken>`_ with the value of the
     /// NGROK_AUTHTOKEN environment variable.
     pub fn authtoken_from_env(mut self_: PyRefMut<Self>) -> PyRefMut<Self> {
-        self_.set(|b| {
-            b.authtoken_from_env();
-        });
+        self_.set(|b| b.authtoken_from_env());
         self_.borrow_mut().auth_token_set();
         self_
     }
@@ -208,9 +197,7 @@ impl NgrokSessionBuilder {
         version: String,
         comments: Option<String>,
     ) -> PyRefMut<Self> {
-        self_.set(|b| {
-            b.client_info(client_type, version, comments);
-        });
+        self_.set(|b| b.client_info(client_type, version, comments));
         self_
     }
 
@@ -222,10 +209,7 @@ impl NgrokSessionBuilder {
     ///
     /// .. _heartbeat_interval parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#heartbeat_interval
     pub fn heartbeat_interval(self_: PyRefMut<Self>, heartbeat_interval: u32) -> PyRefMut<Self> {
-        self_.set(|b| {
-            b.heartbeat_interval(Duration::new(heartbeat_interval.into(), 0))
-                .expect("fixme");
-        });
+        self_.set(|b| b.heartbeat_interval(Duration::new(heartbeat_interval.into(), 0)));
         self_
     }
 
@@ -237,10 +221,7 @@ impl NgrokSessionBuilder {
     ///
     /// .. _heartbeat_tolerance parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#heartbeat_tolerance
     pub fn heartbeat_tolerance(self_: PyRefMut<Self>, heartbeat_tolerance: u32) -> PyRefMut<Self> {
-        self_.set(|b| {
-            b.heartbeat_tolerance(Duration::new(heartbeat_tolerance.into(), 0))
-                .expect("fixme");
-        });
+        self_.set(|b| b.heartbeat_tolerance(Duration::new(heartbeat_tolerance.into(), 0)));
         self_
     }
 
@@ -253,9 +234,7 @@ impl NgrokSessionBuilder {
     ///
     /// .. _metdata parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#metadata
     pub fn metadata(self_: PyRefMut<Self>, metadata: String) -> PyRefMut<Self> {
-        self_.set(|b| {
-            b.metadata(metadata);
-        });
+        self_.set(|b| b.metadata(metadata));
         self_
     }
 
@@ -266,9 +245,7 @@ impl NgrokSessionBuilder {
     ///
     /// .. _server_addr parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#server_addr
     pub fn server_addr(self_: PyRefMut<Self>, addr: String) -> PyRefMut<Self> {
-        self_.set(|b| {
-            b.server_addr(addr).expect("fixme");
-        });
+        self_.set(|b| b.server_addr(addr));
         self_
     }
 
@@ -282,9 +259,7 @@ impl NgrokSessionBuilder {
     ///
     /// .. _root_cas parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#root_cas
     pub fn ca_cert<'a>(self_: PyRefMut<'a, Self>, cert_bytes: &PyByteArray) -> PyRefMut<'a, Self> {
-        self_.set(|b| {
-            b.ca_cert(Bytes::from(cert_bytes.to_vec()));
-        });
+        self_.set(|b| b.ca_cert(Bytes::from(cert_bytes.to_vec())));
         self_
     }
 
@@ -322,7 +297,7 @@ impl NgrokSessionBuilder {
                     })
                     .map_err(|e| format!("Callback error {e:?}"))
                 }
-            });
+            })
         });
         self_
     }
@@ -353,7 +328,7 @@ impl NgrokSessionBuilder {
                     })
                     .map_err(|e| format!("Callback error {e:?}"))
                 }
-            });
+            })
         });
         self_
     }
@@ -386,7 +361,7 @@ impl NgrokSessionBuilder {
                     })
                     .map_err(|e| format!("Callback error {e:?}"))
                 }
-            });
+            })
         });
         self_
     }
@@ -412,7 +387,7 @@ impl NgrokSessionBuilder {
                     })
                     .map_err(|e| format!("Callback error {e:?}").into())
                 }
-            });
+            })
         });
         self_
     }
@@ -425,8 +400,9 @@ impl NgrokSessionBuilder {
     }
 }
 
-async fn do_connect(builder: SessionBuilder) -> Result<NgrokSession, PyErr> {
+async fn do_connect(builder: Option<SessionBuilder>) -> Result<NgrokSession, PyErr> {
     builder
+        .expect("session builder is always set")
         .connect()
         .await
         .map(|s| {
