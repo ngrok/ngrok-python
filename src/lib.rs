@@ -1,4 +1,4 @@
-use ::ngrok::prelude::NgrokError;
+use ::ngrok::prelude::Error;
 use pyo3::{
     exceptions::PyValueError,
     pymodule,
@@ -100,7 +100,7 @@ pub(crate) fn py_err(message: impl Into<String>) -> PyErr {
 }
 
 // Shorthand for Error creation from NgrokError
-pub(crate) fn py_ngrok_err(message: impl Into<String>, err: &impl NgrokError) -> PyErr {
+pub(crate) fn py_ngrok_err(message: impl Into<String>, err: &impl Error) -> PyErr {
     let py_err = if let Some(error_code) = err.error_code() {
         PyValueError::new_err((message.into(), err.msg(), error_code.to_string()))
     } else {

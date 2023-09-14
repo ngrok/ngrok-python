@@ -253,8 +253,8 @@ pub(crate) fn bound_default_tcp_socket(py: Python) -> PyResult<Py<PyAny>> {
     Ok(res)
 }
 
-/// Create and bind a python pipe socket.
-pub(crate) fn bound_default_pipe_socket(py: Python) -> PyResult<Py<PyAny>> {
+/// Create and bind a python unix socket.
+pub(crate) fn bound_default_unix_socket(py: Python) -> PyResult<Py<PyAny>> {
     let socket = PyModule::import(py, intern!(py, "socket"))?;
     let sock_func = socket.getattr(intern!(py, "socket"))?;
     let af_unix = socket.getattr(intern!(py, "AF_UNIX"))?;
