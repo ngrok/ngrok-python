@@ -116,7 +116,7 @@ jobs:
             target: x86_64-unknown-linux-gnu
           - host: ubuntu-latest
             compiler: gcc
-            if: ${{ github.ref == 'refs/heads/main' }}
+            if: true
             target: x86_64-unknown-linux-musl
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
           - host: macos-latest
@@ -126,10 +126,10 @@ jobs:
             if: ${{ github.ref == 'refs/heads/main' }}
             target: universal2-apple-darwin
           - host: ubuntu-latest
-            if: ${{ github.ref == 'refs/heads/main' }}
+            if: true
             target: aarch64-unknown-linux-gnu
           - host: ubuntu-latest
-            if: ${{ github.ref == 'refs/heads/main' }}
+            if: true
             target: armv7-unknown-linux-gnueabihf
             setup: |
               sudo apt-get update
@@ -143,7 +143,7 @@ jobs:
             if: false
             target: armv7-linux-androideabi
           - host: ubuntu-latest
-            if: ${{ github.ref == 'refs/heads/main' }}
+            if: true
             target: aarch64-unknown-linux-musl
           - host: windows-latest
             target: aarch64-pc-windows-msvc
