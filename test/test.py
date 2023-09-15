@@ -143,6 +143,18 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         await self.validate_http_request(tunnel.url())
         await shutdown(tunnel, http_server)
 
+    async def test_listen_and_serve(self):
+        http_server, session = await make_http_and_session()
+        tunnel = await session.http_endpoint().listen_and_serve(http_server)
+        await self.validate_http_request(tunnel.url())
+        await shutdown(tunnel, http_server)
+
+    async def test_listen_and_serve_unix(self):
+        http_server, session = await make_http_and_session(use_unix_socket=True)
+        tunnel = await session.http_endpoint().listen_and_serve(http_server)
+        await self.validate_http_request(tunnel.url())
+        await shutdown(tunnel, http_server)
+
     async def test_gzip_tunnel(self):
         http_server, session = await make_http_and_session()
         tunnel = await session.http_endpoint().compression().listen()
@@ -155,8 +167,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
     async def test_tls_backend(self):
         session = await make_session()
-        tunnel = await session.http_endpoint().listen()
-        tunnel.forward("https://dashboard.ngrok.com")
+        tunnel = await session.http_endpoint().listen_and_forward("https://dashboard.ngrok.com")
 
         response = retry_request().get(tunnel.url())
         self.assertEqual(421, response.status_code)
@@ -393,6 +404,28 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(fd)
         self.assertTrue(fd > 0)
         await session.close()
+
+    async def test_listen_and_forward_multipass(self):
+        http_server, session1 = await make_http_and_session()
+        session2 = await make_session()
+        url = "tcp://" + http_server.listen_to
+        tunnel1 = await session1.http_endpoint().listen_and_forward(url)
+        tunnel2 = await session1.http_endpoint().listen_and_forward(url)
+        tunnel3 = await session2.http_endpoint().listen_and_forward(url)
+        tunnel4 = await session2.tcp_endpoint().listen_and_forward(url)
+
+        self.assertEqual(2, len(await session1.get_tunnels()))
+        self.assertEqual(2, len(await session2.get_tunnels()))
+        self.assertTrue(len(await ngrok.get_tunnels()) >= 4)
+
+        await self.validate_http_request(tunnel1.url())
+        await self.validate_http_request(tunnel2.url())
+        await self.validate_http_request(tunnel3.url())
+        await self.validate_http_request(tunnel4.url().replace("tcp:", "http:"))
+        await shutdown(tunnel1, http_server)
+        await tunnel2.close()
+        await tunnel3.close()
+        await tunnel4.close()
 
     async def test_tcp_multipass(self):
         http_server, session1 = await make_http_and_session()

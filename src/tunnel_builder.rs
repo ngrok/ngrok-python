@@ -18,14 +18,17 @@ use parking_lot::Mutex;
 use pyo3::{
     pyclass,
     pymethods,
+    Py,
     PyAny,
     PyRefMut,
     PyResult,
     Python,
 };
 use tracing::debug;
+use url::Url;
 
 use crate::{
+    py_err,
     py_ngrok_err,
     tunnel::{
         NgrokHttpTunnel,
@@ -34,6 +37,7 @@ use crate::{
         NgrokTlsTunnel,
         NgrokTunnel,
     },
+    wrapper::address_from_server,
 };
 
 macro_rules! make_tunnel_builder {
@@ -65,6 +69,44 @@ macro_rules! make_tunnel_builder {
                         $wrapper::do_listen(session, tun).await
                     },
                 )
+            }
+
+            /// Begin listening for new connections on this tunnel and forwarding them to the given url.
+            pub fn listen_and_forward<'a>(&self, to_url: String, py: Python<'a>) -> PyResult<&'a PyAny> {
+                let url = Url::parse(&to_url).map_err(|e| py_err(format!("Url forward argument parse failure, {e}")))?;
+                let session = self.session.lock().clone();
+                let builder = self.tunnel_builder.lock().clone();
+
+                pyo3_asyncio::tokio::future_into_py(
+                    py,
+                    async move {
+                        let result = builder
+                        .listen_and_forward(url)
+                        .await
+                        .map_err(|e| py_ngrok_err("failed to start tunnel", &e));
+
+                        // create the wrapping tunnel object via its async new()
+                        match result {
+                            Ok(raw_fwd) => Ok($tunnel::new_forwarder(session, raw_fwd).await),
+                            Err(val) => Err(val),
+                        }
+                    },
+                )
+            }
+
+            /// Begin listening for new connections on this tunnel and forwarding them to the given http server.
+            ///
+            /// :param server: The server to link with a tunnel.
+            /// :type server: http.server.HTTPServer or None
+            /// :return: A task to await for the tunnel linked with the server.
+            /// :rtype: Task
+            pub fn listen_and_serve<'a>(
+                &self,
+                py: Python<'a>,
+                server: Py<PyAny>,
+            ) -> PyResult<&'a PyAny> {
+                let address = address_from_server(py, server)?;
+                return self.listen_and_forward(address, py)
             }
         }
 

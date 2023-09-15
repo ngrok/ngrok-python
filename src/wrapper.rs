@@ -9,11 +9,18 @@ use pyo3::{
     IntoPy,
     Py,
     PyAny,
+    PyErr,
     PyResult,
     Python,
 };
 
-use crate::py_err;
+use crate::{
+    py_err,
+    tunnel::{
+        TCP_PREFIX,
+        UNIX_PREFIX,
+    },
+};
 
 /// Create a path name to use for pipe forwarding.
 /// This will be a file path in the temp directory on unix-like systems,
@@ -128,30 +135,8 @@ pub fn listen(
 ) -> PyResult<Py<PyAny>> {
     let mut forward = "".to_string();
     if let Some(server) = server {
-        let server_address_attr = server.getattr(py, "server_address")?;
-        let address_type = server_address_attr.as_ref(py).get_type();
-
-        forward = if server_address_attr
-            .as_ref(py)
-            .is_instance(py.get_type::<PyTuple>())?
-        {
-            let address: &PyTuple = server_address_attr.downcast(py)?;
-            format!(
-                "input.forward('{}:{}')",
-                address.get_item(0)?,
-                address.get_item(1)?
-            )
-        } else if server_address_attr
-            .as_ref(py)
-            .is_instance(py.get_type::<PyString>())?
-        {
-            let address: &PyString = server_address_attr.downcast(py)?;
-            format!("input.forward('{address}')")
-        } else {
-            return Err(py_err(format!(
-                "Unhandled server_address type: {address_type}"
-            )));
-        };
+        let address = address_from_server(py, server)?;
+        forward = format!("input.forward('{address}')");
     }
 
     loop_wrap(
@@ -167,6 +152,32 @@ pub fn listen(
     "###
         ),
     )
+}
+
+pub(crate) fn address_from_server(py: Python, server: Py<PyAny>) -> Result<String, PyErr> {
+    let server_address_attr = server.getattr(py, "server_address")?;
+    let address_type = server_address_attr.as_ref(py).get_type();
+    if server_address_attr
+        .as_ref(py)
+        .is_instance(py.get_type::<PyTuple>())?
+    {
+        let address: &PyTuple = server_address_attr.downcast(py)?;
+        Ok(format!(
+            "{TCP_PREFIX}{}:{}",
+            address.get_item(0)?,
+            address.get_item(1)?
+        ))
+    } else if server_address_attr
+        .as_ref(py)
+        .is_instance(py.get_type::<PyString>())?
+    {
+        let address: &PyString = server_address_attr.downcast(py)?;
+        Ok(format!("{UNIX_PREFIX}{address}"))
+    } else {
+        return Err(py_err(format!(
+            "Unhandled server_address type: {address_type}"
+        )));
+    }
 }
 
 /// Set the WERKZEUG_SERVER_FD environment variable with a file descriptor from a default HTTP tunnel.
