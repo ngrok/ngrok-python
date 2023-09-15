@@ -18,6 +18,7 @@ use parking_lot::Mutex;
 use pyo3::{
     pyclass,
     pymethods,
+    Py,
     PyAny,
     PyRefMut,
     PyResult,
@@ -36,6 +37,7 @@ use crate::{
         NgrokTlsTunnel,
         NgrokTunnel,
     },
+    wrapper::address_from_server,
 };
 
 macro_rules! make_tunnel_builder {
@@ -90,6 +92,21 @@ macro_rules! make_tunnel_builder {
                         }
                     },
                 )
+            }
+
+            /// Begin listening for new connections on this tunnel and forwarding them to the given http server.
+            ///
+            /// :param server: The server to link with a tunnel.
+            /// :type server: http.server.HTTPServer or None
+            /// :return: A task to await for the tunnel linked with the server.
+            /// :rtype: Task
+            pub fn listen_and_serve<'a>(
+                &self,
+                py: Python<'a>,
+                server: Py<PyAny>,
+            ) -> PyResult<&'a PyAny> {
+                let address = address_from_server(py, server)?;
+                return self.listen_and_forward(address, py)
             }
         }
 

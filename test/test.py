@@ -143,6 +143,18 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         await self.validate_http_request(tunnel.url())
         await shutdown(tunnel, http_server)
 
+    async def test_listen_and_serve(self):
+        http_server, session = await make_http_and_session()
+        tunnel = await session.http_endpoint().listen_and_serve(http_server)
+        await self.validate_http_request(tunnel.url())
+        await shutdown(tunnel, http_server)
+
+    async def test_listen_and_serve_unix(self):
+        http_server, session = await make_http_and_session(use_unix_socket=True)
+        tunnel = await session.http_endpoint().listen_and_serve(http_server)
+        await self.validate_http_request(tunnel.url())
+        await shutdown(tunnel, http_server)
+
     async def test_gzip_tunnel(self):
         http_server, session = await make_http_and_session()
         tunnel = await session.http_endpoint().compression().listen()
