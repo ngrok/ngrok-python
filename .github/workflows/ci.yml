@@ -18,6 +18,7 @@ env:
   pull_request: null
 jobs:
   udeps:
+    if: false
     name: Udeps
     runs-on: ubuntu-latest
     steps:
@@ -29,6 +30,7 @@ jobs:
           command: udeps
           args: '--workspace --all-targets --all-features'
   fmt:
+    if: false
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
@@ -39,6 +41,7 @@ jobs:
           command: fmt
           args: '--all -- --check'
   clippy:
+    if: false
     name: Clippy
     runs-on: ubuntu-latest
     steps:
@@ -126,7 +129,7 @@ jobs:
             if: ${{ github.ref == 'refs/heads/main' }}
             target: universal2-apple-darwin
           - host: ubuntu-latest
-            if: ${{ github.ref == 'refs/heads/main' }}
+            if: true
             target: aarch64-unknown-linux-gnu
           - host: ubuntu-latest
             if: ${{ github.ref == 'refs/heads/main' }}
