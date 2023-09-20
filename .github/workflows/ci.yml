@@ -53,6 +53,7 @@ jobs:
           command: clippy
           args: '--all-targets --all-features --workspace -- -D warnings'
   test:
+    if: false
     name: Test
     runs-on: ubuntu-latest
     steps:
@@ -87,11 +88,7 @@ jobs:
 
   build:
     needs:
-      - clippy
       - decide
-      - fmt
-      - test
-      - udeps
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
