@@ -107,12 +107,12 @@ jobs:
             if: ${{ github.ref == 'refs/heads/main' }}
           - host: windows-latest
             target: x86_64-pc-windows-msvc
-            if: true
+            if: false
           - host: windows-latest
             if: ${{ github.ref == 'refs/heads/main' }}
             target: i686-pc-windows-msvc
           - host: ubuntu-latest
-            if: true
+            if: false
             target: x86_64-unknown-linux-gnu
           - host: ubuntu-latest
             compiler: gcc
@@ -120,7 +120,7 @@ jobs:
             target: x86_64-unknown-linux-musl
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
           - host: macos-latest
-            if: true
+            if: false
             target: aarch64-apple-darwin
           - host: macos-latest
             if: ${{ github.ref == 'refs/heads/main' }}

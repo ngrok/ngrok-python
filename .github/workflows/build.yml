@@ -108,6 +108,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ inputs.target }}
+          container: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
           args: --release -i python3.9 -m Cargo.toml
       - name: Publish
         if: ${{ inputs.publish == 'true' && !inputs.docker && !contains(inputs.target,'android') }}
