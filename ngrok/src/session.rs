@@ -65,7 +65,7 @@ use tokio_util::compat::{
 };
 use tracing::{
     debug,
-    warn,
+    warn, info,
 };
 use url::Url;
 
@@ -678,17 +678,16 @@ impl SessionBuilder {
         // generate a default TLS config
         let mut root_store = rustls::RootCertStore::empty();
         let cert_pem = self.ca_cert.as_ref().map_or(CERT_BYTES, |it| it.as_ref());
-        root_store.add_parsable_certificates(
-            rustls_pemfile::read_all(&mut io::Cursor::new(cert_pem))
-                .expect("a valid ngrok root certificate")
-                .into_iter()
-                .filter_map(|it| match it {
-                    Item::X509Certificate(bs) => Some(bs),
-                    _ => None,
-                })
-                .collect::<Vec<_>>()
-                .as_slice(),
-        );
+        let parsed_cert = rustls_pemfile::read_all(&mut io::Cursor::new(cert_pem))
+        .expect("a valid ngrok root certificate")
+        .into_iter()
+        .filter_map(|it| match it {
+            Item::X509Certificate(bs) => Some(bs),
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+        info!("parsed_cert: {parsed_cert:?}");
+        root_store.add_parsable_certificates(parsed_cert.as_slice());
 
         rustls::ClientConfig::builder()
             .with_safe_defaults()
