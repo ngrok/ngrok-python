@@ -24,7 +24,8 @@ pyo3-asyncio = { version = "0.18.0", features = ["attributes", "tokio-runtime"] 
 pyo3-log = { version = "0.8.1" }
 parking_lot = "0.12.1"
 regex = "1.9.5"
-rustls-pemfile = "1.0.1"
+rustls = "0.20.9"
+rustls-pemfile = "1.0.3"
 tokio = { version = "1.23.0", features = ["sync"] }
 tracing = { version = "0.1.37", features = ["log", "log-always"] }
 url = "2.4.0"
