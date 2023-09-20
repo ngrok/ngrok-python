@@ -219,10 +219,13 @@ pub async fn default_connect(
     let domain = rustls::ServerName::try_from(host.as_str())
         .expect("host should have been validated by SessionBuilder::server_addr");
 
-    let tls_conn = async_rustls::TlsConnector::from(tls_config)
+    let res = async_rustls::TlsConnector::from(tls_config)
         .connect(domain, stream)
-        .await
-        .map_err(ConnectError::Tls)?;
+        .await;
+    if let Err(e) = res.as_ref() {
+        warn!("tls handshake error: {}", e);
+    }
+    let tls_conn = res.map_err(ConnectError::Tls)?;
     Ok(Box::new(tls_conn.compat()) as Box<dyn IoStream>)
 }
 
