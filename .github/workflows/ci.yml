@@ -115,8 +115,7 @@ jobs:
             if: true
             target: x86_64-unknown-linux-gnu
           - host: ubuntu-latest
-            compiler: gcc
-            if: ${{ github.ref == 'refs/heads/main' }}
+            if: true
             target: x86_64-unknown-linux-musl
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
           - host: macos-latest
@@ -126,8 +125,9 @@ jobs:
             if: ${{ github.ref == 'refs/heads/main' }}
             target: universal2-apple-darwin
           - host: ubuntu-latest
-            if: ${{ github.ref == 'refs/heads/main' }}
+            if: true
             target: aarch64-unknown-linux-gnu
+            docker: ghcr.io/rust-cross/manylinux2014-cross:aarch64
           - host: ubuntu-latest
             if: ${{ github.ref == 'refs/heads/main' }}
             target: armv7-unknown-linux-gnueabihf
