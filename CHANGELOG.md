@@ -1,3 +1,9 @@
+## 0.10.0
+
+- Add `listen_and_forward` and `listen_and_serve` to tunnel builders.
+- Update to latest version of underlying rust library, allowing TLS backends.
+- Fix aarch64 build for docker-ubuntu-on-macos and raspberry pi.
+
 ## 0.9.0
 
 - Flattened `tunnel.forward_pipe()` and `tunnel.forward_tcp()` into `tunnel.forward()`. Determination will be made based on `addr` input.
