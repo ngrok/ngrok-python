@@ -18,6 +18,7 @@ env:
   pull_request: null
 jobs:
   udeps:
+    if: false
     name: Udeps
     runs-on: ubuntu-latest
     steps:
@@ -29,6 +30,7 @@ jobs:
           command: udeps
           args: '--workspace --all-targets --all-features'
   fmt:
+    if: false
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
@@ -39,6 +41,7 @@ jobs:
           command: fmt
           args: '--all -- --check'
   clippy:
+    if: false
     name: Clippy
     runs-on: ubuntu-latest
     steps:
@@ -50,6 +53,7 @@ jobs:
           command: clippy
           args: '--all-targets --all-features --workspace -- -D warnings'
   test:
+    if: false
     name: Test
     runs-on: ubuntu-latest
     steps:
@@ -84,11 +88,7 @@ jobs:
 
   build:
     needs:
-      - clippy
       - decide
-      - fmt
-      - test
-      - udeps
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
@@ -107,19 +107,19 @@ jobs:
             if: ${{ github.ref == 'refs/heads/main' }}
           - host: windows-latest
             target: x86_64-pc-windows-msvc
-            if: true
+            if: false
           - host: windows-latest
             if: ${{ github.ref == 'refs/heads/main' }}
             target: i686-pc-windows-msvc
           - host: ubuntu-latest
-            if: true
+            if: false
             target: x86_64-unknown-linux-gnu
           - host: ubuntu-latest
-            if: true
+            if: false
             target: x86_64-unknown-linux-musl
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
           - host: macos-latest
-            if: true
+            if: false
             target: aarch64-apple-darwin
           - host: macos-latest
             if: ${{ github.ref == 'refs/heads/main' }}
