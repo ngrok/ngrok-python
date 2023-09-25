@@ -91,7 +91,7 @@ jobs:
             # this is in raw 'sh', use single '='
             if [ "${SHOULD_PUBLISH}" = 'true' ]; then
               echo "~~~~ maturin publishing"
-              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }} --skip-existing --no-strip --debug
             else
               echo "~~~~ maturin building"
               . .env/bin/activate && maturin build --target ${{ inputs.target }}
