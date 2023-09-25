@@ -87,7 +87,8 @@ jobs:
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf
-            if [ "${SHOULD_PUBLISH}" == 'true' ]; then
+            # this is in raw 'sh', use single '='
+            if [ "${SHOULD_PUBLISH}" = 'true' ]; then
               echo "~~~~ maturin publishing"
               . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
             else
