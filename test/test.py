@@ -167,7 +167,9 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
     async def test_tls_backend(self):
         session = await make_session()
-        tunnel = await session.http_endpoint().listen_and_forward("https://dashboard.ngrok.com")
+        tunnel = await session.http_endpoint().listen_and_forward(
+            "https://dashboard.ngrok.com"
+        )
 
         response = retry_request().get(tunnel.url())
         self.assertEqual(421, response.status_code)
