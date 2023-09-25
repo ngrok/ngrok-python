@@ -30,7 +30,7 @@ pub fn pipe_name(py: Python) -> PyResult<Py<PyAny>> {
     call_code(
         py,
         None,
-        r###"
+        r#"
 import atexit
 import logging
 import os
@@ -48,7 +48,7 @@ def delete_socket():
 def run(input=None):
     atexit.register(delete_socket)
     return path
-    "###,
+    "#,
     )
 }
 
@@ -195,7 +195,7 @@ pub fn werkzeug_develop(py: Python, tunnel: Option<Py<PyAny>>) -> PyResult<Py<Py
     loop_wrap(
         py,
         tunnel,
-        r###"
+        r#"
     if input is None:
         session = await NgrokSessionBuilder().authtoken_from_env().connect()
         input = await session.http_endpoint().listen()
@@ -204,7 +204,7 @@ pub fn werkzeug_develop(py: Python, tunnel: Option<Py<PyAny>>) -> PyResult<Py<Py
     os.environ["WERKZEUG_SERVER_FD"] = str(input.fd)
     os.environ["WERKZEUG_RUN_MAIN"] = "true"
     return input
-    "###,
+    "#,
     )
 }
 
