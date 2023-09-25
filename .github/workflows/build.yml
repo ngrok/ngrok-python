@@ -82,6 +82,7 @@ jobs:
             env
             curl --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
             export PATH="$HOME/.cargo/bin:$PATH"
+            export SHOULD_PUBLISH=true
             rustup component add llvm-tools-preview || true
             rustup target add aarch64-unknown-linux-gnu
             python3 -m venv .env
