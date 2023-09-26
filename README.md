@@ -284,7 +284,7 @@ This project relies on [PyO3](https://pyo3.rs/), an excellent system to ease dev
 
 Thank you to [OpenIoTHub](https://github.com/OpenIoTHub/ngrok) for handing over the ngrok name on PyPI.
 
-# Change Log
+# Changelog
 
 Changes are tracked in [CHANGELOG.md](https://github.com/ngrok/ngrok-python/blob/main/CHANGELOG.md).
 
