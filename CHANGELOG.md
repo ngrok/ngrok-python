@@ -1,3 +1,7 @@
+## 0.10.1
+
+- Fix publishing for aarch64
+
 ## 0.10.0
 
 - Add `listen_and_forward` and `listen_and_serve` to tunnel builders.
