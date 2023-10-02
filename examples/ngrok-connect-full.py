@@ -22,20 +22,20 @@ def load_file(name):
 
 logging.basicConfig(level=logging.INFO)
 server = HTTPServer(("localhost", 8080), HelloHandler)
-tunnel = ngrok.connect(
+listener = ngrok.connect(
     # session configuration
     addr="localhost:8080",
     # authtoken="<authtoken>",
     authtoken_from_env=True,
     session_metadata="Online in One Line",
-    # tunnel configuration
+    # listener configuration
     basic_auth=["ngrok:online1line"],
     circuit_breaker=0.1,
     compression=True,
     # domain="<domain>",
     ip_restriction_allow_cidrs="0.0.0.0/0",
     ip_restriction_deny_cidrs="10.1.1.1/32",
-    metadata="example tunnel metadata from python",
+    metadata="example listener metadata from python",
     # mutual_tls_cas=load_file("ca.crt"),
     # oauth_provider="google",
     # oauth_allow_domains=["<domain>"],

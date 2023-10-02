@@ -71,21 +71,21 @@ pub(crate) const UNIX_PREFIX: &str = "unix:";
 pub(crate) const TCP_PREFIX: &str = "tcp://";
 
 lazy_static! {
-    // tunnel references to be kept until explicit close to prevent python gc from dropping them.
-    // the tunnel wrapper object, and the underlying tunnel, both have references to the Session
+    // Listener references to be kept until explicit close to prevent python gc from dropping them.
+    // the Listener wrapper object, and the underlying Listener, both have references to the Session
     // so the Session is safe from premature dropping.
-    static ref GLOBAL_TUNNELS: Mutex<HashMap<String,Arc<Storage>>> = Mutex::new(HashMap::new());
+    static ref GLOBAL_LISTENERS: Mutex<HashMap<String,Arc<Storage>>> = Mutex::new(HashMap::new());
 }
 
-/// Stores the tunnel and session references to be kept until explicit close.
+/// Stores the listener and session references to be kept until explicit close.
 struct Storage {
-    tunnel: Option<Arc<Mutex<dyn ExtendedTunnel>>>,
+    listener: Option<Arc<Mutex<dyn ExtendedListener>>>,
     forwarder: Option<Arc<Mutex<dyn ExtendedForwarder>>>,
     session: Session,
-    tun_meta: Arc<TunnelMetadata>,
+    tun_meta: Arc<ListenerInfo>,
 }
 
-struct TunnelMetadata {
+struct ListenerInfo {
     id: String,
     forwards_to: String,
     metadata: String,
@@ -94,10 +94,10 @@ struct TunnelMetadata {
     labels: HashMap<String, String>,
 }
 
-/// The TunnelExt cannot be turned into an object since it contains generics, so implementing
+/// The upstream object cannot be turned into an object since it contains generics, so implementing
 /// a proxy trait without generics which can be the dyn type stored in the global map.
 #[async_trait]
-pub trait ExtendedTunnel: Send {
+pub trait ExtendedListener: Send {
     async fn fwd(&mut self, url: Url) -> CoreResult<(), io::Error>;
 }
 
@@ -105,17 +105,17 @@ pub trait ExtendedForwarder: Send {
     fn get_join(&mut self) -> &mut JoinHandle<Result<(), io::Error>>;
 }
 
-/// An ngrok tunnel.
+/// An ngrok listener.
 #[pyclass]
 #[derive(Clone)]
-pub(crate) struct NgrokTunnel {
+pub(crate) struct Listener {
     session: Session,
-    tun_meta: Arc<TunnelMetadata>,
+    tun_meta: Arc<ListenerInfo>,
 }
 
-macro_rules! make_tunnel_type {
+macro_rules! make_listener_type {
     // the common (non-labeled) branch
-    ($(#[$outer:meta])* $wrapper:ident, $tunnel:tt, common) => {
+    ($(#[$outer:meta])* $wrapper:ident, $listener:tt, common) => {
 
         $(#[$outer])*
         #[allow(dead_code)]
@@ -124,32 +124,32 @@ macro_rules! make_tunnel_type {
 
         #[allow(dead_code)]
         impl $wrapper {
-            pub(crate) async fn new_tunnel(session: Session, raw_tunnel: $tunnel) -> NgrokTunnel {
-                let id = raw_tunnel.id().to_string();
-                let tun_meta = Arc::new(TunnelMetadata {
+            pub(crate) async fn new_listener(session: Session, raw_listener: $listener) -> Listener {
+                let id = raw_listener.id().to_string();
+                let tun_meta = Arc::new(ListenerInfo {
                     id: id.clone(),
-                    forwards_to: raw_tunnel.forwards_to().to_string(),
-                    metadata: raw_tunnel.metadata().to_string(),
-                    url: Some(raw_tunnel.url().to_string()),
-                    proto: Some(raw_tunnel.proto().to_string()),
+                    forwards_to: raw_listener.forwards_to().to_string(),
+                    metadata: raw_listener.metadata().to_string(),
+                    url: Some(raw_listener.url().to_string()),
+                    proto: Some(raw_listener.proto().to_string()),
                     labels: HashMap::new(),
                 });
-                info!("Created tunnel {id:?} with url {:?}", raw_tunnel.url());
-                // keep a tunnel reference until an explicit call to close to prevent python gc dropping it
+                info!("Created listener {id:?} with url {:?}", raw_listener.url());
+                // keep a listener reference until an explicit call to close to prevent python gc dropping it
                 let storage = Arc::new(Storage {
-                    tunnel: Some(Arc::new(Mutex::new(raw_tunnel))),
+                    listener: Some(Arc::new(Mutex::new(raw_listener))),
                     forwarder: None,
                     session,
                     tun_meta,
                 });
-                GLOBAL_TUNNELS.lock().await.insert(id, storage.clone());
+                GLOBAL_LISTENERS.lock().await.insert(id, storage.clone());
                 // create the user-facing object
-                NgrokTunnel::from_storage(&storage)
+                Listener::from_storage(&storage)
             }
 
-            pub(crate) async fn new_forwarder(session: Session, forwarder: Forwarder<$tunnel>) -> NgrokTunnel {
+            pub(crate) async fn new_forwarder(session: Session, forwarder: Forwarder<$listener>) -> Listener {
                 let id = forwarder.id().to_string();
-                let tun_meta = Arc::new(TunnelMetadata {
+                let tun_meta = Arc::new(ListenerInfo {
                     id: id.clone(),
                     forwards_to: forwarder.forwards_to().to_string(),
                     metadata: forwarder.metadata().to_string(),
@@ -157,25 +157,25 @@ macro_rules! make_tunnel_type {
                     proto: Some(forwarder.proto().to_string()),
                     labels: HashMap::new(),
                 });
-                info!("Created tunnel {id:?} with url {:?}", forwarder.url());
-                // keep a tunnel reference until an explicit call to close to prevent python gc dropping it
+                info!("Created listener {id:?} with url {:?}", forwarder.url());
+                // keep a listener reference until an explicit call to close to prevent python gc dropping it
                 let storage = Arc::new(Storage {
-                    tunnel: None,
+                    listener: None,
                     forwarder: Some(Arc::new(Mutex::new(forwarder))),
                     session,
                     tun_meta,
                 });
-                GLOBAL_TUNNELS.lock().await.insert(id, storage.clone());
+                GLOBAL_LISTENERS.lock().await.insert(id, storage.clone());
                 // create the user-facing object
-                NgrokTunnel::from_storage(&storage)
+                Listener::from_storage(&storage)
             }
         }
 
-        make_tunnel_type!($wrapper, $tunnel);
+        make_listener_type!($wrapper, $listener);
     };
 
     // the labeled branch
-    ($(#[$outer:meta])* $wrapper:ident, $tunnel:tt, label) => {
+    ($(#[$outer:meta])* $wrapper:ident, $listener:tt, label) => {
         $(#[$outer])*
         #[allow(dead_code)]
         pub(crate) struct $wrapper {
@@ -183,32 +183,32 @@ macro_rules! make_tunnel_type {
 
         #[allow(dead_code)]
         impl $wrapper {
-            pub(crate) async fn new_tunnel(session: Session, raw_tunnel: $tunnel) -> NgrokTunnel {
-                let id = raw_tunnel.id().to_string();
-                let tun_meta = Arc::new(TunnelMetadata {
+            pub(crate) async fn new_listener(session: Session, raw_listener: $listener) -> Listener {
+                let id = raw_listener.id().to_string();
+                let tun_meta = Arc::new(ListenerInfo {
                     id: id.clone(),
-                    forwards_to: raw_tunnel.forwards_to().to_string(),
-                    metadata: raw_tunnel.metadata().to_string(),
+                    forwards_to: raw_listener.forwards_to().to_string(),
+                    metadata: raw_listener.metadata().to_string(),
                     url: None,
                     proto: None,
-                    labels: raw_tunnel.labels().clone(),
+                    labels: raw_listener.labels().clone(),
                 });
-                info!("Created tunnel {id:?} with labels {:?}", tun_meta.labels);
-                // keep a tunnel reference until an explicit call to close to prevent python gc dropping it
+                info!("Created listener {id:?} with labels {:?}", tun_meta.labels);
+                // keep a listener reference until an explicit call to close to prevent python gc dropping it
                 let storage = Arc::new(Storage {
-                    tunnel: Some(Arc::new(Mutex::new(raw_tunnel))),
+                    listener: Some(Arc::new(Mutex::new(raw_listener))),
                     forwarder: None,
                     session,
                     tun_meta,
                 });
-                GLOBAL_TUNNELS.lock().await.insert(id, storage.clone());
+                GLOBAL_LISTENERS.lock().await.insert(id, storage.clone());
                 // create the user-facing object
-                NgrokTunnel::from_storage(&storage)
+                Listener::from_storage(&storage)
             }
 
-            pub(crate) async fn new_forwarder(session: Session, forwarder: Forwarder<$tunnel>) -> NgrokTunnel {
+            pub(crate) async fn new_forwarder(session: Session, forwarder: Forwarder<$listener>) -> Listener {
                 let id = forwarder.id().to_string();
-                let tun_meta = Arc::new(TunnelMetadata {
+                let tun_meta = Arc::new(ListenerInfo {
                     id: id.clone(),
                     forwards_to: forwarder.forwards_to().to_string(),
                     metadata: forwarder.metadata().to_string(),
@@ -216,34 +216,34 @@ macro_rules! make_tunnel_type {
                     proto: None,
                     labels: forwarder.labels().clone(),
                 });
-                info!("Created tunnel {id:?} with labels {:?}", tun_meta.labels);
-                // keep a tunnel reference until an explicit call to close to prevent python gc dropping it
+                info!("Created listener {id:?} with labels {:?}", tun_meta.labels);
+                // keep a listener reference until an explicit call to close to prevent python gc dropping it
                 let storage = Arc::new(Storage {
-                    tunnel: None,
+                    listener: None,
                     forwarder: Some(Arc::new(Mutex::new(forwarder))),
                     session,
                     tun_meta,
                 });
-                GLOBAL_TUNNELS.lock().await.insert(id, storage.clone());
+                GLOBAL_LISTENERS.lock().await.insert(id, storage.clone());
                 // create the user-facing object
-                NgrokTunnel::from_storage(&storage)
+                Listener::from_storage(&storage)
             }
         }
 
-        make_tunnel_type!($wrapper, $tunnel);
+        make_listener_type!($wrapper, $listener);
     };
 
-    // all tunnels get these
-    ($wrapper:ident, $tunnel:tt) => {
+    // all listeners get these
+    ($wrapper:ident, $listener:tt) => {
         #[async_trait]
-        impl ExtendedTunnel for $tunnel {
+        impl ExtendedListener for $listener {
             #[allow(deprecated)]
             async fn fwd(&mut self, url: Url) -> CoreResult<(), io::Error> {
                 ngrok::prelude::TunnelExt::forward(self, url).await
             }
         }
 
-        impl ExtendedForwarder for Forwarder<$tunnel> {
+        impl ExtendedForwarder for Forwarder<$listener> {
             fn get_join(&mut self) -> &mut JoinHandle<Result<(), io::Error>> {
                 self.join()
             }
@@ -251,11 +251,11 @@ macro_rules! make_tunnel_type {
     };
 }
 
-impl NgrokTunnel {
-    /// Create NgrokTunnel from Storage
-    fn from_storage(storage: &Arc<Storage>) -> NgrokTunnel {
+impl Listener {
+    /// Create Listener from Storage
+    fn from_storage(storage: &Arc<Storage>) -> Listener {
         // create the user-facing object
-        NgrokTunnel {
+        Listener {
             session: storage.session.clone(),
             tun_meta: storage.tun_meta.clone(),
         }
@@ -264,41 +264,40 @@ impl NgrokTunnel {
 
 #[pymethods]
 #[allow(dead_code)]
-impl NgrokTunnel {
-    /// Returns a tunnel's unique ID.
+impl Listener {
+    /// Returns a listener's unique ID.
     pub fn id(&self) -> String {
         self.tun_meta.id.clone()
     }
 
-    /// The URL that this tunnel backs.
+    /// The URL that this listener backs.
     pub fn url(&self) -> Option<String> {
         self.tun_meta.url.clone()
     }
 
-    /// The protocol of the endpoint that this tunnel backs.
+    /// The protocol of the endpoint that this listener backs.
     pub fn proto(&self) -> Option<String> {
         self.tun_meta.proto.clone()
     }
 
-    /// The labels this tunnel was started with.
+    /// The labels this listener was started with.
     pub fn labels(&self) -> HashMap<String, String> {
         self.tun_meta.labels.clone()
     }
 
     /// Returns a human-readable string presented in the ngrok dashboard
-    /// and the Tunnels API. Use the `HttpTunnelBuilder::forwards_to <https://docs.rs/ngrok/0.11.0/ngrok/config/struct.HttpTunnelBuilder.html#method.forwards_to>`_,
-    /// `TcpTunnelBuilder::forwards_to <https://docs.rs/ngrok/0.11.0/ngrok/config/struct.TcpTunnelBuilder.html#method.forwards_to>`_, etc. to set this value
-    /// explicitly.
+    /// and the API. Use the HttpListenerBuilder forwards_to, TcpListenerBuilder forwards_to, etc.
+    /// to set this value explicitly.
     pub fn forwards_to(&self) -> String {
         self.tun_meta.forwards_to.clone()
     }
 
-    /// Returns the arbitrary metadata string for this tunnel.
+    /// Returns the arbitrary metadata string for this listener.
     pub fn metadata(&self) -> String {
         self.tun_meta.metadata.clone()
     }
 
-    /// Forward incoming tunnel connections. This can be either a TCP address or a file socket path.
+    /// Forward incoming listener connections. This can be either a TCP address or a file socket path.
     /// For file socket paths on Linux/Darwin, addr can be a unix domain socket path, e.g. "/tmp/ngrok.sock"
     /// On Windows, addr can be a named pipe, e.e. "\\\\.\\pipe\\an_ngrok_pipe"
     pub fn forward<'a>(&self, py: Python<'a>, addr: String) -> PyResult<&'a PyAny> {
@@ -321,31 +320,31 @@ impl NgrokTunnel {
                     .map_err(|e| py_err(format!("error on join: {e:?}")))?
                     .map_err(|e| py_err(format!("error on join: {e:?}")))
             } else {
-                Err(py_err("Tunnel is not joinable"))
+                Err(py_err("Listener is not joinable"))
             }
         })
     }
 
-    /// Close the tunnel.
+    /// Close the listener.
     ///
     /// This is an RPC call that must be `.await`ed.
-    /// It is equivalent to calling `Session::close_tunnel` with this
-    /// tunnel's ID.
+    /// It is equivalent to calling `Session::close_listener` with this
+    /// listener's ID.
     pub fn close<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
         let session = self.session.clone();
         let id = self.tun_meta.id.clone();
         pyo3_asyncio::tokio::future_into_py(py, async move {
             debug!("{} closing, id: {id:?}", stringify!($wrapper));
 
-            // we may not be able to lock our reference to the tunnel due to the forward_* calls which
-            // continuously accept-loop while the tunnel is active, so calling close on the Session.
+            // we may not be able to lock our reference to the listener due to the forward_* calls which
+            // continuously accept-loop while the listener is active, so calling close on the Session.
             let res = session
                 .close_tunnel(id.clone())
                 .await
-                .map_err(|e| py_ngrok_err("error closing tunnel", &e));
+                .map_err(|e| py_ngrok_err("error closing listener", &e));
 
-            // drop our internal reference to the tunnel after awaiting close
-            remove_global_tunnel(&id).await?;
+            // drop our internal reference to the listener after awaiting close
+            remove_global_listener(&id).await?;
 
             res
         })
@@ -355,7 +354,7 @@ impl NgrokTunnel {
 // Methods designed to act like a native socket
 #[pymethods]
 #[allow(dead_code)]
-impl NgrokTunnel {
+impl Listener {
     // for aiohttp case, proxy calls to socket
     #[getter]
     pub fn get_family(&self, py: Python) -> PyResult<Py<PyAny>> {
@@ -427,7 +426,7 @@ impl NgrokTunnel {
         self.fileno(py)
     }
 
-    // Get or create the python socket to use for this tunnel, and return an attribute of it.
+    // Get or create the python socket to use for this listener, and return an attribute of it.
     fn get_sock_attr(&self, py: Python, attr: &PyString) -> PyResult<Py<PyAny>> {
         self.get_sock(py)?.getattr(py, attr)
     }
@@ -456,7 +455,7 @@ impl NgrokTunnel {
 
     // Fulfill the iterator protocol so aiohttp will grab the wrap object.
     // This prevents the windows proactor framework from trying to use a weakref
-    // directly to the rust tunnel, which is not supported until ABI 3.9.
+    // directly to the rust listener, which is not supported until ABI 3.9.
     #[cfg(target_os = "windows")]
     fn __iter__(self_: PyRef<'_, Self>, py: Python) -> PyResult<Py<Iter>> {
         // Wrap self in a native python object to support weakref
@@ -469,31 +468,31 @@ impl NgrokTunnel {
 }
 
 #[allow(unused_mut)]
-impl Drop for NgrokTunnel {
+impl Drop for Listener {
     fn drop(&mut self) {
-        debug!("NgrokTunnel finalize, id: {}", self.tun_meta.id);
+        debug!("Listener finalize, id: {}", self.tun_meta.id);
     }
 }
 
-make_tunnel_type! {
-    /// An ngrok tunnel backing an HTTP endpoint.
-    NgrokHttpTunnel, HttpTunnel, common
+make_listener_type! {
+    /// An ngrok listener backing an HTTP endpoint.
+    HttpListener, HttpTunnel, common
 }
-make_tunnel_type! {
-    /// An ngrok tunnel backing a TCP endpoint.
-    NgrokTcpTunnel, TcpTunnel, common
+make_listener_type! {
+    /// An ngrok listener backing a TCP endpoint.
+    TcpListener, TcpTunnel, common
 }
-make_tunnel_type! {
-    /// An ngrok tunnel bcking a TLS endpoint.
-    NgrokTlsTunnel, TlsTunnel, common
+make_listener_type! {
+    /// An ngrok listener bcking a TLS endpoint.
+    TlsListener, TlsTunnel, common
 }
-make_tunnel_type! {
-    /// A labeled ngrok tunnel.
-    NgrokLabeledTunnel, LabeledTunnel, label
+make_listener_type! {
+    /// A labeled ngrok listener.
+    LabeledListener, LabeledTunnel, label
 }
 
 pub async fn forward(id: &String, mut addr: String) -> PyResult<()> {
-    let tun_option = &get_storage_by_id(id).await?.tunnel;
+    let tun_option = &get_storage_by_id(id).await?.listener;
     if let Some(tun) = tun_option {
         // if addr is not a full url, choose a default protocol
         lazy_static! {
@@ -510,13 +509,13 @@ pub async fn forward(id: &String, mut addr: String) -> PyResult<()> {
         let url = Url::parse(addr.as_str())
             .map_err(|e| py_err(format!("Cannot parse address: {addr}, error: {e}")))?;
 
-        info!("Tunnel {id:?} forwarding to {:?}", url.to_string());
+        info!("Listener {id:?} forwarding to {:?}", url.to_string());
         let res = tun.lock().await.fwd(url).await;
 
         debug!("forward returning");
         canceled_is_ok(res)
     } else {
-        Err(py_err("tunnel is not forwardable"))
+        Err(py_err("listener is not forwardable"))
     }
 }
 
@@ -541,18 +540,18 @@ fn canceled_is_ok(input: CoreResult<(), io::Error>) -> PyResult<()> {
 
 async fn get_storage_by_id(id: &String) -> PyResult<Arc<Storage>> {
     // we must clone the Arc before any locking so there is a local reference
-    // to the mutex to unlock if the tunnel wrapper struct is dropped.
-    Ok(GLOBAL_TUNNELS
+    // to the mutex to unlock if the listener wrapper struct is dropped.
+    Ok(GLOBAL_LISTENERS
         .lock()
         .await
         .get(id)
-        .ok_or(py_err("Tunnel is no longer running"))?
+        .ok_or(py_err("Listener is no longer running"))?
         .clone()) // required clone
 }
 
-/// Delete any reference to the tunnel id
-pub(crate) async fn remove_global_tunnel(id: &String) -> PyResult<()> {
-    GLOBAL_TUNNELS.lock().await.remove(id);
+/// Delete any reference to the listener id
+pub(crate) async fn remove_global_listener(id: &String) -> PyResult<()> {
+    GLOBAL_LISTENERS.lock().await.remove(id);
 
     // remove any references to sockets
     Python::with_gil(|py| -> PyResult<()> {
@@ -572,61 +571,61 @@ pub(crate) async fn remove_global_tunnel(id: &String) -> PyResult<()> {
     })
 }
 
-/// Close a tunnel with the given url, or all tunnels if no url is defined.
+/// Close a listener with the given url, or all listeners if no url is defined.
 #[allow(dead_code)]
 pub(crate) async fn close_url(url: Option<String>) -> PyResult<()> {
     let mut close_ids: Vec<String> = vec![];
-    let tunnels = GLOBAL_TUNNELS.lock().await;
-    for (id, storage) in tunnels.iter() {
-        debug!("tunnel: {}", id);
+    let listeners = GLOBAL_LISTENERS.lock().await;
+    for (id, storage) in listeners.iter() {
+        debug!("listener: {}", id);
         if url.as_ref().is_none() || url == storage.tun_meta.url {
-            debug!("closing tunnel: {}", id);
+            debug!("closing listener: {}", id);
             storage
                 .session
                 .close_tunnel(id)
                 .await
-                .map_err(|e| py_ngrok_err("error closing tunnel", &e))?;
+                .map_err(|e| py_ngrok_err("error closing listener", &e))?;
             close_ids.push(id.clone());
         }
     }
-    drop(tunnels); // unlock GLOBAL_TUNNELS
+    drop(listeners); // unlock GLOBAL_LISTENERS
 
     // remove references entirely
     for id in close_ids {
-        remove_global_tunnel(&id).await?;
+        remove_global_listener(&id).await?;
     }
     Ok(())
 }
 
-/// Make a list of all tunnels by iterating over the global tunnel map and creating an NgrokTunnel from each.
-pub(crate) async fn list_tunnels(session_id: Option<String>) -> PyResult<Vec<NgrokTunnel>> {
-    let mut tunnels: Vec<NgrokTunnel> = vec![];
-    for (_, storage) in GLOBAL_TUNNELS.lock().await.iter() {
+/// Make a list of all Listeners by iterating over the global Listener map and creating an Listener from each.
+pub(crate) async fn list_listeners(session_id: Option<String>) -> PyResult<Vec<Listener>> {
+    let mut listeners: Vec<Listener> = vec![];
+    for (_, storage) in GLOBAL_LISTENERS.lock().await.iter() {
         // filter by session_id, if provided
         if let Some(session_id) = session_id.as_ref() {
             if session_id.ne(&storage.session.id()) {
                 continue;
             }
         }
-        // create a new NgrokTunnel from the storage
-        tunnels.push(NgrokTunnel::from_storage(storage));
+        // create a new Listener from the storage
+        listeners.push(Listener::from_storage(storage));
     }
-    Ok(tunnels)
+    Ok(listeners)
 }
 
-/// Retrieve a list of non-closed tunnels, in no particular order.
+/// Retrieve a list of non-closed listeners, in no particular order.
 #[pyfunction]
-pub fn get_tunnels(py: Python) -> PyResult<Py<PyAny>> {
+pub fn get_listeners(py: Python) -> PyResult<Py<PyAny>> {
     // move to async, handling if there is an async loop running or not
-    wrapper::loop_wrap(py, None, "    return await ngrok.async_tunnels()")
+    wrapper::loop_wrap(py, None, "    return await ngrok.async_listeners()")
 }
 
 #[pyfunction]
-pub fn async_tunnels(py: Python) -> PyResult<&PyAny> {
-    pyo3_asyncio::tokio::future_into_py(py, async move { list_tunnels(None).await })
+pub fn async_listeners(py: Python) -> PyResult<&PyAny> {
+    pyo3_asyncio::tokio::future_into_py(py, async move { list_listeners(None).await })
 }
 
-// Helper class to implement the iterator protocol for tunnel sockets.
+// Helper class to implement the iterator protocol for listener sockets.
 #[pyclass]
 struct Iter {
     inner: std::vec::IntoIter<Py<PyAny>>,

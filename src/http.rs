@@ -12,11 +12,11 @@ use pyo3::{
     PyRefMut,
 };
 
-use crate::tunnel_builder::NgrokHttpTunnelBuilder;
+use crate::listener_builder::HttpListenerBuilder;
 
 #[pymethods]
 #[allow(dead_code)]
-impl NgrokHttpTunnelBuilder {
+impl HttpListenerBuilder {
     /// The scheme that this edge should use.
     /// Defaults to [Scheme::HTTPS].
     pub fn scheme(self_: PyRefMut<Self>, scheme: String) -> PyRefMut<Self> {

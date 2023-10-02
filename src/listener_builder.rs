@@ -28,41 +28,41 @@ use tracing::debug;
 use url::Url;
 
 use crate::{
+    listener::{
+        HttpListener,
+        LabeledListener,
+        Listener,
+        TcpListener,
+        TlsListener,
+    },
     py_err,
     py_ngrok_err,
-    tunnel::{
-        NgrokHttpTunnel,
-        NgrokLabeledTunnel,
-        NgrokTcpTunnel,
-        NgrokTlsTunnel,
-        NgrokTunnel,
-    },
     wrapper::address_from_server,
 };
 
-macro_rules! make_tunnel_builder {
-    ($(#[$outer:meta])* $wrapper:ident, $builder:tt, $tunnel:tt, $mode:tt) => {
+macro_rules! make_listener_builder {
+    ($(#[$outer:meta])* $wrapper:ident, $builder:tt, $listener:tt, $mode:tt) => {
         $(#[$outer])*
         #[pyclass]
         #[allow(dead_code)]
         pub(crate) struct $wrapper {
             session: Arc<Mutex<Session>>,
-            pub(crate) tunnel_builder: Arc<Mutex<$builder>>,
+            pub(crate) listener_builder: Arc<Mutex<$builder>>,
         }
 
         #[pymethods]
         #[allow(dead_code)]
         impl $wrapper {
-            /// Tunnel-specific opaque metadata. Viewable via the API.
+            /// Listener-specific opaque metadata. Viewable via the API.
             pub fn metadata(self_: PyRefMut<Self>, metadata: String) -> PyRefMut<Self> {
                 self_.set(|b| {b.metadata(metadata);});
                 self_
             }
 
-            /// Begin listening for new connections on this tunnel.
+            /// Begin listening for new connections on this listener.
             pub fn listen<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
                 let session = self.session.lock().clone();
-                let tun = self.tunnel_builder.lock().clone();
+                let tun = self.listener_builder.lock().clone();
                 pyo3_asyncio::tokio::future_into_py(
                     py,
                     async move {
@@ -71,11 +71,11 @@ macro_rules! make_tunnel_builder {
                 )
             }
 
-            /// Begin listening for new connections on this tunnel and forwarding them to the given url.
+            /// Begin listening for new connections on this listener and forwarding them to the given url.
             pub fn listen_and_forward<'a>(&self, to_url: String, py: Python<'a>) -> PyResult<&'a PyAny> {
                 let url = Url::parse(&to_url).map_err(|e| py_err(format!("Url forward argument parse failure, {e}")))?;
                 let session = self.session.lock().clone();
-                let builder = self.tunnel_builder.lock().clone();
+                let builder = self.listener_builder.lock().clone();
 
                 pyo3_asyncio::tokio::future_into_py(
                     py,
@@ -83,22 +83,22 @@ macro_rules! make_tunnel_builder {
                         let result = builder
                         .listen_and_forward(url)
                         .await
-                        .map_err(|e| py_ngrok_err("failed to start tunnel", &e));
+                        .map_err(|e| py_ngrok_err("failed to start listener", &e));
 
-                        // create the wrapping tunnel object via its async new()
+                        // create the wrapping listener object via its async new()
                         match result {
-                            Ok(raw_fwd) => Ok($tunnel::new_forwarder(session, raw_fwd).await),
+                            Ok(raw_fwd) => Ok($listener::new_forwarder(session, raw_fwd).await),
                             Err(val) => Err(val),
                         }
                     },
                 )
             }
 
-            /// Begin listening for new connections on this tunnel and forwarding them to the given http server.
+            /// Begin listening for new connections on this listener and forwarding them to the given http server.
             ///
-            /// :param server: The server to link with a tunnel.
+            /// :param server: The server to link with a listener.
             /// :type server: http.server.HTTPServer or None
-            /// :return: A task to await for the tunnel linked with the server.
+            /// :return: A task to await for the listener linked with the server.
             /// :rtype: Task
             pub fn listen_and_serve<'a>(
                 &self,
@@ -112,10 +112,10 @@ macro_rules! make_tunnel_builder {
 
         #[allow(dead_code)]
         impl $wrapper {
-            pub(crate) fn new(session: Session, raw_tunnel_builder: $builder) -> Self {
+            pub(crate) fn new(session: Session, raw_listener_builder: $builder) -> Self {
                 $wrapper {
                     session: Arc::new(Mutex::new(session)),
-                    tunnel_builder: Arc::new(Mutex::new(raw_tunnel_builder)),
+                    listener_builder: Arc::new(Mutex::new(raw_listener_builder)),
                 }
             }
 
@@ -124,25 +124,25 @@ macro_rules! make_tunnel_builder {
             where
                 F: FnOnce(&mut parking_lot::lock_api::MutexGuard<'_, parking_lot::RawMutex, $builder>),
             {
-                let mut builder = self.tunnel_builder.lock();
+                let mut builder = self.listener_builder.lock();
                 f(&mut builder);
             }
 
-            pub(crate) async fn async_listen(&self) -> PyResult<NgrokTunnel> {
+            pub(crate) async fn async_listen(&self) -> PyResult<Listener> {
                 let session = self.session.lock().clone();
-                let tun = self.tunnel_builder.lock().clone();
+                let tun = self.listener_builder.lock().clone();
                 $wrapper::do_listen(session, tun).await
             }
 
-            async fn do_listen(session: Session, builder: $builder) -> PyResult<NgrokTunnel> {
+            async fn do_listen(session: Session, builder: $builder) -> PyResult<Listener> {
                 let result = builder
                             .listen()
                             .await
-                            .map_err(|e| py_ngrok_err("failed to start tunnel", &e));
+                            .map_err(|e| py_ngrok_err("failed to start listener", &e));
 
-                // create the wrapping tunnel object via its async new()
+                // create the wrapping listener object via its async new()
                 match result {
-                    Ok(raw_tun) => Ok($tunnel::new_tunnel(session, raw_tun).await),
+                    Ok(raw_tun) => Ok($listener::new_listener(session, raw_tun).await),
                     Err(val) => Err(val),
                 }
             }
@@ -156,7 +156,7 @@ macro_rules! make_tunnel_builder {
 
 
         // mode specific methods
-        make_tunnel_builder!($mode, $wrapper);
+        make_listener_builder!($mode, $wrapper);
     };
 
     (common, $wrapper:ty) => {
@@ -175,7 +175,7 @@ macro_rules! make_tunnel_builder {
                 self_.set(|b| {b.deny_cidr(cidr);});
                 self_
             }
-            /// The version of PROXY protocol to use with this tunnel "1", "2", or "" if not using.
+            /// The version of PROXY protocol to use with this listener "1", "2", or "" if not using.
             pub fn proxy_proto(self_: PyRefMut<Self>, proxy_proto: String) -> PyRefMut<Self> {
                 self_.set(|b| {b.proxy_proto(
                     ProxyProto::from_str(proxy_proto.as_str())
@@ -183,8 +183,8 @@ macro_rules! make_tunnel_builder {
                 );});
                 self_
             }
-            /// Tunnel backend metadata. Viewable via the dashboard and API, but has no
-            /// bearing on tunnel behavior.
+            /// Listener backend metadata. Viewable via the dashboard and API, but has no
+            /// bearing on listener behavior.
             pub fn forwards_to(self_: PyRefMut<Self>, forwards_to: String) -> PyRefMut<Self> {
                 self_.set(|b| {b.forwards_to(forwards_to);});
                 self_
@@ -196,7 +196,7 @@ macro_rules! make_tunnel_builder {
         #[pymethods]
         #[allow(dead_code)]
         impl $wrapper {
-            /// Add a label, value pair for this tunnel.
+            /// Add a label, value pair for this listener.
             pub fn label(self_: PyRefMut<Self>, label: String, value: String) -> PyRefMut<Self> {
                 self_.set(|b| {b.label(label, value);});
                 self_
@@ -205,19 +205,19 @@ macro_rules! make_tunnel_builder {
     };
 }
 
-make_tunnel_builder! {
-    /// An ngrok tunnel backing an HTTP endpoint.
-    NgrokHttpTunnelBuilder, HttpTunnelBuilder, NgrokHttpTunnel, common
+make_listener_builder! {
+    /// An ngrok listener backing an HTTP endpoint.
+    HttpListenerBuilder, HttpTunnelBuilder, HttpListener, common
 }
-make_tunnel_builder! {
-    /// An ngrok tunnel backing a TCP endpoint.
-    NgrokTcpTunnelBuilder, TcpTunnelBuilder, NgrokTcpTunnel, common
+make_listener_builder! {
+    /// An ngrok listener backing a TCP endpoint.
+    TcpListenerBuilder, TcpTunnelBuilder, TcpListener, common
 }
-make_tunnel_builder! {
-    /// An ngrok tunnel backing a TLS endpoint.
-    NgrokTlsTunnelBuilder, TlsTunnelBuilder, NgrokTlsTunnel, common
+make_listener_builder! {
+    /// An ngrok listener backing a TLS endpoint.
+    TlsListenerBuilder, TlsTunnelBuilder, TlsListener, common
 }
-make_tunnel_builder! {
-    /// A labeled ngrok tunnel.
-    NgrokLabeledTunnelBuilder, LabeledTunnelBuilder, NgrokLabeledTunnel, label
+make_listener_builder! {
+    /// A labeled ngrok listener.
+    LabeledListenerBuilder, LabeledTunnelBuilder, LabeledListener, label
 }

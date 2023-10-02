@@ -6,7 +6,7 @@ use std::{
 
 // the lib.name and the pymodule below need to be 'ngrok' for that to be the python library
 // name, so this has to explicitly set this as a crate with the '::' prefix
-use ::ngrok::session::Session;
+use ::ngrok::session::Session as NgrokSession;
 use async_rustls::rustls::ClientConfig;
 use bytes::Bytes;
 use lazy_static::lazy_static;
@@ -14,7 +14,7 @@ use ngrok::{
     session::{
         default_connect,
         ConnectError,
-        SessionBuilder,
+        SessionBuilder as NgrokSessionBuilder,
         Update,
     },
     tunnel::AcceptError,
@@ -38,17 +38,17 @@ use tracing::{
 };
 
 use crate::{
+    listener::{
+        list_listeners,
+        remove_global_listener,
+    },
+    listener_builder::{
+        HttpListenerBuilder,
+        LabeledListenerBuilder,
+        TcpListenerBuilder,
+        TlsListenerBuilder,
+    },
     py_ngrok_err,
-    tunnel::{
-        list_tunnels,
-        remove_global_tunnel,
-    },
-    tunnel_builder::{
-        NgrokHttpTunnelBuilder,
-        NgrokLabeledTunnelBuilder,
-        NgrokTcpTunnelBuilder,
-        NgrokTlsTunnelBuilder,
-    },
 };
 
 const CLIENT_TYPE: &str = "ngrok-python";
@@ -70,13 +70,13 @@ pub fn set_auth_token(authtoken: String) {
 /// The builder for an ngrok session.
 #[pyclass]
 #[allow(dead_code)]
-pub(crate) struct NgrokSessionBuilder {
-    raw_builder: Arc<SyncMutex<SessionBuilder>>,
+pub(crate) struct SessionBuilder {
+    raw_builder: Arc<SyncMutex<NgrokSessionBuilder>>,
     disconnect_handler: Option<PyObject>,
     auth_token_set: bool,
 }
 
-impl NgrokSessionBuilder {
+impl SessionBuilder {
     /// Mark that the auth token has been set on this builder.
     fn auth_token_set(&mut self) {
         self.auth_token_set = true;
@@ -96,7 +96,7 @@ impl NgrokSessionBuilder {
     fn set<F>(&self, f: F)
     where
         F: FnOnce(
-            &mut parking_lot::lock_api::MutexGuard<'_, parking_lot::RawMutex, SessionBuilder>,
+            &mut parking_lot::lock_api::MutexGuard<'_, parking_lot::RawMutex, NgrokSessionBuilder>,
         ),
     {
         let mut builder = self.raw_builder.lock();
@@ -139,7 +139,7 @@ impl NgrokSessionBuilder {
         });
     }
 
-    pub async fn async_connect<'a>(&self) -> Result<NgrokSession, PyErr> {
+    pub async fn async_connect<'a>(&self) -> Result<Session, PyErr> {
         self.handle_default_auth_token();
         let builder = self.raw_builder.lock().clone();
         do_connect(builder).await
@@ -147,7 +147,7 @@ impl NgrokSessionBuilder {
 }
 
 #[pymethods]
-impl NgrokSessionBuilder {
+impl SessionBuilder {
     fn __str__(&self) -> String {
         "ngrok_session_builder".to_string()
     }
@@ -155,9 +155,9 @@ impl NgrokSessionBuilder {
     /// Create a new session builder
     #[new]
     pub fn new() -> Self {
-        NgrokSessionBuilder {
+        SessionBuilder {
             raw_builder: Arc::new(SyncMutex::new(
-                Session::builder()
+                NgrokSession::builder()
                     .client_info(CLIENT_TYPE, VERSION, None::<String>)
                     .clone(),
             )),
@@ -425,70 +425,73 @@ impl NgrokSessionBuilder {
     }
 }
 
-async fn do_connect(builder: SessionBuilder) -> Result<NgrokSession, PyErr> {
+async fn do_connect(builder: NgrokSessionBuilder) -> Result<Session, PyErr> {
     builder
         .connect()
         .await
         .map(|s| {
             info!("Session created");
-            NgrokSession {
+            Session {
                 raw_session: Arc::new(SyncMutex::new(s)),
             }
         })
         .map_err(|e| py_ngrok_err("failed to connect session", &e))
 }
 
-impl Drop for NgrokSessionBuilder {
+impl Drop for SessionBuilder {
     fn drop(&mut self) {
-        debug!("NgrokSessionBuilder drop");
+        debug!("SessionBuilder drop");
     }
 }
 
 /// An ngrok session.
 #[pyclass]
 #[derive(Clone)]
-pub(crate) struct NgrokSession {
-    raw_session: Arc<SyncMutex<Session>>,
+pub(crate) struct Session {
+    raw_session: Arc<SyncMutex<NgrokSession>>,
 }
 
 #[pymethods]
-impl NgrokSession {
+impl Session {
     fn __str__(&self) -> String {
         "ngrok_session".to_string()
     }
 
-    /// Start building a tunnel backing an HTTP endpoint.
-    pub fn http_endpoint(&self) -> NgrokHttpTunnelBuilder {
+    /// Start building a Listener backing an HTTP endpoint.
+    pub fn http_endpoint(&self) -> HttpListenerBuilder {
         let session = self.raw_session.lock().clone();
-        NgrokHttpTunnelBuilder::new(session.clone(), session.http_endpoint())
+        HttpListenerBuilder::new(session.clone(), session.http_endpoint())
     }
 
-    /// Start building a tunnel backing a TCP endpoint.
-    pub fn tcp_endpoint(&self) -> NgrokTcpTunnelBuilder {
+    /// Start building a Listener backing a TCP endpoint.
+    pub fn tcp_endpoint(&self) -> TcpListenerBuilder {
         let session = self.raw_session.lock().clone();
-        NgrokTcpTunnelBuilder::new(session.clone(), session.tcp_endpoint())
+        TcpListenerBuilder::new(session.clone(), session.tcp_endpoint())
     }
 
-    /// Start building a tunnel backing a TLS endpoint.
-    pub fn tls_endpoint(&self) -> NgrokTlsTunnelBuilder {
+    /// Start building a Listener backing a TLS endpoint.
+    pub fn tls_endpoint(&self) -> TlsListenerBuilder {
         let session = self.raw_session.lock().clone();
-        NgrokTlsTunnelBuilder::new(session.clone(), session.tls_endpoint())
+        TlsListenerBuilder::new(session.clone(), session.tls_endpoint())
     }
 
-    /// Start building a labeled tunnel.
-    pub fn labeled_tunnel(&self) -> NgrokLabeledTunnelBuilder {
+    /// Start building a labeled Listener.
+    pub fn labeled_listener(&self) -> LabeledListenerBuilder {
         let session = self.raw_session.lock().clone();
-        NgrokLabeledTunnelBuilder::new(session.clone(), session.labeled_tunnel())
+        LabeledListenerBuilder::new(session.clone(), session.labeled_tunnel())
     }
 
-    /// Retrieve a list of this session's non-closed tunnels, in no particular order.
-    pub fn get_tunnels<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+    /// Retrieve a list of this session's non-closed Listeners, in no particular order.
+    pub fn get_listeners<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
         let session_id = self.raw_session.lock().id();
-        pyo3_asyncio::tokio::future_into_py(py, async move { list_tunnels(Some(session_id)).await })
+        pyo3_asyncio::tokio::future_into_py(
+            py,
+            async move { list_listeners(Some(session_id)).await },
+        )
     }
 
-    /// Close a tunnel with the given ID.
-    pub fn close_tunnel<'a>(&self, py: Python<'a>, id: String) -> PyResult<&'a PyAny> {
+    /// Close a listener with the given ID.
+    pub fn close_listener<'a>(&self, py: Python<'a>, id: String) -> PyResult<&'a PyAny> {
         let session = self.raw_session.lock().clone();
         pyo3_asyncio::tokio::future_into_py(py, async move {
             let res = session
@@ -498,7 +501,7 @@ impl NgrokSession {
 
             if res.is_ok() {
                 // remove our reference to allow it to drop
-                remove_global_tunnel(&id).await?;
+                remove_global_listener(&id).await?;
             }
             res
         })
@@ -511,13 +514,13 @@ impl NgrokSession {
             session
                 .close()
                 .await
-                .map_err(|e| py_ngrok_err("failed to close tunnel", &e))
+                .map_err(|e| py_ngrok_err("failed to close listener", &e))
         })
     }
 }
 
-impl Drop for NgrokSession {
+impl Drop for Session {
     fn drop(&mut self) {
-        debug!("NgrokSession drop");
+        debug!("Session drop");
     }
 }

@@ -9,16 +9,16 @@ logging.basicConfig(level=logging.INFO)
 pipe = ngrok.pipe_name()
 
 
-async def create_tunnel() -> ngrok.NgrokTunnel:
+async def create_listener() -> ngrok.Listener:
     # create session
-    session: ngrok.NgrokSession = (
-        await ngrok.NgrokSessionBuilder()
+    session: ngrok.Session = (
+        await ngrok.SessionBuilder()
         .authtoken_from_env()
         # .authtoken("<authtoken>")
         .metadata("Online in One Line")
         .connect()
     )
-    # create tunnel
+    # create listener
     return (
         await session.tls_endpoint()
         # .allow_cidr("0.0.0.0/0")
@@ -28,7 +28,7 @@ async def create_tunnel() -> ngrok.NgrokTunnel:
         # .mutual_tlsca(load_file("ca.crt"))
         # .proxy_proto("") # One of: "", "1", "2"
         .termination(load_file("domain.crt"), load_file("domain.key"))
-        .metadata("example tunnel metadata from python")
+        .metadata("example listener metadata from python")
         .listen()
     )
 
@@ -62,6 +62,6 @@ if os.name != "nt":
     httpd = UnixSocketHttpServer((ngrok.pipe_name()), HelloHandler)
 
 logging.basicConfig(level=logging.INFO)
-tunnel = asyncio.run(create_tunnel())
-ngrok.listen(httpd, tunnel)
+listener = asyncio.run(create_listener())
+ngrok.listen(httpd, listener)
 httpd.serve_forever()

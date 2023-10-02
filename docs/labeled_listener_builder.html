@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Ngrok TLS Tunnel Builder" href="ngrok_tls_tunnel_builder.html" /><link rel="prev" title="Ngrok HTTP Tunnel Builder" href="ngrok_http_tunnel_builder.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Ngrok Module" href="module.html" /><link rel="prev" title="TLS Listener Builder" href="tls_listener_builder.html" />
 
     <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
-        <title>Ngrok TCP Tunnel Builder - ngrok documentation</title>
+        <title>Labeled Listener Builder - ngrok documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -154,18 +154,18 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Tunnel and Sessions:</span></p>
+  <p class="caption" role="heading"><span class="caption-text">Listener and Sessions:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_session_builder.html">Ngrok Session Builder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_session.html">Ngrok Session</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_tunnel.html">Ngrok Tunnel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_builder.html">Session Builder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">Session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="listener.html">Listener</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Tunnel Builders:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Listener Builders:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="ngrok_http_tunnel_builder.html">Ngrok HTTP Tunnel Builder</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Ngrok TCP Tunnel Builder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_tls_tunnel_builder.html">Ngrok TLS Tunnel Builder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_labeled_tunnel_builder.html">Ngrok Labeled Tunnel Builder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="http_listener_builder.html">HTTP Listener Builder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tcp_listener_builder.html">TCP Listener Builder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tls_listener_builder.html">TLS Listener Builder</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Labeled Listener Builder</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Module:</span></p>
 <ul>
@@ -204,56 +204,41 @@
           </label>
         </div>
         <article role="main">
-          <section id="ngrok-tcp-tunnel-builder">
-<h1>Ngrok TCP Tunnel Builder<a class="headerlink" href="#ngrok-tcp-tunnel-builder" title="Permalink to this heading">#</a></h1>
+          <section id="labeled-listener-builder">
+<h1>Labeled Listener Builder<a class="headerlink" href="#labeled-listener-builder" title="Permalink to this heading">#</a></h1>
 <p>The ngrok Agent SDK for Python</p>
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">NgrokTcpTunnelBuilder</span></span></dt>
-<dd><p>An ngrok tunnel backing a TCP endpoint.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">LabeledListenerBuilder</span></span></dt>
+<dd><p>A labeled ngrok listener.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">allow_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Restriction placed on the origin of incoming connections to the edge to only allow these CIDR ranges.
-Call multiple times to add additional CIDR ranges.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">deny_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Restriction placed on the origin of incoming connections to the edge to deny these CIDR ranges.
-Call multiple times to add additional CIDR ranges.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">forwards_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forwards_to</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Tunnel backend metadata. Viewable via the dashboard and API, but has no
-bearing on tunnel behavior.</p>
+<span class="sig-name descname"><span class="pre">label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Add a label, value pair for this listener.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">listen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Begin listening for new connections on this tunnel.</p>
+<dd><p>Begin listening for new connections on this listener.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">listen_and_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_url</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Begin listening for new connections on this tunnel and forwarding them to the given url.</p>
+<dd><p>Begin listening for new connections on this listener and forwarding them to the given url.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">listen_and_serve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Begin listening for new connections on this tunnel and forwarding them to the given http server.</p>
+<dd><p>Begin listening for new connections on this listener and forwarding them to the given http server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>server</strong> (<em>http.server.HTTPServer</em><em> or </em><em>None</em>) – The server to link with a tunnel.</p>
+<dd class="field-odd"><p><strong>server</strong> (<em>http.server.HTTPServer</em><em> or </em><em>None</em>) – The server to link with a listener.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A task to await for the tunnel linked with the server.</p>
+<dd class="field-even"><p>A task to await for the listener linked with the server.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Task</p>
@@ -264,19 +249,7 @@ bearing on tunnel behavior.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Tunnel-specific opaque metadata. Viewable via the API.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">proxy_proto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxy_proto</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>The version of PROXY protocol to use with this tunnel “1”, “2”, or “” if not using.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">remote_addr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remote_addr</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>The TCP address to request for this edge.</p>
+<dd><p>Listener-specific opaque metadata. Viewable via the API.</p>
 </dd></dl>
 
 </dd></dl>
@@ -288,23 +261,23 @@ bearing on tunnel behavior.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="ngrok_tls_tunnel_builder.html">
+          <a class="next-page" href="module.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Ngrok TLS Tunnel Builder</div>
+                <div class="title">Ngrok Module</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="ngrok_http_tunnel_builder.html">
+          <a class="prev-page" href="tls_listener_builder.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Ngrok HTTP Tunnel Builder</div>
+                <div class="title">TLS Listener Builder</div>
                 
               </div>
             </a>

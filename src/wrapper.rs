@@ -15,11 +15,11 @@ use pyo3::{
 };
 
 use crate::{
-    py_err,
-    tunnel::{
+    listener::{
         TCP_PREFIX,
         UNIX_PREFIX,
     },
+    py_err,
 };
 
 /// Create a path name to use for pipe forwarding.
@@ -52,49 +52,49 @@ def run(input=None):
     )
 }
 
-/// Create a default HTTP tunnel. Optionally pass in a connected NgrokSession to use.
+/// Create a default HTTP listener. Optionally pass in a connected Session to use.
 ///
-/// Returns the tunnel if no async loop is running, otherwise returns a Task to await with a tunnel result.
+/// Returns the listener if no async loop is running, otherwise returns a Task to await with a listener result.
 ///
-/// :param session: The NgrokSession to use to create the tunnel.
-/// :type session: NgrokSession or None
-/// :return: The created tunnel.
-/// :rtype: NgrokTunnel
+/// :param session: The Session to use to create the listener.
+/// :type session: Session or None
+/// :return: The created listener.
+/// :rtype: Listener
 #[pyfunction]
 #[pyo3(text_signature = "(session=None)")]
 pub fn default(py: Python, session: Option<Py<PyAny>>) -> PyResult<Py<PyAny>> {
-    default_tunnel_with_return(py, session, "tunnel")
+    default_listener_with_return(py, session, "listener")
 }
 
-/// Create a default HTTP tunnel and get its file descriptor. Optionally pass in a connected NgrokSession to use.
+/// Create a default HTTP listener and get its file descriptor. Optionally pass in a connected Session to use.
 ///
 /// Returns the file descriptor if no async loop is running, otherwise returns a Task to await with a file descriptor result.
 ///
-/// :param session: The NgrokSession to use to create the tunnel.
-/// :type session: NgrokSession or None
-/// :return: The file descriptor of the created tunnel's forwarding socket.
+/// :param session: The Session to use to create the listener.
+/// :type session: Session or None
+/// :return: The file descriptor of the created listener's forwarding socket.
 /// :rtype: int
 #[pyfunction]
 #[pyo3(text_signature = "(session=None)")]
 pub fn fd(py: Python, session: Option<Py<PyAny>>) -> PyResult<Py<PyAny>> {
-    default_tunnel_with_return(py, session, "tunnel.fd")
+    default_listener_with_return(py, session, "listener.fd")
 }
 
-/// Create a default HTTP tunnel and get its socket name. Optionally pass in a connected NgrokSession to use.
+/// Create a default HTTP listener and get its socket name. Optionally pass in a connected Session to use.
 ///
 /// Returns the socket name if no async loop is running, otherwise returns a Task to await with a socket name result.
 ///
-/// :param session: The NgrokSession to use to create the tunnel.
-/// :type session: NgrokSession or None
-/// :return: The name of the created tunnel's forwarding socket.
+/// :param session: The Session to use to create the listener.
+/// :type session: Session or None
+/// :return: The name of the created listener's forwarding socket.
 /// :rtype: str
 #[pyfunction]
 #[pyo3(text_signature = "(session=None)")]
 pub fn getsockname(py: Python, session: Option<Py<PyAny>>) -> PyResult<Py<PyAny>> {
-    default_tunnel_with_return(py, session, "tunnel.getsockname()")
+    default_listener_with_return(py, session, "listener.getsockname()")
 }
 
-fn default_tunnel_with_return(
+fn default_listener_with_return(
     py: Python,
     session: Option<Py<PyAny>>,
     return_str: &str,
@@ -105,33 +105,33 @@ fn default_tunnel_with_return(
         &format!(
             r###"
     if input is None:
-        input = await NgrokSessionBuilder().authtoken_from_env().connect()
-    tunnel = await input.http_endpoint().listen()
+        input = await SessionBuilder().authtoken_from_env().connect()
+    listener = await input.http_endpoint().listen()
     return {return_str}
     "###
         ),
     )
 }
 
-/// Create and return a listening default HTTP tunnel.
+/// Create and return a listening default HTTP listener.
 /// Optionally pass in an object with at "server_address" attribute,
-/// such as a http.server.HTTPServer, and the tunnel will
-/// forward TCP to that server_address. Optionally also pass in a previously created tunnel.
+/// such as a http.server.HTTPServer, and the listener will
+/// forward TCP to that server_address. Optionally also pass in a previously created listener.
 ///
-/// Returns the created tunnel if no async loop is running, otherwise returns a Task to await with a tunnel result.
+/// Returns the created listener if no async loop is running, otherwise returns a Task to await with a listener result.
 ///
-/// :param server: The server to link with a tunnel.
+/// :param server: The server to link with a listener.
 /// :type server: http.server.HTTPServer or None
-/// :param tunnel: The NgrokTunnel to use to link with the server.
-/// :type tunnel: NgrokTunnel or None
-/// :return: The tunnel linked with the server, or a Task to await for said tunnel.
-/// :rtype: NgrokTunnel or Task
+/// :param listener: The Listener to use to link with the server.
+/// :type listener: Listener or None
+/// :return: The listener linked with the server, or a Task to await for said listener.
+/// :rtype: Listener or Task
 #[pyfunction]
-#[pyo3(text_signature = "(server=None, tunnel=None)")]
+#[pyo3(text_signature = "(server=None, listener=None)")]
 pub fn listen(
     py: Python,
     server: Option<Py<PyAny>>,
-    tunnel: Option<Py<PyAny>>,
+    listener: Option<Py<PyAny>>,
 ) -> PyResult<Py<PyAny>> {
     let mut forward = "".to_string();
     if let Some(server) = server {
@@ -141,11 +141,11 @@ pub fn listen(
 
     loop_wrap(
         py,
-        tunnel,
+        listener,
         &format!(
             r###"
     if input is None:
-        session = await NgrokSessionBuilder().authtoken_from_env().connect()
+        session = await SessionBuilder().authtoken_from_env().connect()
         input = await session.http_endpoint().listen()
     {forward}
     return input
@@ -180,24 +180,24 @@ pub(crate) fn address_from_server(py: Python, server: Py<PyAny>) -> Result<Strin
     }
 }
 
-/// Set the WERKZEUG_SERVER_FD environment variable with a file descriptor from a default HTTP tunnel.
+/// Set the WERKZEUG_SERVER_FD environment variable with a file descriptor from a default HTTP listener.
 /// Also sets WERKZEUG_RUN_MAIN to "true" to engage the use of WERKZEUG_SERVER_FD.
 ///
-/// Returns the created tunnel if no async loop is running, otherwise returns a Task to await with a tunnel result.
+/// Returns the created listener if no async loop is running, otherwise returns a Task to await with a listener result.
 ///
-/// :param tunnel: The NgrokTunnel to use to link with the werkzeug server.
-/// :type tunnel: NgrokTunnel or None
-/// :return: The tunnel linked with the server, or a Task to await for said tunnel.
-/// :rtype: NgrokTunnel or Task
+/// :param listener: The Listener to use to link with the werkzeug server.
+/// :type listener: Listener or None
+/// :return: The listener linked with the server, or a Task to await for said listener.
+/// :rtype: Listener or Task
 #[pyfunction]
-#[pyo3(text_signature = "(tunnel=None)")]
-pub fn werkzeug_develop(py: Python, tunnel: Option<Py<PyAny>>) -> PyResult<Py<PyAny>> {
+#[pyo3(text_signature = "(listener=None)")]
+pub fn werkzeug_develop(py: Python, listener: Option<Py<PyAny>>) -> PyResult<Py<PyAny>> {
     loop_wrap(
         py,
-        tunnel,
+        listener,
         r#"
     if input is None:
-        session = await NgrokSessionBuilder().authtoken_from_env().connect()
+        session = await SessionBuilder().authtoken_from_env().connect()
         input = await session.http_endpoint().listen()
 
     import os
@@ -214,7 +214,7 @@ pub(crate) fn loop_wrap(py: Python, input: Option<Py<PyAny>>, work: &str) -> PyR
         r###"
 import asyncio
 import ngrok
-from ngrok import NgrokSessionBuilder
+from ngrok import SessionBuilder
 
 async def wrap(input=None):
 {work}

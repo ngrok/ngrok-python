@@ -12,7 +12,7 @@ DEFAULT_PORT = "8000"
 
 
 def configure_session(args):
-    builder = ngrok.NgrokSessionBuilder()
+    builder = ngrok.SessionBuilder()
     if args.authtoken:
         builder.authtoken(args.authtoken)
     else:
@@ -23,7 +23,7 @@ def configure_session(args):
     return builder
 
 
-def configure_tunnel(session, args):
+def configure_listener(session, args):
     builder = session.http_endpoint()
     if args.allow_cidr:
         for cidr in args.allow_cidr:
@@ -135,51 +135,51 @@ def get_tcp_string(args):
     return tcp_string
 
 
-def setup_forwarding(tunnel, args, tcp_string=None):
+def setup_forwarding(listener, args, tcp_string=None):
     if tcp_string:
-        tunnel.forward(tcp_string)
+        listener.forward(tcp_string)
         return True
 
     # prefer pipe over tcp
     pipe_string = get_pipe_string(args)
     if pipe_string:
-        tunnel.forward(pipe_string)
+        listener.forward(pipe_string)
     else:
         tcp_string = get_tcp_string(args)
         if not tcp_string:
             return False
-        tunnel.forward(tcp_string)
+        listener.forward(tcp_string)
 
     return True
 
 
 async def bind(parser, args):
     session = await configure_session(args).connect()
-    tunnel = await configure_tunnel(session, args).listen()
-    tunnel_success = setup_forwarding(tunnel, args)
+    listener = await configure_listener(session, args).listen()
+    listener_success = setup_forwarding(listener, args)
 
     # if we don't have what we need, check gunicorn environment variable
     if (
-        not tunnel_success
+        not listener_success
         and args.command == "gunicorn"
         and "GUNICORN_CMD_ARGS" in os.environ
     ):
         env_cmd_args = shlex.split(os.getenv("GUNICORN_CMD_ARGS"))
         env_args, unknown = parser.parse_known_args(env_cmd_args)
-        tunnel_success = setup_forwarding(tunnel, env_args)
+        listener_success = setup_forwarding(listener, env_args)
 
     # fallback to the default host and port for these runners
-    if not tunnel_success:
-        tunnel_success = setup_forwarding(
-            tunnel, args, tcp_string=f"{DEFAULT_HOST}:{fallback_port(args)}"
+    if not listener_success:
+        listener_success = setup_forwarding(
+            listener, args, tcp_string=f"{DEFAULT_HOST}:{fallback_port(args)}"
         )
 
     # give up
-    if not tunnel_success:
-        logging.fatal("No tunnel created. Exiting.")
+    if not listener_success:
+        logging.fatal("No listener created. Exiting.")
         sys.exit(1)
 
-    return tunnel
+    return listener
 
 
 def main(args):
@@ -198,7 +198,7 @@ def main(args):
         sys.exit(3)
 
     # bind to ngrok
-    tunnel = asyncio.run(bind(parser, args))
+    listener = asyncio.run(bind(parser, args))
 
     # now pretend we don't exist
     pass_args = [args.command]

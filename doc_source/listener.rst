@@ -1,7 +1,7 @@
-Ngrok Tunnel
+Listener
 =====================================
 
 .. automodule:: ngrok
-   :members: NgrokTunnel
+   :members: Listener
    :noindex:
 

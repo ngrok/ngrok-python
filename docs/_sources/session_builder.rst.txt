@@ -1,7 +1,7 @@
-Ngrok HTTP Tunnel Builder
+Session Builder
 =====================================
 
 .. automodule:: ngrok
-   :members: NgrokHttpTunnelBuilder
+   :members: SessionBuilder
    :noindex:
 

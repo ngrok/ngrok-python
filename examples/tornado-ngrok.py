@@ -19,16 +19,16 @@ def make_app():
     )
 
 
-async def setup_tunnel():
+async def setup_listener():
     listen = f"localhost:{app_port}"
-    session = await ngrok.NgrokSessionBuilder().authtoken_from_env().connect()
-    tunnel = await (
+    session = await ngrok.SessionBuilder().authtoken_from_env().connect()
+    listener = await (
         session.http_endpoint()
         # .domain('<name>.ngrok.app') # if on a paid plan, set a custom static domain
         .listen()
     )
-    print(f"Forwarding to {listen} from ingress url: {tunnel.url()}")
-    tunnel.forward(listen)
+    print(f"Forwarding to {listen} from ingress url: {listener.url()}")
+    listener.forward(listen)
 
 
 async def main():
@@ -38,5 +38,5 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(setup_tunnel())
+    asyncio.run(setup_listener())
     asyncio.run(main())
