@@ -18,7 +18,7 @@ use crate::listener_builder::HttpListenerBuilder;
 #[allow(dead_code)]
 impl HttpListenerBuilder {
     /// The scheme that this edge should use.
-    /// Defaults to [Scheme::HTTPS].
+    /// "HTTPS" or "HTTP", defaults to "HTTPS".
     pub fn scheme(self_: PyRefMut<Self>, scheme: String) -> PyRefMut<Self> {
         self_.set(|b| {
             b.scheme(
@@ -28,7 +28,11 @@ impl HttpListenerBuilder {
         });
         self_
     }
-    /// The domain to request for this edge.
+    /// The domain to request for this edge, any valid domain or hostname that you have
+    /// previously registered with ngrok. If using a custom domain, this requires
+    /// registering in the `ngrok dashboard`_ and setting a DNS CNAME value.
+    ///
+    /// .. _ngrok dashboard: https://dashboard.ngrok.com/cloud-edge/domains
     pub fn domain(self_: PyRefMut<Self>, domain: String) -> PyRefMut<Self> {
         self_.set(|b| {
             b.domain(domain);
@@ -36,6 +40,9 @@ impl HttpListenerBuilder {
         self_
     }
     /// Certificates to use for client authentication at the ngrok edge.
+    /// See `Mutual TLS`_ in the ngrok docs for additional details.
+    ///
+    /// .. _Mutual TLS: https://ngrok.com/docs/cloud-edge/modules/mutual-tls/
     pub fn mutual_tlsca<'a>(
         self_: PyRefMut<'a, Self>,
         mutual_tlsca: &PyByteArray,
@@ -46,6 +53,9 @@ impl HttpListenerBuilder {
         self_
     }
     /// Enable gzip compression for HTTP responses.
+    /// See `Compression`_ in the ngrok docs for additional details.
+    ///
+    /// .. _Compression: https://ngrok.com/docs/cloud-edge/modules/compression/
     pub fn compression(self_: PyRefMut<Self>) -> PyRefMut<Self> {
         self_.set(|b| {
             b.compression();
@@ -61,6 +71,9 @@ impl HttpListenerBuilder {
     }
     /// Reject requests when 5XX responses exceed this ratio.
     /// Disabled when 0.
+    /// See `Circuit Breaker`_ in the ngrok docs for additional details.
+    ///
+    /// .. _Circuit Breaker: https://ngrok.com/docs/cloud-edge/modules/circuit-breaker/
     pub fn circuit_breaker(self_: PyRefMut<Self>, circuit_breaker: f64) -> PyRefMut<Self> {
         self_.set(|b| {
             b.circuit_breaker(circuit_breaker);
@@ -69,6 +82,9 @@ impl HttpListenerBuilder {
     }
 
     /// Adds a header to all requests to this edge.
+    /// See `Request Headers`_ in the ngrok docs for additional details.
+    ///
+    /// .. _Request Headers: https://ngrok.com/docs/cloud-edge/modules/request-headers/
     pub fn request_header(self_: PyRefMut<Self>, name: String, value: String) -> PyRefMut<Self> {
         self_.set(|b| {
             b.request_header(name, value);
@@ -76,6 +92,9 @@ impl HttpListenerBuilder {
         self_
     }
     /// Adds a header to all responses coming from this edge.
+    /// See `Response Headers`_ in the ngrok docs for additional details.
+    ///
+    /// .. _Response Headers: https://ngrok.com/docs/cloud-edge/modules/response-headers/
     pub fn response_header(self_: PyRefMut<Self>, name: String, value: String) -> PyRefMut<Self> {
         self_.set(|b| {
             b.response_header(name, value);
@@ -83,6 +102,9 @@ impl HttpListenerBuilder {
         self_
     }
     /// Removes a header from requests to this edge.
+    /// See `Request Headers`_ in the ngrok docs for additional details.
+    ///
+    /// .. _Request Headers: https://ngrok.com/docs/cloud-edge/modules/request-headers/
     pub fn remove_request_header(self_: PyRefMut<Self>, name: String) -> PyRefMut<Self> {
         self_.set(|b| {
             b.remove_request_header(name);
@@ -90,6 +112,9 @@ impl HttpListenerBuilder {
         self_
     }
     /// Removes a header from responses from this edge.
+    /// See `Response Headers`_ in the ngrok docs for additional details.
+    ///
+    /// .. _Response Headers: https://ngrok.com/docs/cloud-edge/modules/response-headers/
     pub fn remove_response_header(self_: PyRefMut<Self>, name: String) -> PyRefMut<Self> {
         self_.set(|b| {
             b.remove_response_header(name);
@@ -108,6 +133,9 @@ impl HttpListenerBuilder {
 
     /// OAuth configuration.
     /// If not called, OAuth is disabled.
+    /// See `OAuth`_ in the ngrok docs for additional details.
+    ///
+    /// .. _OAuth: https://ngrok.com/docs/cloud-edge/modules/oauth/
     ///
     /// :param str provider: The name of the OAuth provider to use.
     /// :param list or None allow_emails: A list of email addresses to allow.
@@ -146,6 +174,9 @@ impl HttpListenerBuilder {
 
     /// OIDC configuration.
     /// If not called, OIDC is disabled.
+    /// See `OpenID Connect`_ in the ngrok docs for additional details.
+    ///
+    /// .. _OpenID Connect: https://ngrok.com/docs/cloud-edge/modules/openid-connect/
     ///
     /// :param str issuer_url: The name of the OIDC issuer URL to use.
     /// :param str client_id: The OIDC client ID.
@@ -190,6 +221,9 @@ impl HttpListenerBuilder {
 
     /// WebhookVerification configuration.
     /// If not called, WebhookVerification is disabled.
+    /// See `Webhook Verification`_ in the ngrok docs for additional details.
+    ///
+    /// .. _Webhook Verification: https://ngrok.com/docs/cloud-edge/modules/webhook-verification/
     pub fn webhook_verification(
         self_: PyRefMut<Self>,
         provider: String,

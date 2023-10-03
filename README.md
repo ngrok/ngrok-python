@@ -119,6 +119,8 @@ options = {"authtoken_from_env":True, "response_header_add":"X-Awesome:yes"}
 listener = ngrok.connect(8080, **options)
 ```
 
+See [Full Configuration](#full-configuration) for the list of possible configuration options.
+
 ## Disconnection
 
 To close a listener use the [disconnect](https://ngrok.github.io/ngrok-python/module.html) method with the `url` of the listener to close. If there is an asynchronous runtime running the [disconnect](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves when the call is complete.
