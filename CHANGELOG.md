@@ -1,3 +1,9 @@
+## 0.11.0
+
+- Rename all assets to listener
+- Add links to ngrok documentation
+- Log if an auth token was used for session creation
+
 ## 0.10.1
 
 - Fix publishing for aarch64
