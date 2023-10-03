@@ -215,20 +215,24 @@
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">allow_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Restriction placed on the origin of incoming connections to the edge to only allow these CIDR ranges.
-Call multiple times to add additional CIDR ranges.</p>
+Call multiple times to add additional CIDR ranges.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/ip-restrictions/">IP restrictions</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">deny_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Restriction placed on the origin of incoming connections to the edge to deny these CIDR ranges.
-Call multiple times to add additional CIDR ranges.</p>
+Call multiple times to add additional CIDR ranges.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/ip-restrictions/">IP restrictions</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>The domain to request for this edge.</p>
+<dd><p>The domain to request for this edge, any valid domain or hostname that you have
+previously registered with ngrok. If using a custom domain, this requires
+registering in the <a class="reference external" href="https://dashboard.ngrok.com/cloud-edge/domains">ngrok dashboard</a> and setting a DNS CNAME value.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -276,7 +280,8 @@ bearing on listener behavior.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">mutual_tlsca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutual_tlsca</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Certificates to use for client authentication at the ngrok edge.</p>
+<dd><p>Certificates to use for client authentication at the ngrok edge.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/mutual-tls/">Mutual TLS</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -288,7 +293,8 @@ bearing on listener behavior.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">termination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cert_pem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_pem</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>The key to use for TLS termination at the ngrok edge in PEM format.</p>
+<dd><p>The key to use for TLS termination at the ngrok edge in PEM format.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/tls-termination/">TLS Termination</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 </dd></dl>

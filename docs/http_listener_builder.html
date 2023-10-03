@@ -215,7 +215,8 @@
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">allow_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Restriction placed on the origin of incoming connections to the edge to only allow these CIDR ranges.
-Call multiple times to add additional CIDR ranges.</p>
+Call multiple times to add additional CIDR ranges.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/ip-restrictions/">IP restrictions</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -229,26 +230,31 @@ If not called, basic authentication is disabled.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">circuit_breaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Reject requests when 5XX responses exceed this ratio.
-Disabled when 0.</p>
+Disabled when 0.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/circuit-breaker/">Circuit Breaker</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">compression</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Enable gzip compression for HTTP responses.</p>
+<dd><p>Enable gzip compression for HTTP responses.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/compression/">Compression</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">deny_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Restriction placed on the origin of incoming connections to the edge to deny these CIDR ranges.
-Call multiple times to add additional CIDR ranges.</p>
+Call multiple times to add additional CIDR ranges.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/ip-restrictions/">IP restrictions</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>The domain to request for this edge.</p>
+<dd><p>The domain to request for this edge, any valid domain or hostname that you have
+previously registered with ngrok. If using a custom domain, this requires
+registering in the <a class="reference external" href="https://dashboard.ngrok.com/cloud-edge/domains">ngrok dashboard</a> and setting a DNS CNAME value.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -296,14 +302,16 @@ bearing on listener behavior.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">mutual_tlsca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutual_tlsca</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Certificates to use for client authentication at the ngrok edge.</p>
+<dd><p>Certificates to use for client authentication at the ngrok edge.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/mutual-tls/">Mutual TLS</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">oauth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_emails</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_domains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>OAuth configuration.
-If not called, OAuth is disabled.</p>
+If not called, OAuth is disabled.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/oauth/">OAuth</a> in the ngrok docs for additional details.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -320,7 +328,8 @@ If not called, OAuth is disabled.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">oidc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_secret</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_emails</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_domains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>OIDC configuration.
-If not called, OIDC is disabled.</p>
+If not called, OIDC is disabled.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/openid-connect/">OpenID Connect</a> in the ngrok docs for additional details.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -344,39 +353,44 @@ If not called, OIDC is disabled.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">remove_request_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Removes a header from requests to this edge.</p>
+<dd><p>Removes a header from requests to this edge.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/request-headers/">Request Headers</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">remove_response_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Removes a header from responses from this edge.</p>
+<dd><p>Removes a header from responses from this edge.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/response-headers/">Response Headers</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">request_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Adds a header to all requests to this edge.</p>
+<dd><p>Adds a header to all requests to this edge.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/request-headers/">Request Headers</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">response_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Adds a header to all responses coming from this edge.</p>
+<dd><p>Adds a header to all responses coming from this edge.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/response-headers/">Response Headers</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">scheme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scheme</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>The scheme that this edge should use.
-Defaults to [Scheme::HTTPS].</p>
+“HTTPS” or “HTTP”, defaults to “HTTPS”.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">webhook_verification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secret</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>WebhookVerification configuration.
-If not called, WebhookVerification is disabled.</p>
+If not called, WebhookVerification is disabled.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/webhook-verification/">Webhook Verification</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">

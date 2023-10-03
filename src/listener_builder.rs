@@ -165,12 +165,18 @@ macro_rules! make_listener_builder {
         impl $wrapper {
             /// Restriction placed on the origin of incoming connections to the edge to only allow these CIDR ranges.
             /// Call multiple times to add additional CIDR ranges.
+            /// See `IP restrictions`_ in the ngrok docs for additional details.
+            ///
+            /// .. _IP restrictions: https://ngrok.com/docs/cloud-edge/modules/ip-restrictions/
             pub fn allow_cidr(self_: PyRefMut<Self>, cidr: String) -> PyRefMut<Self> {
                 self_.set(|b| {b.allow_cidr(cidr);});
                 self_
             }
             /// Restriction placed on the origin of incoming connections to the edge to deny these CIDR ranges.
             /// Call multiple times to add additional CIDR ranges.
+            /// See `IP restrictions`_ in the ngrok docs for additional details.
+            ///
+            /// .. _IP restrictions: https://ngrok.com/docs/cloud-edge/modules/ip-restrictions/
             pub fn deny_cidr(self_: PyRefMut<Self>, cidr: String) -> PyRefMut<Self> {
                 self_.set(|b| {b.deny_cidr(cidr);});
                 self_

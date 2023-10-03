@@ -142,7 +142,7 @@ impl SessionBuilder {
     pub async fn async_connect<'a>(&self) -> Result<Session, PyErr> {
         self.handle_default_auth_token();
         let builder = self.raw_builder.lock().clone();
-        do_connect(builder).await
+        do_connect(builder, self.auth_token_set).await
     }
 }
 
@@ -421,16 +421,21 @@ impl SessionBuilder {
     pub fn connect<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
         self.handle_default_auth_token();
         let builder = self.raw_builder.lock().clone();
-        pyo3_asyncio::tokio::future_into_py(py, async move { do_connect(builder).await })
+        let auth_token_set = self.auth_token_set;
+        pyo3_asyncio::tokio::future_into_py(
+            py,
+            async move { do_connect(builder, auth_token_set).await },
+        )
     }
 }
 
-async fn do_connect(builder: NgrokSessionBuilder) -> Result<Session, PyErr> {
+async fn do_connect(builder: NgrokSessionBuilder, auth_token_set: bool) -> Result<Session, PyErr> {
     builder
         .connect()
         .await
         .map(|s| {
-            info!("Session created");
+            let maybe_with = if auth_token_set { "with" } else { "without" };
+            info!("Session created {maybe_with} auth token");
             Session {
                 raw_session: Arc::new(SyncMutex::new(s)),
             }

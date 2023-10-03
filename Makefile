@@ -128,7 +128,9 @@ testfast: develop
 testpublish:
 	. $(BIN)/activate && maturin publish --repository testpypi
 
-docs: clean develop black
+docs: clean develop black docsfast
+
+docsfast : develop
 	. $(BIN)/activate && sphinx-build -a -E -b html doc_source/ docs/
 
 black: develop

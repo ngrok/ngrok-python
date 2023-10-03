@@ -215,14 +215,16 @@
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">allow_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Restriction placed on the origin of incoming connections to the edge to only allow these CIDR ranges.
-Call multiple times to add additional CIDR ranges.</p>
+Call multiple times to add additional CIDR ranges.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/ip-restrictions/">IP restrictions</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">deny_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Restriction placed on the origin of incoming connections to the edge to deny these CIDR ranges.
-Call multiple times to add additional CIDR ranges.</p>
+Call multiple times to add additional CIDR ranges.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/ip-restrictions/">IP restrictions</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -276,7 +278,8 @@ bearing on listener behavior.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">remote_addr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remote_addr</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>The TCP address to request for this edge.</p>
+<dd><p>The TCP address to request for this edge.
+These addresses can be reserved in the <a class="reference external" href="https://dashboard.ngrok.com/cloud-edge/tcp-addresses">ngrok dashboard</a> to use across sessions. For example: remote_addr(“2.tcp.ngrok.io:21746”)</p>
 </dd></dl>
 
 </dd></dl>
