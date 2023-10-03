@@ -6,15 +6,15 @@ from typing import Union
 from socketserver import TCPServer, UnixStreamServer
 
 
-async def create_tunnel() -> ngrok.NgrokTunnel:
+async def create_listener() -> ngrok.Listener:
     # create session
-    session: ngrok.NgrokSession = (
-        await ngrok.NgrokSessionBuilder()
+    session: ngrok.Session = (
+        await ngrok.SessionBuilder()
         .authtoken_from_env()
         .metadata("Online in One Line")
         .connect()
     )
-    # create tunnel
+    # create listener
     return (
         await session.tcp_endpoint()
         # .allow_cidr("0.0.0.0/0")
@@ -22,7 +22,7 @@ async def create_tunnel() -> ngrok.NgrokTunnel:
         # .forwards_to("example python")
         # .proxy_proto("") # One of: "", "1", "2"
         # .remote_addr("<n>.tcp.ngrok.io:<p>")
-        .metadata("example tunnel metadata from python").listen()
+        .metadata("example listener metadata from python").listen()
     )
 
 
@@ -50,6 +50,6 @@ if os.name != "nt":
     httpd = UnixSocketHttpServer((ngrok.pipe_name()), HelloHandler)
 
 logging.basicConfig(level=logging.INFO)
-tunnel = asyncio.run(create_tunnel())
-ngrok.listen(httpd, tunnel)
+listener = asyncio.run(create_listener())
+ngrok.listen(httpd, listener)
 httpd.serve_forever()

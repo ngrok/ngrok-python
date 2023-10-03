@@ -49,8 +49,8 @@ python -m pip install ngrok
 
 ```python
 import ngrok
-tunnel = ngrok.connect(9000, authtoken_from_env=True)
-print (f"Ingress established at {tunnel.url()}")
+listener = ngrok.connect(9000, authtoken_from_env=True)
+print (f"Ingress established at {listener.url()}")
 ```
 
 You can find more examples in [the /examples directory](https://github.com/ngrok/ngrok-python/tree/main/examples).
@@ -79,72 +79,72 @@ ngrok.set_auth_token(token)
 
 ## Connection
 
-The [connect](https://ngrok.github.io/ngrok-python/module.html) method is the easiest way to start an ngrok session and establish a tunnel to a specified address. If an asynchronous runtime is running, the [connect](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves to the public tunnel object.
+The [connect](https://ngrok.github.io/ngrok-python/module.html) method is the easiest way to start an ngrok session and establish a listener to a specified address. If an asynchronous runtime is running, the [connect](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves to the public listener object.
 
-With no arguments, the [connect](https://ngrok.github.io/ngrok-python/module.html) method will start an HTTP tunnel to `localhost` port `80`:
+With no arguments, the [connect](https://ngrok.github.io/ngrok-python/module.html) method will start an HTTP listener to `localhost` port `80`:
 
 ```python
-tunnel = ngrok.connect()
+listener = ngrok.connect()
 ```
 
 You can pass the port number to forward on `localhost`:
 
 ```python
-tunnel = ngrok.connect(4242)
+listener = ngrok.connect(4242)
 ```
 
 Or you can specify the host and port via a string:
 
 ```python
-tunnel = ngrok.connect("localhost:4242")
+listener = ngrok.connect("localhost:4242")
 ```
 
 More options can be passed to the `connect` method to customize the connection:
 
 ```python
-tunnel = ngrok.connect(8080, basic_auth="ngrok:online1line"})
-tunnel = ngrok.connect(8080, oauth_provider="google", oauth_allow_domains="example.com")
+listener = ngrok.connect(8080, basic_auth="ngrok:online1line"})
+listener = ngrok.connect(8080, oauth_provider="google", oauth_allow_domains="example.com")
 ```
 
-The second (optional) argument is the tunnel type, which defaults to `http`. To create a TCP tunnel:
+The second (optional) argument is the listener type, which defaults to `http`. To create a TCP listener:
 
 ```python
-tunnel = ngrok.connect(25565, "tcp")
+listener = ngrok.connect(25565, "tcp")
 ```
 
 Since the options are kwargs, you can also use the `**` operator to pass a dictionary for configuration:
 
 ```python
 options = {"authtoken_from_env":True, "response_header_add":"X-Awesome:yes"}
-tunnel = ngrok.connect(8080, **options)
+listener = ngrok.connect(8080, **options)
 ```
 
 ## Disconnection
 
-To close a tunnel use the [disconnect](https://ngrok.github.io/ngrok-python/module.html) method with the `url` of the tunnel to close. If there is an asynchronous runtime running the [disconnect](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves when the call is complete.
+To close a listener use the [disconnect](https://ngrok.github.io/ngrok-python/module.html) method with the `url` of the listener to close. If there is an asynchronous runtime running the [disconnect](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves when the call is complete.
 
 ```python
 ngrok.disconnect(url)
 ```
 
-Or omit the `url` to close all tunnels:
+Or omit the `url` to close all listeners:
 
 ```python
 ngrok.disconnect()
 ```
 
-The [close](https://ngrok.github.io/ngrok-python/ngrok_tunnel.html) method on a tunnel will shut it down, and also stop the ngrok session if it is no longer needed. This method returns a promise that resolves when the tunnel is closed.
+The [close](https://ngrok.github.io/ngrok-python/ngrok_listener.html) method on a listener will shut it down, and also stop the ngrok session if it is no longer needed. This method returns a promise that resolves when the listener is closed.
 
 ```python
-await tunnel.close()
+await listener.close()
 ```
 
-## Listing Tunnels
+## Listing Listeners
 
-To list all current non-closed tunnels use the [get_tunnels](https://ngrok.github.io/ngrok-python/module.html) method. If there is an asynchronous runtime running the [get_tunnels](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves to the list of tunnel objects.
+To list all current non-closed listeners use the [get_listeners](https://ngrok.github.io/ngrok-python/module.html) method. If there is an asynchronous runtime running the [get_listeners](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves to the list of listener objects.
 
 ```python
-tunnels = ngrok.get_tunnels()
+listeners = ngrok.get_listeners()
 ```
 
 # Full Configuration
@@ -152,20 +152,20 @@ tunnels = ngrok.get_tunnels()
 This example shows [all the possible configuration items of ngrok.connect](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-full.py):
 
 ```python
-tunnel = ngrok.connect(
+listener = ngrok.connect(
     # session configuration
     addr="localhost:8080",
     authtoken="<authtoken>",
     authtoken_from_env=True,
     session_metadata="Online in One Line",
-    # tunnel configuration
+    # listener configuration
     basic_auth=["ngrok:online1line"],
     circuit_breaker=0.1,
     compression=True,
     domain="<domain>",
     ip_restriction_allow_cidrs="0.0.0.0/0",
     ip_restriction_deny_cidrs="10.1.1.1/32",
-    metadata="example tunnel metadata from python",
+    metadata="example listener metadata from python",
     mutual_tls_cas=load_file("ca.crt"),
     oauth_provider="google",
     oauth_allow_domains=["<domain>"],
@@ -189,9 +189,9 @@ tunnel = ngrok.connect(
 )
 ```
 
-# ASGI Runner - Tunnels to Uvicorn, Gunicorn, Django and More, With No Code
+# ASGI Runner - Listeners to Uvicorn, Gunicorn, Django and More, With No Code
 
-Prefix the command line which starts up a Uvicorn or Gunicorn web server with either `ngrok-asgi` or `python -m ngrok`. Any TCP or Unix Domain Socket arguments will be used to establish connectivity automatically. There are many command line arguments to configure the Tunnel used, for instance adding `--basic-auth ngrok online1line` will introduce basic authentication to the ingress tunnel.
+Prefix the command line which starts up a Uvicorn or Gunicorn web server with either `ngrok-asgi` or `python -m ngrok`. Any TCP or Unix Domain Socket arguments will be used to establish connectivity automatically. There are many command line arguments to configure the Listener used, for instance adding `--basic-auth ngrok online1line` will introduce basic authentication to the ingress listener.
 
 ## Uvicorn
 Examples:
@@ -234,29 +234,40 @@ python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorke
 * [OpenPlayground](https://github.com/nat/openplayground) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/openplayground/run.py) of an LLM playground you can run on your laptop
 * [GPT4ALL](https://github.com/nomic-ai/gpt4all) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/gpt4all/run.py) of running the [GPT4All-L Snoozy 13B](https://gpt4all.io/index.html) model with a Gradio frontend
 
-## Tunnel Types
+## Listener Types
 * HTTP - [Minimal Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-http-minimal.py), [Full Configuration Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-http-full.py)
 * Labeled - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-labeled.py)
 * TCP - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tcp.py)
 * TLS - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tls.py)
 
+## TLS Backends
+
+As of version `0.10.0` there is backend TLS connection support, validated by a filepath specified in the `SSL_CERT_FILE` environment variable, or falling back to the host OS installed trusted certificate authorities. So it is now possible to do this to connect:
+
+```python
+ngrok.connect("https://127.0.0.1:3000", authtoken_from_env=True)
+```
+
+If the service is using certs not trusted by the OS, such as self-signed certificates, add an environment variable like this before running: `SSL_CERT_FILE=/path/to/ca.crt`.
+
 ## Unix Sockets
+
 You may also choose to use Unix Sockets instead of TCP. You can view an example of this [here](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-full.py).
 
-A socket address may be passed directly into the tunnel `forward()` call as well by prefixing the address with `unix:`, for example `unix:/tmp/socket-123`.
+A socket address may be passed directly into the listener `forward()` call as well by prefixing the address with `unix:`, for example `unix:/tmp/socket-123`.
 
 # Builders
 
-For more control over Sessions and Tunnels, the builder classes can be used.
+For more control over Sessions and Listeners, the builder classes can be used.
 
 A minimal example using the builder class looks like [the following](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-minimal.py):
 
 ```python
-async def create_tunnel():
+async def create_listener():
     session = await ngrok.NgrokSessionBuilder().authtoken_from_env().connect()
-    tunnel = await session.http_endpoint().listen()
-    print (f"Ingress established at {tunnel.url()}")
-    tunnel.forward("localhost:9000")
+    listener = await session.http_endpoint().listen()
+    print (f"Ingress established at {listener.url()}")
+    listener.forward("localhost:9000")
 ```
 
 See here for a [Full Configuration Example](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-full.py)

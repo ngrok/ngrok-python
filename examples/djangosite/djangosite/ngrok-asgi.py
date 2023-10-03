@@ -18,15 +18,15 @@ application = get_asgi_application()
 """Added by ngrok"""
 # This block handles 'make run-django-uvicorn' and 'make run-django-gunicorn' which uses this asgi.py as the entry point.
 # Set env variable to protect against the gunicorn autoreloader.
-if os.getenv("NGROK_TUNNEL_RUNNING") is None:
-    os.environ["NGROK_TUNNEL_RUNNING"] = "true"
+if os.getenv("NGROK_LISTENER_RUNNING") is None:
+    os.environ["NGROK_LISTENER_RUNNING"] = "true"
     import asyncio, multiprocessing, ngrok, sys
 
     async def setup():
         listen = "localhost:8000"
-        tunnel = await ngrok.default()
-        print(f"Forwarding to {listen} from ingress url: {tunnel.url()}")
-        tunnel.forward(listen)
+        listener = await ngrok.default()
+        print(f"Forwarding to {listen} from ingress url: {listener.url()}")
+        listener.forward(listen)
 
     try:
         running_loop = asyncio.get_running_loop()

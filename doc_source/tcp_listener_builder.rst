@@ -1,7 +1,7 @@
-Ngrok TCP Tunnel Builder
+TCP Listener Builder
 =====================================
 
 .. automodule:: ngrok
-   :members: NgrokTcpTunnelBuilder
+   :members: TcpListenerBuilder
    :noindex:
 

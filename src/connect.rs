@@ -27,28 +27,28 @@ use pyo3::{
 use tokio::sync::Mutex;
 
 use crate::{
-    py_err,
-    session::{
-        NgrokSession,
-        NgrokSessionBuilder,
-    },
-    tunnel::{
+    listener::{
         self,
-        NgrokTunnel,
+        Listener,
         TCP_PREFIX,
     },
-    tunnel_builder::{
-        NgrokHttpTunnelBuilder,
-        NgrokLabeledTunnelBuilder,
-        NgrokTcpTunnelBuilder,
-        NgrokTlsTunnelBuilder,
+    listener_builder::{
+        HttpListenerBuilder,
+        LabeledListenerBuilder,
+        TcpListenerBuilder,
+        TlsListenerBuilder,
+    },
+    py_err,
+    session::{
+        Session,
+        SessionBuilder,
     },
     wrapper,
 };
 
 lazy_static! {
-    // Save a user-facing NgrokSession to use for connect use cases
-    pub(crate) static ref SESSION: Mutex<Option<NgrokSession>> = Mutex::new(None);
+    // Save a user-facing Session to use for connect use cases
+    pub(crate) static ref SESSION: Mutex<Option<Session>> = Mutex::new(None);
 }
 
 /// Single string configuration
@@ -107,7 +107,7 @@ macro_rules! plumb_vec {
     };
 }
 
-/// All non-labeled tunnels have these common configuration options
+/// All non-labeled listeners have these common configuration options
 macro_rules! config_common {
     ($builder:tt, $self:tt, $config:tt) => {
         plumb!($builder, $self, $config, metadata);
@@ -146,12 +146,12 @@ fn get_byte_array(v: &PyAny) -> Result<&PyByteArray, PyDowncastError> {
     v.downcast::<PyByteArray>()
 }
 
-/// Establish ngrok ingress, returning an tunnel object.
+/// Establish ngrok ingress, returning an Listener object.
 ///
 /// :param int, str or None addr: The address to forward traffic to, this can be an integer port, or a host:port string, e.g. "localhost:8080"
-/// :param str or None proto: The protocol type of the tunnel, one of "http", "tcp", "tls", "labeled"
-/// :param options: A dict of options to pass to the tunnel.
-/// :return: A tunnel object.
+/// :param str or None proto: The protocol type of the Listener, one of "http", "tcp", "tls", "labeled"
+/// :param options: A dict of options to pass to the Listener.
+/// :return: A Listener object.
 #[pyfunction]
 #[pyo3(signature = (addr=None, proto=None, **options), text_signature = "(addr=None, proto=None, **options)")]
 pub fn connect(
@@ -217,15 +217,15 @@ pub fn async_connect(py: Python, config: Py<PyDict>) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move { do_connect(config).await })
 }
 
-fn configure_session(options: &Py<PyDict>) -> Result<NgrokSessionBuilder, PyErr> {
+fn configure_session(options: &Py<PyDict>) -> Result<SessionBuilder, PyErr> {
     Python::with_gil(|py: Python| {
-        let s_builder = PyCell::new(py, NgrokSessionBuilder::new())?;
+        let s_builder = PyCell::new(py, SessionBuilder::new())?;
         let cfg = options.as_ref(py);
-        type B = NgrokSessionBuilder;
+        type B = SessionBuilder;
         plumb!(B, s_builder, cfg, authtoken);
         plumb_bool!(B, s_builder, cfg, authtoken_from_env);
         plumb!(B, s_builder, cfg, metadata, session_metadata);
-        Ok(s_builder.replace(NgrokSessionBuilder::new()))
+        Ok(s_builder.replace(SessionBuilder::new()))
     })
 }
 
@@ -251,27 +251,23 @@ async fn do_connect(options: Py<PyDict>) -> PyResult<PyObject> {
         })
     })?;
 
-    // create tunnel
-    let tunnel = match proto.as_str() {
+    // create Listener
+    let listener = match proto.as_str() {
         "http" => http_endpoint(session, addr, options).await,
         "tcp" => tcp_endpoint(session, addr, options).await,
         "tls" => tls_endpoint(session, addr, options).await,
-        "labeled" => labeled_tunnel(session, addr, options).await,
+        "labeled" => labeled_listener(session, addr, options).await,
         _ => Err(py_err(format!("unhandled protocol {proto:?}"))),
     }?;
-    Ok(Python::with_gil(|py| tunnel.into_py(py)))
+    Ok(Python::with_gil(|py| listener.into_py(py)))
 }
 
-/// HTTP tunnel creation and forwarding
-async fn http_endpoint(
-    session: &NgrokSession,
-    addr: String,
-    options: Py<PyDict>,
-) -> PyResult<NgrokTunnel> {
+/// HTTP Listener creation and forwarding
+async fn http_endpoint(session: &Session, addr: String, options: Py<PyDict>) -> PyResult<Listener> {
     let bld = Python::with_gil(|py: Python| {
         let bld = PyCell::new(py, session.http_endpoint())?;
         let cfg = options.as_ref(py);
-        type B = NgrokHttpTunnelBuilder;
+        type B = HttpListenerBuilder;
         config_common!(B, bld, cfg);
         plumb_vec!(B, bld, cfg, scheme, schemes);
         plumb!(B, bld, cfg, domain, hostname); // synonym for domain
@@ -293,11 +289,11 @@ async fn http_endpoint(
         // circuit breaker
         if let Some(cb) = cfg.get_item("circuit_breaker") {
             let cb64 = cb.downcast::<PyFloat>()?.extract::<f64>()?;
-            NgrokHttpTunnelBuilder::circuit_breaker(bld.borrow_mut(), cb64);
+            HttpListenerBuilder::circuit_breaker(bld.borrow_mut(), cb64);
         }
         // oauth
         if let Some(provider) = cfg.get_item("oauth_provider") {
-            NgrokHttpTunnelBuilder::oauth(
+            HttpListenerBuilder::oauth(
                 bld.borrow_mut(),
                 get_string(provider)?,
                 get_str_list(cfg.get_item("oauth_allow_emails"))?,
@@ -313,7 +309,7 @@ async fn http_endpoint(
             let client_secret = cfg.get_item("oidc_client_secret").ok_or_else(|| {
                 py_err("Missing client secret for oidc. oidc_client_secret must be set if oidc_issuer_url is set")
             })?;
-            NgrokHttpTunnelBuilder::oidc(
+            HttpListenerBuilder::oidc(
                 bld.borrow_mut(),
                 get_string(issuer_url)?,
                 get_string(client_id)?,
@@ -326,7 +322,7 @@ async fn http_endpoint(
         // webhook verification
         if let Some(provider) = cfg.get_item("verify_webhook_provider") {
             if let Some(secret) = cfg.get_item("verify_webhook_secret") {
-                NgrokHttpTunnelBuilder::webhook_verification(
+                HttpListenerBuilder::webhook_verification(
                     bld.borrow_mut(),
                     get_string(provider)?,
                     get_string(secret)?,
@@ -340,16 +336,12 @@ async fn http_endpoint(
     forward(bld.async_listen().await?, addr).await
 }
 
-/// TCP tunnel creation and forwarding
-async fn tcp_endpoint(
-    session: &NgrokSession,
-    addr: String,
-    options: Py<PyDict>,
-) -> PyResult<NgrokTunnel> {
+/// TCP Listener creation and forwarding
+async fn tcp_endpoint(session: &Session, addr: String, options: Py<PyDict>) -> PyResult<Listener> {
     let bld = Python::with_gil(|py: Python| {
         let bld = PyCell::new(py, session.tcp_endpoint())?;
         let cfg = options.as_ref(py);
-        type B = NgrokTcpTunnelBuilder;
+        type B = TcpListenerBuilder;
         config_common!(B, bld, cfg);
         plumb!(B, bld, cfg, remote_addr);
         Ok::<_, PyErr>(bld.replace(session.tcp_endpoint()))
@@ -357,16 +349,12 @@ async fn tcp_endpoint(
     forward(bld.async_listen().await?, addr).await
 }
 
-/// TLS tunnel creation and forwarding
-async fn tls_endpoint(
-    session: &NgrokSession,
-    addr: String,
-    options: Py<PyDict>,
-) -> PyResult<NgrokTunnel> {
+/// TLS Listener creation and forwarding
+async fn tls_endpoint(session: &Session, addr: String, options: Py<PyDict>) -> PyResult<Listener> {
     let bld = Python::with_gil(|py: Python| {
         let bld = PyCell::new(py, session.tls_endpoint())?;
         let cfg = options.as_ref(py);
-        type B = NgrokTlsTunnelBuilder;
+        type B = TlsListenerBuilder;
         config_common!(B, bld, cfg);
         plumb!(B, bld, cfg, domain, hostname); // synonym for domain
         plumb!(B, bld, cfg, domain);
@@ -374,7 +362,7 @@ async fn tls_endpoint(
         // tls termination
         if let Some(crt) = cfg.get_item("crt") {
             if let Some(key) = cfg.get_item("key") {
-                NgrokTlsTunnelBuilder::termination(
+                TlsListenerBuilder::termination(
                     bld.borrow_mut(),
                     get_byte_array(crt)?,
                     get_byte_array(key)?,
@@ -388,40 +376,40 @@ async fn tls_endpoint(
     forward(bld.async_listen().await?, addr).await
 }
 
-/// Labeled tunnel creation and forwarding
-async fn labeled_tunnel(
-    session: &NgrokSession,
+/// Labeled Listener creation and forwarding
+async fn labeled_listener(
+    session: &Session,
     addr: String,
     options: Py<PyDict>,
-) -> PyResult<NgrokTunnel> {
+) -> PyResult<Listener> {
     let bld = Python::with_gil(|py: Python| {
-        let bld = PyCell::new(py, session.labeled_tunnel())?;
+        let bld = PyCell::new(py, session.labeled_listener())?;
         let cfg = options.as_ref(py);
-        type B = NgrokLabeledTunnelBuilder;
+        type B = LabeledListenerBuilder;
         plumb!(B, bld, cfg, metadata);
         plumb_vec!(B, bld, cfg, label, labels, ":");
-        Ok::<_, PyErr>(bld.replace(session.labeled_tunnel()))
+        Ok::<_, PyErr>(bld.replace(session.labeled_listener()))
     })?;
     forward(bld.async_listen().await?, addr).await
 }
 
-/// Background the tunnel forwarding
-async fn forward(tunnel: NgrokTunnel, addr: String) -> PyResult<NgrokTunnel> {
-    let id = tunnel.id();
+/// Background the Listener forwarding
+async fn forward(listener: Listener, addr: String) -> PyResult<Listener> {
+    let id = listener.id();
     // move forwarding to another task
-    tokio::spawn(async move { tunnel::forward(&id, addr).await.map(|_| ()) });
-    Ok(tunnel)
+    tokio::spawn(async move { listener::forward(&id, addr).await.map(|_| ()) });
+    Ok(listener)
 }
 
-/// Shut down all tunnels and sessions.
+/// Shut down all listeners and sessions.
 #[pyfunction]
 pub fn kill(py: Python) -> PyResult<Py<PyAny>> {
     disconnect(py, None)
 }
 
-/// Shut down tunnel with the given url, or if no url is given, shut down all tunnels.
+/// Shut down Listener with the given url, or if no url is given, shut down all Listeners.
 ///
-/// :param str or None url: The url of the NgrokTunnel to disconnect, or None to disconnect all tunnels.
+/// :param str or None url: The url of the Listener to disconnect, or None to disconnect all listeners.
 #[pyfunction]
 #[pyo3(text_signature = "(url=None)")]
 pub fn disconnect(py: Python, url: Option<Py<PyString>>) -> PyResult<Py<PyAny>> {
@@ -437,9 +425,9 @@ pub fn disconnect(py: Python, url: Option<Py<PyString>>) -> PyResult<Py<PyAny>> 
 pub fn async_disconnect(py: Python, url: Option<String>) -> PyResult<&PyAny> {
     debug!("Disconnecting. url: {url:?}");
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        tunnel::close_url(url.clone()).await?;
+        listener::close_url(url.clone()).await?;
 
-        // if closing every tunnel, remove any stored session
+        // if closing every listener, remove any stored session
         if url.is_none() {
             SESSION.lock().await.take();
         }

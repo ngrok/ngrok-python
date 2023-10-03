@@ -6,27 +6,27 @@ from typing import Union
 from socketserver import TCPServer, UnixStreamServer
 
 
-async def create_tunnel() -> ngrok.NgrokTunnel:
+async def create_listener() -> ngrok.Listener:
     # create session
     session = (
-        await ngrok.NgrokSessionBuilder()
+        await ngrok.SessionBuilder()
         .authtoken_from_env()
         .metadata("Online in One Line")
         .connect()
     )
-    # create tunnel
+    # create listener
     return (
-        await session.labeled_tunnel()
+        await session.labeled_listener()
         .label("edge", "edghts_<edge_id>")
-        .metadata("example tunnel metadata from python")
+        .metadata("example listener metadata from python")
         .listen()
     )
 
 
 # Example of using the ngrok.connect convenience function for labeled ingress
-def create_tunnel_connect(addr):
+def create_listener_connect(addr):
     if addr.startswith("/"):
-        addr = f"pipe:{addr}"
+        addr = f"unix:{addr}"
     ngrok.connect(
         addr,
         authtoken_from_env=True,
@@ -59,7 +59,7 @@ if os.name != "nt":
     httpd = UnixSocketHttpServer((ngrok.pipe_name()), HelloHandler)
 
 logging.basicConfig(level=logging.INFO)
-# create_tunnel_connect(httpd.server_address)
-tunnel = asyncio.run(create_tunnel())
-ngrok.listen(httpd, tunnel)
+# create_listener_connect(httpd.server_address)
+listener = asyncio.run(create_listener())
+ngrok.listen(httpd, listener)
 httpd.serve_forever()

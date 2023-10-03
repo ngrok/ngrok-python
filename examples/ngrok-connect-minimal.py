@@ -17,5 +17,5 @@ class HelloHandler(BaseHTTPRequestHandler):
 
 logging.basicConfig(level=logging.INFO)
 server = HTTPServer(("localhost", 8080), HelloHandler)
-tunnel = ngrok.connect("localhost:8080", authtoken_from_env=True)
+listener = ngrok.connect("localhost:8080", authtoken_from_env=True)
 server.serve_forever()

@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 default_port = 7860
 
 
-def create_ngrok_tunnel():
+def create_ngrok_listener():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", help="Hostname or IP address", default="localhost")
     parser.add_argument("--port", help="Port number", type=int, default=default_port)
@@ -24,7 +24,7 @@ def create_ngrok_tunnel():
 
 
 # setup ngrok
-tunnel = create_ngrok_tunnel()
+listener = create_ngrok_listener()
 
 # Load model path from environment.
 if "MODEL_PATH" not in os.environ:

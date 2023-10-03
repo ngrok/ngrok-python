@@ -9,7 +9,7 @@ parser.add_argument("--host", help="Hostname or IP address", default="localhost"
 parser.add_argument("--port", help="Port number", type=int, default=5432)
 args, unknown = parser.parse_known_args()
 logging.basicConfig(level=logging.INFO)
-tunnel = ngrok.connect(f"{args.host}:{args.port}", authtoken_from_env=True)
+listener = ngrok.connect(f"{args.host}:{args.port}", authtoken_from_env=True)
 
 # call the runner
 app.run()

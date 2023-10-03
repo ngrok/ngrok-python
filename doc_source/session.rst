@@ -1,7 +1,7 @@
-Ngrok TLS Tunnel Builder
+Session
 =====================================
 
 .. automodule:: ngrok
-   :members: NgrokTlsTunnelBuilder
+   :members: Session
    :noindex:
 

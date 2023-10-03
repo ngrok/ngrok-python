@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Ngrok TCP Tunnel Builder" href="ngrok_tcp_tunnel_builder.html" /><link rel="prev" title="Ngrok Tunnel" href="ngrok_tunnel.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Labeled Listener Builder" href="labeled_listener_builder.html" /><link rel="prev" title="TCP Listener Builder" href="tcp_listener_builder.html" />
 
     <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
-        <title>Ngrok HTTP Tunnel Builder - ngrok documentation</title>
+        <title>TLS Listener Builder - ngrok documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -154,18 +154,18 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Tunnel and Sessions:</span></p>
+  <p class="caption" role="heading"><span class="caption-text">Listener and Sessions:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_session_builder.html">Ngrok Session Builder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_session.html">Ngrok Session</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_tunnel.html">Ngrok Tunnel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_builder.html">Session Builder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">Session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="listener.html">Listener</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Tunnel Builders:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Listener Builders:</span></p>
 <ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Ngrok HTTP Tunnel Builder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_tcp_tunnel_builder.html">Ngrok TCP Tunnel Builder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_tls_tunnel_builder.html">Ngrok TLS Tunnel Builder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ngrok_labeled_tunnel_builder.html">Ngrok Labeled Tunnel Builder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="http_listener_builder.html">HTTP Listener Builder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tcp_listener_builder.html">TCP Listener Builder</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">TLS Listener Builder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="labeled_listener_builder.html">Labeled Listener Builder</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Module:</span></p>
 <ul>
@@ -204,38 +204,18 @@
           </label>
         </div>
         <article role="main">
-          <section id="ngrok-http-tunnel-builder">
-<h1>Ngrok HTTP Tunnel Builder<a class="headerlink" href="#ngrok-http-tunnel-builder" title="Permalink to this heading">#</a></h1>
+          <section id="tls-listener-builder">
+<h1>TLS Listener Builder<a class="headerlink" href="#tls-listener-builder" title="Permalink to this heading">#</a></h1>
 <p>The ngrok Agent SDK for Python</p>
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">NgrokHttpTunnelBuilder</span></span></dt>
-<dd><p>An ngrok tunnel backing an HTTP endpoint.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">TlsListenerBuilder</span></span></dt>
+<dd><p>An ngrok listener backing a TLS endpoint.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">allow_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Restriction placed on the origin of incoming connections to the edge to only allow these CIDR ranges.
 Call multiple times to add additional CIDR ranges.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">basic_auth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Credentials for basic authentication.
-If not called, basic authentication is disabled.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">circuit_breaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Reject requests when 5XX responses exceed this ratio.
-Disabled when 0.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">compression</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Enable gzip compression for HTTP responses.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -254,32 +234,32 @@ Call multiple times to add additional CIDR ranges.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">forwards_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forwards_to</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Tunnel backend metadata. Viewable via the dashboard and API, but has no
-bearing on tunnel behavior.</p>
+<dd><p>Listener backend metadata. Viewable via the dashboard and API, but has no
+bearing on listener behavior.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">listen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Begin listening for new connections on this tunnel.</p>
+<dd><p>Begin listening for new connections on this listener.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">listen_and_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_url</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Begin listening for new connections on this tunnel and forwarding them to the given url.</p>
+<dd><p>Begin listening for new connections on this listener and forwarding them to the given url.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">listen_and_serve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Begin listening for new connections on this tunnel and forwarding them to the given http server.</p>
+<dd><p>Begin listening for new connections on this listener and forwarding them to the given http server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>server</strong> (<em>http.server.HTTPServer</em><em> or </em><em>None</em>) – The server to link with a tunnel.</p>
+<dd class="field-odd"><p><strong>server</strong> (<em>http.server.HTTPServer</em><em> or </em><em>None</em>) – The server to link with a listener.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A task to await for the tunnel linked with the server.</p>
+<dd class="field-even"><p>A task to await for the listener linked with the server.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Task</p>
@@ -290,7 +270,7 @@ bearing on tunnel behavior.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Tunnel-specific opaque metadata. Viewable via the API.</p>
+<dd><p>Listener-specific opaque metadata. Viewable via the API.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -301,88 +281,14 @@ bearing on tunnel behavior.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">oauth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_emails</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_domains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>OAuth configuration.
-If not called, OAuth is disabled.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>provider</strong> (<em>str</em>) – The name of the OAuth provider to use.</p></li>
-<li><p><strong>allow_emails</strong> (<em>list</em><em> or </em><em>None</em>) – A list of email addresses to allow.</p></li>
-<li><p><strong>allow_domains</strong> (<em>list</em><em> or </em><em>None</em>) – A list of domain names to allow.</p></li>
-<li><p><strong>scopes</strong> (<em>list</em><em> or </em><em>None</em>) – A list of scopes.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">oidc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_secret</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_emails</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_domains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>OIDC configuration.
-If not called, OIDC is disabled.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>issuer_url</strong> (<em>str</em>) – The name of the OIDC issuer URL to use.</p></li>
-<li><p><strong>client_id</strong> (<em>str</em>) – The OIDC client ID.</p></li>
-<li><p><strong>client_secret</strong> (<em>str</em>) – The OIDC client secret.</p></li>
-<li><p><strong>allow_emails</strong> (<em>list</em><em> or </em><em>None</em>) – A list of email addresses to allow.</p></li>
-<li><p><strong>allow_domains</strong> (<em>list</em><em> or </em><em>None</em>) – A list of domain names to allow.</p></li>
-<li><p><strong>scopes</strong> (<em>list</em><em> or </em><em>None</em>) – A list of scopes.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">proxy_proto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxy_proto</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>The version of PROXY protocol to use with this tunnel “1”, “2”, or “” if not using.</p>
+<dd><p>The version of PROXY protocol to use with this listener “1”, “2”, or “” if not using.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">remove_request_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Removes a header from requests to this edge.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">remove_response_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Removes a header from responses from this edge.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">request_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Adds a header to all requests to this edge.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">response_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Adds a header to all responses coming from this edge.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">scheme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scheme</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>The scheme that this edge should use.
-Defaults to [Scheme::HTTPS].</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">webhook_verification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secret</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>WebhookVerification configuration.
-If not called, WebhookVerification is disabled.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">websocket_tcp_conversion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Convert incoming websocket connections to TCP-like streams.</p>
+<span class="sig-name descname"><span class="pre">termination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cert_pem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_pem</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>The key to use for TLS termination at the ngrok edge in PEM format.</p>
 </dd></dl>
 
 </dd></dl>
@@ -394,23 +300,23 @@ If not called, WebhookVerification is disabled.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="ngrok_tcp_tunnel_builder.html">
+          <a class="next-page" href="labeled_listener_builder.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Ngrok TCP Tunnel Builder</div>
+                <div class="title">Labeled Listener Builder</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="ngrok_tunnel.html">
+          <a class="prev-page" href="tcp_listener_builder.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Ngrok Tunnel</div>
+                <div class="title">TCP Listener Builder</div>
                 
               </div>
             </a>

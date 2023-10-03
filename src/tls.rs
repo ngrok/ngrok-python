@@ -5,11 +5,11 @@ use pyo3::{
     PyRefMut,
 };
 
-use crate::tunnel_builder::NgrokTlsTunnelBuilder;
+use crate::listener_builder::TlsListenerBuilder;
 
 #[pymethods]
 #[allow(dead_code)]
-impl NgrokTlsTunnelBuilder {
+impl TlsListenerBuilder {
     /// The domain to request for this edge.
     pub fn domain(self_: PyRefMut<Self>, domain: String) -> PyRefMut<Self> {
         self_.set(|b| {

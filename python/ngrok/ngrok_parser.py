@@ -25,7 +25,7 @@ def get_parser():
         help="Configures the opaque, machine-readable metadata string for this session.",
     )
 
-    # ngrok tunnel options
+    # ngrok listener options
     parser.add_argument(
         "--allow-cidr",
         action="append",
@@ -54,10 +54,10 @@ def get_parser():
     parser.add_argument("--domain", help="The domain to request for this edge.")
     parser.add_argument(
         "--forwards-to",
-        help="Tunnel backend metadata. Viewable via the dashboard and API, but has no bearing on tunnel behavior.",
+        help="Listener backend metadata. Viewable via the dashboard and API, but has no bearing on listener behavior.",
     )
     parser.add_argument(
-        "--metadata", help="Tunnel-specific opaque metadata. Viewable via the API."
+        "--metadata", help="Listener-specific opaque metadata. Viewable via the API."
     )
     parser.add_argument(
         "--mutual-tlsca",
@@ -80,7 +80,7 @@ def get_parser():
     parser.add_argument(
         "--proxy-proto",
         choices=["", "1", "2"],
-        help="The version of PROXY protocol to use with this tunnel “1”, “2”, or “” if not using.",
+        help="The version of PROXY protocol to use with this listener “1”, “2”, or “” if not using.",
     )
     parser.add_argument(
         "--remove-request-header",

@@ -1,7 +1,7 @@
-Ngrok Session
+TLS Listener Builder
 =====================================
 
 .. automodule:: ngrok
-   :members: NgrokSession
+   :members: TlsListenerBuilder
    :noindex:
 

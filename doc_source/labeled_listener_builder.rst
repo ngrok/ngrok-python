@@ -1,7 +1,7 @@
-Ngrok Labeled Tunnel Builder
+Labeled Listener Builder
 =====================================
 
 .. automodule:: ngrok
-   :members: NgrokLabeledTunnelBuilder
+   :members: LabeledListenerBuilder
    :noindex:
 

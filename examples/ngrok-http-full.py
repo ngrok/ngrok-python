@@ -33,10 +33,10 @@ def on_disconnection(addr, error):
     print(f"connecting, addr: {addr} error: {error}")
 
 
-async def create_tunnel(httpd: Union[TCPServer, UnixStreamServer]) -> None:
+async def create_listener(httpd: Union[TCPServer, UnixStreamServer]) -> None:
     # create session
-    session: ngrok.NgrokSession = (
-        await ngrok.NgrokSessionBuilder()
+    session: ngrok.Session = (
+        await ngrok.SessionBuilder()
         .authtoken_from_env()
         # .authtoken("<authtoken>")
         .metadata("Online in One Line")
@@ -48,8 +48,8 @@ async def create_tunnel(httpd: Union[TCPServer, UnixStreamServer]) -> None:
         .handle_disconnection(on_disconnection)
         .connect()
     )
-    # create tunnel
-    tunnel: ngrok.NgrokTunnel = (
+    # create listener
+    listener: ngrok.Listener = (
         await session.http_endpoint()
         # .allow_cidr("0.0.0.0/0")
         # .basic_auth("ngrok", "online1line")
@@ -68,13 +68,13 @@ async def create_tunnel(httpd: Union[TCPServer, UnixStreamServer]) -> None:
         # .scheme("HTTPS")
         # .websocket_tcp_conversion()
         # .webhook_verification("twilio", "asdf")
-        .metadata("example tunnel metadata from python").listen()
+        .metadata("example listener metadata from python").listen()
     )
     sock = cast(tuple[str, int], httpd.server_address)
     if os.name != "nt":
-        tunnel.forward(cast(str, httpd.server_address))
+        listener.forward(cast(str, httpd.server_address))
     else:
-        tunnel.forward(f"localhost:{sock[1]}")
+        listener.forward(f"localhost:{sock[1]}")
 
 
 def load_file(name):
@@ -111,5 +111,5 @@ if os.name != "nt":
 # ngrok.log_level("TRACE")
 
 logging.basicConfig(level=logging.INFO)
-asyncio.run(create_tunnel(httpd))
+asyncio.run(create_listener(httpd))
 httpd.serve_forever()

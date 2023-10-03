@@ -8,13 +8,13 @@ from django.urls import path
 import asyncio, logging, ngrok, os, sys
 
 # Set env variable to protect against the autoreloader.
-if os.getenv("NGROK_TUNNEL_RUNNING") is None:
-    os.environ["NGROK_TUNNEL_RUNNING"] = "true"
+if os.getenv("NGROK_LISTENER_RUNNING") is None:
+    os.environ["NGROK_LISTENER_RUNNING"] = "true"
     logging.basicConfig(level=logging.INFO)
 
     async def setup():
-        tunnel = await ngrok.default()
-        tunnel.forward("localhost:8080")
+        listener = await ngrok.default()
+        listener.forward("localhost:8080")
 
     asyncio.run(setup())
 

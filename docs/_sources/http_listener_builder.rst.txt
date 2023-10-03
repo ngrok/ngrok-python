@@ -1,7 +1,7 @@
-Ngrok Session Builder
+HTTP Listener Builder
 =====================================
 
 .. automodule:: ngrok
-   :members: NgrokSessionBuilder
+   :members: HttpListenerBuilder
    :noindex:
 
