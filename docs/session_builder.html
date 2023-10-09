@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -198,22 +198,22 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="session-builder">
-<h1>Session Builder<a class="headerlink" href="#session-builder" title="Permalink to this heading">#</a></h1>
+          <section id="module-ngrok">
+<span id="session-builder"></span><h1>Session Builder<a class="headerlink" href="#module-ngrok" title="Permalink to this heading">#</a></h1>
 <p>The ngrok Agent SDK for Python</p>
 <dl class="py class">
-<dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">SessionBuilder</span></span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">SessionBuilder</span></span><a class="headerlink" href="#ngrok.SessionBuilder" title="Permalink to this definition">#</a></dt>
 <dd><p>The builder for an ngrok session.</p>
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">authtoken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">authtoken</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.authtoken">
+<span class="sig-name descname"><span class="pre">authtoken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">authtoken</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.authtoken" title="Permalink to this definition">#</a></dt>
 <dd><p>Configures the session to authenticate with the provided authtoken. You
 can <a class="reference external" href="https://dashboard.ngrok.com/get-started/your-authtoken">find your existing authtoken</a> or <a class="reference external" href="https://dashboard.ngrok.com/tunnels/authtokens">create a new one</a> in the ngrok
 dashboard.</p>
@@ -221,15 +221,15 @@ dashboard.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">authtoken_from_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.authtoken_from_env">
+<span class="sig-name descname"><span class="pre">authtoken_from_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.authtoken_from_env" title="Permalink to this definition">#</a></dt>
 <dd><p>Shortcut for calling <a class="reference external" href="https://docs.rs/ngrok/0.11.0/ngrok/session/struct.SessionBuilder.html#method.authtoken">SessionBuilder::authtoken</a> with the value of the
 NGROK_AUTHTOKEN environment variable.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ca_cert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cert_bytes</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.ca_cert">
+<span class="sig-name descname"><span class="pre">ca_cert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cert_bytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.ca_cert" title="Permalink to this definition">#</a></dt>
 <dd><p>Configures the TLS certificate used to connect to the ngrok service while
 establishing the session. Use this option only if you are connecting through
 a man-in-the-middle or deep packet inspection proxy. Pass in the bytes of the certificate
@@ -239,8 +239,8 @@ the server_addr call.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">client_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.client_info">
+<span class="sig-name descname"><span class="pre">client_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.client_info" title="Permalink to this definition">#</a></dt>
 <dd><p>Add client type and version information for a client application.</p>
 <p>This is a way for applications and library consumers of this crate
 identify themselves.</p>
@@ -249,14 +249,14 @@ identify themselves.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.connect">
+<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.connect" title="Permalink to this definition">#</a></dt>
 <dd><p>Attempt to establish an ngrok session using the current configuration.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">handle_disconnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.handle_disconnection">
+<span class="sig-name descname"><span class="pre">handle_disconnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.handle_disconnection" title="Permalink to this definition">#</a></dt>
 <dd><p>Configures a function which is called to after a disconnection to the
 ngrok service. In the event of network disruptions, it will be called each time
 the session reconnects. The handler is given the address that will be used to
@@ -266,8 +266,8 @@ throw an uncaught error instead of reconnecting.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">handle_heartbeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.handle_heartbeat">
+<span class="sig-name descname"><span class="pre">handle_heartbeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.handle_heartbeat" title="Permalink to this definition">#</a></dt>
 <dd><p>Call the provided handler whenever a heartbeat response is received,
 with the latency in milliseconds.</p>
 <p>If the handler returns an error, the heartbeat task will exit, resulting
@@ -275,8 +275,8 @@ in the session eventually dying as well.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">handle_restart_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.handle_restart_command">
+<span class="sig-name descname"><span class="pre">handle_restart_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.handle_restart_command" title="Permalink to this definition">#</a></dt>
 <dd><p>Configures a function which is called when the ngrok service requests
 that this <a class="reference external" href="https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html">Session</a> updates. Your application may choose to interpret
 this callback as a request to restart the <a class="reference external" href="https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html">Session</a> or the entire
@@ -289,8 +289,8 @@ callback, it will also cause the operation to time out.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">handle_stop_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.handle_stop_command">
+<span class="sig-name descname"><span class="pre">handle_stop_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.handle_stop_command" title="Permalink to this definition">#</a></dt>
 <dd><p>Configures a function which is called when the ngrok service requests that
 this <a class="reference external" href="https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html">Session</a> stops. Your application may choose to interpret this callback
 as a request to terminate the <a class="reference external" href="https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html">Session</a> or the entire process.</p>
@@ -302,8 +302,8 @@ callback, it will also cause the operation to time out.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">handle_update_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.handle_update_command">
+<span class="sig-name descname"><span class="pre">handle_update_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.handle_update_command" title="Permalink to this definition">#</a></dt>
 <dd><p>Configures a function which is called when the ngrok service requests
 that this <a class="reference external" href="https://docs.rs/ngrok/0.11.0/ngrok/struct.Session.html">Session</a> updates. Your application may choose to interpret
 this callback as a request to update its configuration, itself, or to
@@ -316,8 +316,8 @@ callback, it will also cause the operation to time out.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">heartbeat_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heartbeat_interval</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.heartbeat_interval">
+<span class="sig-name descname"><span class="pre">heartbeat_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heartbeat_interval</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.heartbeat_interval" title="Permalink to this definition">#</a></dt>
 <dd><p>Configures how often the session will send heartbeat messages to the ngrok
 service to check session liveness.</p>
 <p>See the <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#heartbeat_interval">heartbeat_interval parameter in the ngrok docs</a> for additional
@@ -325,8 +325,8 @@ details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">heartbeat_tolerance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heartbeat_tolerance</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.heartbeat_tolerance">
+<span class="sig-name descname"><span class="pre">heartbeat_tolerance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heartbeat_tolerance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.heartbeat_tolerance" title="Permalink to this definition">#</a></dt>
 <dd><p>Configures the duration to wait for a response to a heartbeat before
 assuming the session connection is dead and attempting to reconnect.</p>
 <p>See the <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#heartbeat_tolerance">heartbeat_tolerance parameter in the ngrok docs</a> for additional
@@ -334,8 +334,8 @@ details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.metadata" title="Permalink to this definition">#</a></dt>
 <dd><p>Configures the opaque, machine-readable metadata string for this session.
 Metadata is made available to you in the ngrok dashboard and the Agents API
 resource. It is a useful way to allow you to uniquely identify sessions. We
@@ -344,8 +344,8 @@ suggest encoding the value in a structured format like JSON.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">server_addr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.server_addr">
+<span class="sig-name descname"><span class="pre">server_addr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.server_addr" title="Permalink to this definition">#</a></dt>
 <dd><p>Configures the network address to dial to connect to the ngrok service.
 Use this option only if you are connecting to a custom agent ingress.</p>
 <p>See the <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#server_addr">server_addr parameter in the ngrok docs</a> for additional details.</p>
@@ -398,8 +398,43 @@ Use this option only if you are connecting to a custom agent ingress.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Session Builder</a><ul>
+<li><a class="reference internal" href="#ngrok.SessionBuilder"><code class="docutils literal notranslate"><span class="pre">SessionBuilder</span></code></a><ul>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.authtoken"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.authtoken()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.authtoken_from_env"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.authtoken_from_env()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.ca_cert"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.ca_cert()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.client_info"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.client_info()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.connect"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.connect()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.handle_disconnection"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.handle_disconnection()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.handle_heartbeat"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.handle_heartbeat()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.handle_restart_command"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.handle_restart_command()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.handle_stop_command"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.handle_stop_command()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.handle_update_command"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.handle_update_command()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.heartbeat_interval"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.heartbeat_interval()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.heartbeat_tolerance"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.heartbeat_tolerance()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.metadata"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.metadata()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.server_addr"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.server_addr()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

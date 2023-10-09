@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -198,40 +198,41 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="labeled-listener-builder">
-<h1>Labeled Listener Builder<a class="headerlink" href="#labeled-listener-builder" title="Permalink to this heading">#</a></h1>
+          <section id="module-ngrok">
+<span id="labeled-listener-builder"></span><h1>Labeled Listener Builder<a class="headerlink" href="#module-ngrok" title="Permalink to this heading">#</a></h1>
 <p>The ngrok Agent SDK for Python</p>
 <dl class="py class">
-<dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">LabeledListenerBuilder</span></span></dt>
+<dt class="sig sig-object py" id="ngrok.LabeledListenerBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">LabeledListenerBuilder</span></span><a class="headerlink" href="#ngrok.LabeledListenerBuilder" title="Permalink to this definition">#</a></dt>
 <dd><p>A labeled ngrok listener.</p>
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Add a label, value pair for this listener.</p>
+<dt class="sig sig-object py" id="ngrok.LabeledListenerBuilder.label">
+<span class="sig-name descname"><span class="pre">label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.LabeledListenerBuilder.label" title="Permalink to this definition">#</a></dt>
+<dd><p>Add a label, value pair for this listener.
+See <a class="reference external" href="https://ngrok.com/docs/guides/using-labels-within-ngrok/">Using Labels</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">listen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.LabeledListenerBuilder.listen">
+<span class="sig-name descname"><span class="pre">listen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.LabeledListenerBuilder.listen" title="Permalink to this definition">#</a></dt>
 <dd><p>Begin listening for new connections on this listener.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">listen_and_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_url</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.LabeledListenerBuilder.listen_and_forward">
+<span class="sig-name descname"><span class="pre">listen_and_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.LabeledListenerBuilder.listen_and_forward" title="Permalink to this definition">#</a></dt>
 <dd><p>Begin listening for new connections on this listener and forwarding them to the given url.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">listen_and_serve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.LabeledListenerBuilder.listen_and_serve">
+<span class="sig-name descname"><span class="pre">listen_and_serve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.LabeledListenerBuilder.listen_and_serve" title="Permalink to this definition">#</a></dt>
 <dd><p>Begin listening for new connections on this listener and forwarding them to the given http server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -247,8 +248,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.LabeledListenerBuilder.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.LabeledListenerBuilder.metadata" title="Permalink to this definition">#</a></dt>
 <dd><p>Listener-specific opaque metadata. Viewable via the API.</p>
 </dd></dl>
 
@@ -299,8 +300,34 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Labeled Listener Builder</a><ul>
+<li><a class="reference internal" href="#ngrok.LabeledListenerBuilder"><code class="docutils literal notranslate"><span class="pre">LabeledListenerBuilder</span></code></a><ul>
+<li><a class="reference internal" href="#ngrok.LabeledListenerBuilder.label"><code class="docutils literal notranslate"><span class="pre">LabeledListenerBuilder.label()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.LabeledListenerBuilder.listen"><code class="docutils literal notranslate"><span class="pre">LabeledListenerBuilder.listen()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.LabeledListenerBuilder.listen_and_forward"><code class="docutils literal notranslate"><span class="pre">LabeledListenerBuilder.listen_and_forward()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.LabeledListenerBuilder.listen_and_serve"><code class="docutils literal notranslate"><span class="pre">LabeledListenerBuilder.listen_and_serve()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.LabeledListenerBuilder.metadata"><code class="docutils literal notranslate"><span class="pre">LabeledListenerBuilder.metadata()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

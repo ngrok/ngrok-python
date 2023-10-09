@@ -1,5 +1,6 @@
 use std::{
     borrow::BorrowMut,
+    env,
     sync::Arc,
     time::Duration,
 };
@@ -189,7 +190,11 @@ impl SessionBuilder {
         self_.set(|b| {
             b.authtoken_from_env();
         });
-        self_.borrow_mut().auth_token_set();
+        if let Ok(token) = env::var("NGROK_AUTHTOKEN") {
+            if !token.is_empty() {
+                self_.borrow_mut().auth_token_set();
+            }
+        }
         self_
     }
 

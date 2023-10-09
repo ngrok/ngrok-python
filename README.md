@@ -235,6 +235,8 @@ python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorke
 * [Gradio](https://gradio.app/) - [ngrok-asgi Example](https://github.com/ngrok/ngrok-python/tree/main/examples/gradio/gradio-asgi.py), [gradio CLI Example](https://github.com/ngrok/ngrok-python/tree/main/examples/gradio/gradio-ngrok.py) sharing machine learning apps
 * [OpenPlayground](https://github.com/nat/openplayground) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/openplayground/run.py) of an LLM playground you can run on your laptop
 * [GPT4ALL](https://github.com/nomic-ai/gpt4all) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/gpt4all/run.py) of running the [GPT4All-L Snoozy 13B](https://gpt4all.io/index.html) model with a Gradio frontend
+* [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui/) by AUTOMATIC1111 - `ngrok-python` is now built-in, see the `--ngrok` and `--ngrok-options` arguments.
+* [Text Generation WebUI](https://github.com/oobabooga/text-generation-webui) by oobabooga - `ngrok-python` is now built-in using the `--extension ngrok` argument.
 
 ## Listener Types
 * HTTP - [Minimal Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-http-minimal.py), [Full Configuration Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-http-full.py)
