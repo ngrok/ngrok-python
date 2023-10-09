@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -198,18 +198,18 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="ngrok-module">
-<h1>Ngrok Module<a class="headerlink" href="#ngrok-module" title="Permalink to this heading">#</a></h1>
+          <section id="module-ngrok">
+<span id="ngrok-module"></span><h1>Ngrok Module<a class="headerlink" href="#module-ngrok" title="Permalink to this heading">#</a></h1>
 <p>The ngrok Agent SDK for Python</p>
 <dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proto</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.connect">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proto</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.connect" title="Permalink to this definition">#</a></dt>
 <dd><p>Establish ngrok ingress, returning an Listener object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -226,26 +226,26 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.default">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.default" title="Permalink to this definition">#</a></dt>
 <dd><p>Create a default HTTP listener. Optionally pass in a connected Session to use.</p>
 <p>Returns the listener if no async loop is running, otherwise returns a Task to await with a listener result.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>session</strong> (<em>Session</em><em> or </em><em>None</em>) – The Session to use to create the listener.</p>
+<dd class="field-odd"><p><strong>session</strong> (<a class="reference internal" href="session.html#ngrok.Session" title="ngrok.Session"><em>Session</em></a><em> or </em><em>None</em>) – The Session to use to create the listener.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The created listener.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Listener</p>
+<dd class="field-odd"><p><a class="reference internal" href="listener.html#ngrok.Listener" title="ngrok.Listener">Listener</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.disconnect">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.disconnect" title="Permalink to this definition">#</a></dt>
 <dd><p>Shut down Listener with the given url, or if no url is given, shut down all Listeners.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -255,13 +255,13 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">fd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.fd">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">fd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.fd" title="Permalink to this definition">#</a></dt>
 <dd><p>Create a default HTTP listener and get its file descriptor. Optionally pass in a connected Session to use.</p>
 <p>Returns the file descriptor if no async loop is running, otherwise returns a Task to await with a file descriptor result.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>session</strong> (<em>Session</em><em> or </em><em>None</em>) – The Session to use to create the listener.</p>
+<dd class="field-odd"><p><strong>session</strong> (<a class="reference internal" href="session.html#ngrok.Session" title="ngrok.Session"><em>Session</em></a><em> or </em><em>None</em>) – The Session to use to create the listener.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The file descriptor of the created listener’s forwarding socket.</p>
@@ -273,13 +273,13 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">getsockname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.getsockname">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">getsockname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.getsockname" title="Permalink to this definition">#</a></dt>
 <dd><p>Create a default HTTP listener and get its socket name. Optionally pass in a connected Session to use.</p>
 <p>Returns the socket name if no async loop is running, otherwise returns a Task to await with a socket name result.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>session</strong> (<em>Session</em><em> or </em><em>None</em>) – The Session to use to create the listener.</p>
+<dd class="field-odd"><p><strong>session</strong> (<a class="reference internal" href="session.html#ngrok.Session" title="ngrok.Session"><em>Session</em></a><em> or </em><em>None</em>) – The Session to use to create the listener.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The name of the created listener’s forwarding socket.</p>
@@ -291,14 +291,14 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">kill</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.kill">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">kill</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.kill" title="Permalink to this definition">#</a></dt>
 <dd><p>Shut down all listeners and sessions.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">listen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listener</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.listen">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">listen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listener</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.listen" title="Permalink to this definition">#</a></dt>
 <dd><p>Create and return a listening default HTTP listener.
 Optionally pass in an object with at “server_address” attribute,
 such as a http.server.HTTPServer, and the listener will
@@ -308,21 +308,21 @@ forward TCP to that server_address. Optionally also pass in a previously created
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>server</strong> (<em>http.server.HTTPServer</em><em> or </em><em>None</em>) – The server to link with a listener.</p></li>
-<li><p><strong>listener</strong> (<em>Listener</em><em> or </em><em>None</em>) – The Listener to use to link with the server.</p></li>
+<li><p><strong>listener</strong> (<a class="reference internal" href="listener.html#ngrok.Listener" title="ngrok.Listener"><em>Listener</em></a><em> or </em><em>None</em>) – The Listener to use to link with the server.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The listener linked with the server, or a Task to await for said listener.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Listener or Task</p>
+<dd class="field-odd"><p><a class="reference internal" href="listener.html#ngrok.Listener" title="ngrok.Listener">Listener</a> or Task</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">log_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INFO'</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.log_level">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">log_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INFO'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.log_level" title="Permalink to this definition">#</a></dt>
 <dd><p>Set the log level for the bridge to Python logging.
 The log level defaults to INFO, it can be set to one of ERROR, WARN, INFO, DEBUG, or TRACE.</p>
 <dl class="field-list simple">
@@ -333,28 +333,28 @@ The log level defaults to INFO, it can be set to one of ERROR, WARN, INFO, DEBUG
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">pipe_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.pipe_name">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">pipe_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.pipe_name" title="Permalink to this definition">#</a></dt>
 <dd><p>Create a path name to use for pipe forwarding.
 This will be a file path in the temp directory on unix-like systems,
 or a named pipe on Windows. Files will be removed at program exit.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">werkzeug_develop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.werkzeug_develop">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">werkzeug_develop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listener</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.werkzeug_develop" title="Permalink to this definition">#</a></dt>
 <dd><p>Set the WERKZEUG_SERVER_FD environment variable with a file descriptor from a default HTTP listener.
 Also sets WERKZEUG_RUN_MAIN to “true” to engage the use of WERKZEUG_SERVER_FD.</p>
 <p>Returns the created listener if no async loop is running, otherwise returns a Task to await with a listener result.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>listener</strong> (<em>Listener</em><em> or </em><em>None</em>) – The Listener to use to link with the werkzeug server.</p>
+<dd class="field-odd"><p><strong>listener</strong> (<a class="reference internal" href="listener.html#ngrok.Listener" title="ngrok.Listener"><em>Listener</em></a><em> or </em><em>None</em>) – The Listener to use to link with the werkzeug server.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The listener linked with the server, or a Task to await for said listener.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Listener or Task</p>
+<dd class="field-odd"><p><a class="reference internal" href="listener.html#ngrok.Listener" title="ngrok.Listener">Listener</a> or Task</p>
 </dd>
 </dl>
 </dd></dl>
@@ -396,8 +396,36 @@ Also sets WERKZEUG_RUN_MAIN to “true” to engage the use of WERKZEUG_SERVER_F
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Ngrok Module</a><ul>
+<li><a class="reference internal" href="#ngrok.connect"><code class="docutils literal notranslate"><span class="pre">connect()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.default"><code class="docutils literal notranslate"><span class="pre">default()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.disconnect"><code class="docutils literal notranslate"><span class="pre">disconnect()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.fd"><code class="docutils literal notranslate"><span class="pre">fd()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.getsockname"><code class="docutils literal notranslate"><span class="pre">getsockname()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.kill"><code class="docutils literal notranslate"><span class="pre">kill()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.listen"><code class="docutils literal notranslate"><span class="pre">listen()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.log_level"><code class="docutils literal notranslate"><span class="pre">log_level()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.pipe_name"><code class="docutils literal notranslate"><span class="pre">pipe_name()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.werkzeug_develop"><code class="docutils literal notranslate"><span class="pre">werkzeug_develop()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

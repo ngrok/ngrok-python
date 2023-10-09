@@ -2,12 +2,10 @@
 <html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Listener" href="listener.html" /><link rel="prev" title="Session Builder" href="session_builder.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
-    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
-        <title>Session - ngrok documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 --><title>Python Module Index - ngrok documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -134,7 +132,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -155,9 +153,9 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Listener and Sessions:</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="session_builder.html">Session Builder</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">Session</a></li>
 <li class="toctree-l1"><a class="reference internal" href="listener.html">Listener</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Listener Builders:</span></p>
@@ -189,8 +187,7 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          
-<div class="theme-toggle-container theme-toggle-content">
+          <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -198,90 +195,39 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="module-ngrok">
-<span id="session"></span><h1>Session<a class="headerlink" href="#module-ngrok" title="Permalink to this heading">#</a></h1>
-<p>The ngrok Agent SDK for Python</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="ngrok.Session">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">Session</span></span><a class="headerlink" href="#ngrok.Session" title="Permalink to this definition">#</a></dt>
-<dd><p>An ngrok session.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="ngrok.Session.close">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Session.close" title="Permalink to this definition">#</a></dt>
-<dd><p>Close the ngrok session.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ngrok.Session.close_listener">
-<span class="sig-name descname"><span class="pre">close_listener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Session.close_listener" title="Permalink to this definition">#</a></dt>
-<dd><p>Close a listener with the given ID.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ngrok.Session.get_listeners">
-<span class="sig-name descname"><span class="pre">get_listeners</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Session.get_listeners" title="Permalink to this definition">#</a></dt>
-<dd><p>Retrieve a list of this session’s non-closed Listeners, in no particular order.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ngrok.Session.http_endpoint">
-<span class="sig-name descname"><span class="pre">http_endpoint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Session.http_endpoint" title="Permalink to this definition">#</a></dt>
-<dd><p>Start building a Listener backing an HTTP endpoint.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ngrok.Session.labeled_listener">
-<span class="sig-name descname"><span class="pre">labeled_listener</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Session.labeled_listener" title="Permalink to this definition">#</a></dt>
-<dd><p>Start building a labeled Listener.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ngrok.Session.tcp_endpoint">
-<span class="sig-name descname"><span class="pre">tcp_endpoint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Session.tcp_endpoint" title="Permalink to this definition">#</a></dt>
-<dd><p>Start building a Listener backing a TCP endpoint.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ngrok.Session.tls_endpoint">
-<span class="sig-name descname"><span class="pre">tls_endpoint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Session.tls_endpoint" title="Permalink to this definition">#</a></dt>
-<dd><p>Start building a Listener backing a TLS endpoint.</p>
-</dd></dl>
-
-</dd></dl>
-
+          
+<section class="domainindex-section">
+  <h1>Python Module Index</h1>
+  <div class="domainindex-jumpbox"><a href="#cap-n"><strong>n</strong></a></div>
 </section>
+<table class="domainindex-table">
+  <tr class="pcap">
+    <td></td><td>&#160;</td><td></td>
+  </tr>
+  <tr class="cap" id="cap-n">
+    <td></td><td><strong>n</strong></td><td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+        <a href="tls_listener_builder.html#module-ngrok"><code class="xref">ngrok</code></a></td><td>
+    <em></em></td>
+  </tr>
+</table>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="listener.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Listener</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="session_builder.html">
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-              <div class="page-info">
-                <div class="context">
-                  <span>Previous</span>
-                </div>
-                
-                <div class="title">Session Builder</div>
-                
-              </div>
-            </a>
+          
+          
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -300,36 +246,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Session</a><ul>
-<li><a class="reference internal" href="#ngrok.Session"><code class="docutils literal notranslate"><span class="pre">Session</span></code></a><ul>
-<li><a class="reference internal" href="#ngrok.Session.close"><code class="docutils literal notranslate"><span class="pre">Session.close()</span></code></a></li>
-<li><a class="reference internal" href="#ngrok.Session.close_listener"><code class="docutils literal notranslate"><span class="pre">Session.close_listener()</span></code></a></li>
-<li><a class="reference internal" href="#ngrok.Session.get_listeners"><code class="docutils literal notranslate"><span class="pre">Session.get_listeners()</span></code></a></li>
-<li><a class="reference internal" href="#ngrok.Session.http_endpoint"><code class="docutils literal notranslate"><span class="pre">Session.http_endpoint()</span></code></a></li>
-<li><a class="reference internal" href="#ngrok.Session.labeled_listener"><code class="docutils literal notranslate"><span class="pre">Session.labeled_listener()</span></code></a></li>
-<li><a class="reference internal" href="#ngrok.Session.tcp_endpoint"><code class="docutils literal notranslate"><span class="pre">Session.tcp_endpoint()</span></code></a></li>
-<li><a class="reference internal" href="#ngrok.Session.tls_endpoint"><code class="docutils literal notranslate"><span class="pre">Session.tls_endpoint()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
@@ -338,5 +256,6 @@
     <script src="_static/doctools.js"></script>
     <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
-    </body>
+    
+    <script>DOCUMENTATION_OPTIONS.COLLAPSE_INDEX = true</script></body>
 </html>

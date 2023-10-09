@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -198,87 +198,87 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="http-listener-builder">
-<h1>HTTP Listener Builder<a class="headerlink" href="#http-listener-builder" title="Permalink to this heading">#</a></h1>
+          <section id="module-ngrok">
+<span id="http-listener-builder"></span><h1>HTTP Listener Builder<a class="headerlink" href="#module-ngrok" title="Permalink to this heading">#</a></h1>
 <p>The ngrok Agent SDK for Python</p>
 <dl class="py class">
-<dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">HttpListenerBuilder</span></span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">HttpListenerBuilder</span></span><a class="headerlink" href="#ngrok.HttpListenerBuilder" title="Permalink to this definition">#</a></dt>
 <dd><p>An ngrok listener backing an HTTP endpoint.</p>
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">allow_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.allow_cidr">
+<span class="sig-name descname"><span class="pre">allow_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.allow_cidr" title="Permalink to this definition">#</a></dt>
 <dd><p>Restriction placed on the origin of incoming connections to the edge to only allow these CIDR ranges.
 Call multiple times to add additional CIDR ranges.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/ip-restrictions/">IP restrictions</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">basic_auth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.basic_auth">
+<span class="sig-name descname"><span class="pre">basic_auth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.basic_auth" title="Permalink to this definition">#</a></dt>
 <dd><p>Credentials for basic authentication.
 If not called, basic authentication is disabled.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">circuit_breaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.circuit_breaker">
+<span class="sig-name descname"><span class="pre">circuit_breaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.circuit_breaker" title="Permalink to this definition">#</a></dt>
 <dd><p>Reject requests when 5XX responses exceed this ratio.
 Disabled when 0.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/circuit-breaker/">Circuit Breaker</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">compression</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.compression">
+<span class="sig-name descname"><span class="pre">compression</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.compression" title="Permalink to this definition">#</a></dt>
 <dd><p>Enable gzip compression for HTTP responses.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/compression/">Compression</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">deny_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.deny_cidr">
+<span class="sig-name descname"><span class="pre">deny_cidr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cidr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.deny_cidr" title="Permalink to this definition">#</a></dt>
 <dd><p>Restriction placed on the origin of incoming connections to the edge to deny these CIDR ranges.
 Call multiple times to add additional CIDR ranges.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/ip-restrictions/">IP restrictions</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.domain">
+<span class="sig-name descname"><span class="pre">domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.domain" title="Permalink to this definition">#</a></dt>
 <dd><p>The domain to request for this edge, any valid domain or hostname that you have
 previously registered with ngrok. If using a custom domain, this requires
 registering in the <a class="reference external" href="https://dashboard.ngrok.com/cloud-edge/domains">ngrok dashboard</a> and setting a DNS CNAME value.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">forwards_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forwards_to</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.forwards_to">
+<span class="sig-name descname"><span class="pre">forwards_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forwards_to</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.forwards_to" title="Permalink to this definition">#</a></dt>
 <dd><p>Listener backend metadata. Viewable via the dashboard and API, but has no
 bearing on listener behavior.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">listen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.listen">
+<span class="sig-name descname"><span class="pre">listen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.listen" title="Permalink to this definition">#</a></dt>
 <dd><p>Begin listening for new connections on this listener.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">listen_and_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_url</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.listen_and_forward">
+<span class="sig-name descname"><span class="pre">listen_and_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.listen_and_forward" title="Permalink to this definition">#</a></dt>
 <dd><p>Begin listening for new connections on this listener and forwarding them to the given url.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">listen_and_serve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.listen_and_serve">
+<span class="sig-name descname"><span class="pre">listen_and_serve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.listen_and_serve" title="Permalink to this definition">#</a></dt>
 <dd><p>Begin listening for new connections on this listener and forwarding them to the given http server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -294,21 +294,21 @@ bearing on listener behavior.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.metadata" title="Permalink to this definition">#</a></dt>
 <dd><p>Listener-specific opaque metadata. Viewable via the API.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">mutual_tlsca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutual_tlsca</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.mutual_tlsca">
+<span class="sig-name descname"><span class="pre">mutual_tlsca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutual_tlsca</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.mutual_tlsca" title="Permalink to this definition">#</a></dt>
 <dd><p>Certificates to use for client authentication at the ngrok edge.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/mutual-tls/">Mutual TLS</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">oauth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_emails</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_domains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.oauth">
+<span class="sig-name descname"><span class="pre">oauth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_emails</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_domains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.oauth" title="Permalink to this definition">#</a></dt>
 <dd><p>OAuth configuration.
 If not called, OAuth is disabled.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/oauth/">OAuth</a> in the ngrok docs for additional details.</p>
@@ -325,8 +325,8 @@ See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/module
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">oidc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_secret</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_emails</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_domains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.oidc">
+<span class="sig-name descname"><span class="pre">oidc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_secret</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_emails</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_domains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.oidc" title="Permalink to this definition">#</a></dt>
 <dd><p>OIDC configuration.
 If not called, OIDC is disabled.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/openid-connect/">OpenID Connect</a> in the ngrok docs for additional details.</p>
@@ -345,57 +345,57 @@ See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/module
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">proxy_proto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxy_proto</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.proxy_proto">
+<span class="sig-name descname"><span class="pre">proxy_proto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxy_proto</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.proxy_proto" title="Permalink to this definition">#</a></dt>
 <dd><p>The version of PROXY protocol to use with this listener “1”, “2”, or “” if not using.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">remove_request_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.remove_request_header">
+<span class="sig-name descname"><span class="pre">remove_request_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.remove_request_header" title="Permalink to this definition">#</a></dt>
 <dd><p>Removes a header from requests to this edge.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/request-headers/">Request Headers</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">remove_response_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.remove_response_header">
+<span class="sig-name descname"><span class="pre">remove_response_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.remove_response_header" title="Permalink to this definition">#</a></dt>
 <dd><p>Removes a header from responses from this edge.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/response-headers/">Response Headers</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">request_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.request_header">
+<span class="sig-name descname"><span class="pre">request_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.request_header" title="Permalink to this definition">#</a></dt>
 <dd><p>Adds a header to all requests to this edge.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/request-headers/">Request Headers</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">response_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.response_header">
+<span class="sig-name descname"><span class="pre">response_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.response_header" title="Permalink to this definition">#</a></dt>
 <dd><p>Adds a header to all responses coming from this edge.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/response-headers/">Response Headers</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">scheme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scheme</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.scheme">
+<span class="sig-name descname"><span class="pre">scheme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scheme</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.scheme" title="Permalink to this definition">#</a></dt>
 <dd><p>The scheme that this edge should use.
 “HTTPS” or “HTTP”, defaults to “HTTPS”.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">webhook_verification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secret</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.webhook_verification">
+<span class="sig-name descname"><span class="pre">webhook_verification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secret</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.webhook_verification" title="Permalink to this definition">#</a></dt>
 <dd><p>WebhookVerification configuration.
 If not called, WebhookVerification is disabled.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/webhook-verification/">Webhook Verification</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">websocket_tcp_conversion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.websocket_tcp_conversion">
+<span class="sig-name descname"><span class="pre">websocket_tcp_conversion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.websocket_tcp_conversion" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert incoming websocket connections to TCP-like streams.</p>
 </dd></dl>
 
@@ -446,8 +446,51 @@ See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/module
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">HTTP Listener Builder</a><ul>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder</span></code></a><ul>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.allow_cidr"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.allow_cidr()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.basic_auth"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.basic_auth()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.circuit_breaker"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.circuit_breaker()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.compression"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.compression()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.deny_cidr"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.deny_cidr()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.domain"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.domain()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.forwards_to"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.forwards_to()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.listen"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.listen()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.listen_and_forward"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.listen_and_forward()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.listen_and_serve"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.listen_and_serve()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.metadata"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.metadata()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.mutual_tlsca"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.mutual_tlsca()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.oauth"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.oauth()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.oidc"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.oidc()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.proxy_proto"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.proxy_proto()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.remove_request_header"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.remove_request_header()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.remove_response_header"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.remove_response_header()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.request_header"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.request_header()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.response_header"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.response_header()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.scheme"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.scheme()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.webhook_verification"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.webhook_verification()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.websocket_tcp_conversion"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.websocket_tcp_conversion()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

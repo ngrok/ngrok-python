@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -198,22 +198,22 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="listener">
-<h1>Listener<a class="headerlink" href="#listener" title="Permalink to this heading">#</a></h1>
+          <section id="module-ngrok">
+<span id="listener"></span><h1>Listener<a class="headerlink" href="#module-ngrok" title="Permalink to this heading">#</a></h1>
 <p>The ngrok Agent SDK for Python</p>
 <dl class="py class">
-<dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">Listener</span></span></dt>
+<dt class="sig sig-object py" id="ngrok.Listener">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">Listener</span></span><a class="headerlink" href="#ngrok.Listener" title="Permalink to this definition">#</a></dt>
 <dd><p>An ngrok listener.</p>
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.Listener.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Listener.close" title="Permalink to this definition">#</a></dt>
 <dd><p>Close the listener.</p>
 <p>This is an RPC call that must be <cite>.await`ed.
 It is equivalent to calling `Session::close_listener</cite> with this
@@ -221,54 +221,54 @@ listener’s ID.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span></em><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.Listener.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Listener.forward" title="Permalink to this definition">#</a></dt>
 <dd><p>Forward incoming listener connections. This can be either a TCP address or a file socket path.
 For file socket paths on Linux/Darwin, addr can be a unix domain socket path, e.g. “/tmp/ngrok.sock”
 On Windows, addr can be a named pipe, e.e. “\\.\pipe\an_ngrok_pipe”</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">forwards_to</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.Listener.forwards_to">
+<span class="sig-name descname"><span class="pre">forwards_to</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Listener.forwards_to" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns a human-readable string presented in the ngrok dashboard
 and the API. Use the HttpListenerBuilder forwards_to, TcpListenerBuilder forwards_to, etc.
 to set this value explicitly.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.Listener.id">
+<span class="sig-name descname"><span class="pre">id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Listener.id" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns a listener’s unique ID.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">join</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.Listener.join">
+<span class="sig-name descname"><span class="pre">join</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Listener.join" title="Permalink to this definition">#</a></dt>
 <dd><p>Wait for the forwarding task to exit.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.Listener.labels">
+<span class="sig-name descname"><span class="pre">labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Listener.labels" title="Permalink to this definition">#</a></dt>
 <dd><p>The labels this listener was started with.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.Listener.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Listener.metadata" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the arbitrary metadata string for this listener.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">proto</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.Listener.proto">
+<span class="sig-name descname"><span class="pre">proto</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Listener.proto" title="Permalink to this definition">#</a></dt>
 <dd><p>The protocol of the endpoint that this listener backs.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">url</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dt class="sig sig-object py" id="ngrok.Listener.url">
+<span class="sig-name descname"><span class="pre">url</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Listener.url" title="Permalink to this definition">#</a></dt>
 <dd><p>The URL that this listener backs.</p>
 </dd></dl>
 
@@ -319,8 +319,38 @@ to set this value explicitly.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Listener</a><ul>
+<li><a class="reference internal" href="#ngrok.Listener"><code class="docutils literal notranslate"><span class="pre">Listener</span></code></a><ul>
+<li><a class="reference internal" href="#ngrok.Listener.close"><code class="docutils literal notranslate"><span class="pre">Listener.close()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.Listener.forward"><code class="docutils literal notranslate"><span class="pre">Listener.forward()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.Listener.forwards_to"><code class="docutils literal notranslate"><span class="pre">Listener.forwards_to()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.Listener.id"><code class="docutils literal notranslate"><span class="pre">Listener.id()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.Listener.join"><code class="docutils literal notranslate"><span class="pre">Listener.join()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.Listener.labels"><code class="docutils literal notranslate"><span class="pre">Listener.labels()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.Listener.metadata"><code class="docutils literal notranslate"><span class="pre">Listener.metadata()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.Listener.proto"><code class="docutils literal notranslate"><span class="pre">Listener.proto()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.Listener.url"><code class="docutils literal notranslate"><span class="pre">Listener.url()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

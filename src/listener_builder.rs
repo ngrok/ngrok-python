@@ -203,6 +203,9 @@ macro_rules! make_listener_builder {
         #[allow(dead_code)]
         impl $wrapper {
             /// Add a label, value pair for this listener.
+            /// See `Using Labels`_ in the ngrok docs for additional details.
+            ///
+            /// .. _Using Labels: https://ngrok.com/docs/guides/using-labels-within-ngrok/
             pub fn label(self_: PyRefMut<Self>, label: String, value: String) -> PyRefMut<Self> {
                 self_.set(|b| {b.label(label, value);});
                 self_
