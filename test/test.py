@@ -292,6 +292,24 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
         await shutdown(listener, http_server)
 
+    async def test_user_agent(self):
+        http_server, session = await make_http_and_session()
+        listener = (
+            await session.http_endpoint()
+            .allow_user_agent("^curl.*")
+            .deny_user_agent(".*")
+            .listen()
+        )
+
+        listener.forward(http_server.listen_to)
+
+        response = retry_request().get(listener.url())
+        self.assertEqual(403, response.status_code)
+        # ERR_NGROK_3206: The server does not authorize requests from your user-agent
+        self.assertEqual("ERR_NGROK_3211", response.headers["ngrok-error-code"])
+
+        await shutdown(listener, http_server)
+
     async def test_tcp_listener(self):
         http_server, session = await make_http_and_session()
         listener = (

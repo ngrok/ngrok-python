@@ -52,13 +52,16 @@ async def create_listener(httpd: Union[TCPServer, UnixStreamServer]) -> None:
     listener: ngrok.Listener = (
         await session.http_endpoint()
         # .allow_cidr("0.0.0.0/0")
+        # .allow_user_agent("^mozilla.*")
         # .basic_auth("ngrok", "online1line")
         # .circuit_breaker(0.5)
         # .compression()
         # .deny_cidr("10.1.1.1/32")
+        # .deny_user_agent("^curl.*")
         # .domain("<somedomain>.ngrok.io")
         # .mutual_tlsca(load_file("ca.crt"))
-        # .oauth("google", ["<user>@<domain>"], ["<domain>"], ["<scope>"])
+        # .oauth("google", ["<user>@<domain>"], ["<domain>"])
+        # .oauth("google", ["<user>@<domain>"], ["<domain>"], ["<scope>"], "<id>", "<secret>")
         # .oidc("<url>", "<id>", "<secret>", ["<user>@<domain>"], ["<domain>"], ["<scope>"])
         # .proxy_proto("") # One of: "", "1", "2"
         # .remove_request_header("X-Req-Nope")

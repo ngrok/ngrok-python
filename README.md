@@ -157,6 +157,7 @@ This example shows [all the possible configuration items of ngrok.connect](https
 listener = ngrok.connect(
     # session configuration
     addr="localhost:8080",
+    allow_user_agent="^mozilla.*",
     authtoken="<authtoken>",
     authtoken_from_env=True,
     session_metadata="Online in One Line",
@@ -164,6 +165,7 @@ listener = ngrok.connect(
     basic_auth=["ngrok:online1line"],
     circuit_breaker=0.1,
     compression=True,
+    deny_user_agent="^curl.*",
     domain="<domain>",
     ip_restriction_allow_cidrs="0.0.0.0/0",
     ip_restriction_deny_cidrs="10.1.1.1/32",
@@ -173,6 +175,8 @@ listener = ngrok.connect(
     oauth_allow_domains=["<domain>"],
     oauth_allow_emails=["<email>"],
     oauth_scopes=["<scope>"],
+    oauth_client_id="<id>",
+    oauth_client_secret="<id>",
     oidc_issuer_url="<url>",
     oidc_client_id="<id>",
     oidc_client_secret="<secret>",

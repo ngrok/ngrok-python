@@ -286,6 +286,8 @@ async fn http_endpoint(session: &Session, addr: String, options: Py<PyDict>) -> 
         plumb_vec!(B, bld, cfg, remove_request_header, request_header_remove);
         plumb_vec!(B, bld, cfg, remove_response_header, response_header_remove);
         plumb_vec!(B, bld, cfg, basic_auth, basic_auth, ":");
+        plumb_vec!(B, bld, cfg, allow_user_agent, allow_user_agent);
+        plumb_vec!(B, bld, cfg, deny_user_agent, deny_user_agent);
         // circuit breaker
         if let Some(cb) = cfg.get_item("circuit_breaker") {
             let cb64 = cb.downcast::<PyFloat>()?.extract::<f64>()?;
@@ -299,6 +301,12 @@ async fn http_endpoint(session: &Session, addr: String, options: Py<PyDict>) -> 
                 get_str_list(cfg.get_item("oauth_allow_emails"))?,
                 get_str_list(cfg.get_item("oauth_allow_domains"))?,
                 get_str_list(cfg.get_item("oauth_scopes"))?,
+                cfg.get_item("oauth_client_id")
+                    .map(get_string)
+                    .transpose()?,
+                cfg.get_item("oauth_client_secret")
+                    .map(get_string)
+                    .transpose()?,
             );
         }
         // oidc
