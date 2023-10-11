@@ -131,6 +131,31 @@ impl HttpListenerBuilder {
         self_
     }
 
+    /// A set of regular expressions used to match User-Agents that will be allowed.
+    /// On request, the User Agent Filter module will check the incoming User-Agent header value
+    /// against the list of defined allow and deny regular expression rules.
+    /// See `User Agent Filter`_ in the ngrok docs for additional details.
+    ///
+    /// .. _User Agent Filter: https://ngrok.com/docs/cloud-edge/modules/user-agent-filter/
+    pub fn allow_user_agent(self_: PyRefMut<Self>, regex: String) -> PyRefMut<Self> {
+        self_.set(|b| {
+            b.allow_user_agent(regex);
+        });
+        self_
+    }
+    /// A set of regular expressions used to match User-Agents that will be denied.
+    /// On request, the User Agent Filter module will check the incoming User-Agent header value
+    /// against the list of defined allow and deny regular expression rules.
+    /// See `User Agent Filter`_ in the ngrok docs for additional details.
+    ///
+    /// .. _User Agent Filter: https://ngrok.com/docs/cloud-edge/modules/user-agent-filter/
+    pub fn deny_user_agent(self_: PyRefMut<Self>, regex: String) -> PyRefMut<Self> {
+        self_.set(|b| {
+            b.deny_user_agent(regex);
+        });
+        self_
+    }
+
     /// OAuth configuration.
     /// If not called, OAuth is disabled.
     /// See `OAuth`_ in the ngrok docs for additional details.
@@ -141,13 +166,19 @@ impl HttpListenerBuilder {
     /// :param list or None allow_emails: A list of email addresses to allow.
     /// :param list or None allow_domains: A list of domain names to allow.
     /// :param list or None scopes: A list of scopes.
-    #[pyo3(text_signature = "(provider, allow_emails=None, allow_domains=None, scopes=None)")]
+    /// :param str or None client_id: The optional OAuth client ID, required for scopes.
+    /// :param str or None client_secret: The optional OAuth client secret, required for scopes.
+    #[pyo3(
+        text_signature = "(provider, allow_emails=None, allow_domains=None, scopes=None, client_id=None, client_secret=None)"
+    )]
     pub fn oauth(
         self_: PyRefMut<Self>,
         provider: String,
         allow_emails: Option<Vec<String>>,
         allow_domains: Option<Vec<String>>,
         scopes: Option<Vec<String>>,
+        client_id: Option<String>,
+        client_secret: Option<String>,
     ) -> PyRefMut<Self> {
         let mut oauth = OauthOptions::new(provider);
         if let Some(allow_emails) = allow_emails {
@@ -164,6 +195,12 @@ impl HttpListenerBuilder {
             for v in scopes.iter() {
                 oauth.scope(v);
             }
+        }
+        if let Some(client_id) = client_id {
+            oauth.client_id(client_id);
+        }
+        if let Some(client_secret) = client_secret {
+            oauth.client_secret(client_secret);
         }
 
         self_.set(|b| {
