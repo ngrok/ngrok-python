@@ -220,6 +220,15 @@ See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/module
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.allow_user_agent">
+<span class="sig-name descname"><span class="pre">allow_user_agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regex</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.allow_user_agent" title="Permalink to this definition">#</a></dt>
+<dd><p>A set of regular expressions used to match User-Agents that will be allowed.
+On request, the User Agent Filter module will check the incoming User-Agent header value
+against the list of defined allow and deny regular expression rules.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/user-agent-filter/">User Agent Filter</a> in the ngrok docs for additional details.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.basic_auth">
 <span class="sig-name descname"><span class="pre">basic_auth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.basic_auth" title="Permalink to this definition">#</a></dt>
 <dd><p>Credentials for basic authentication.
@@ -247,6 +256,15 @@ See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/module
 <dd><p>Restriction placed on the origin of incoming connections to the edge to deny these CIDR ranges.
 Call multiple times to add additional CIDR ranges.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/ip-restrictions/">IP restrictions</a> in the ngrok docs for additional details.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.deny_user_agent">
+<span class="sig-name descname"><span class="pre">deny_user_agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regex</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.deny_user_agent" title="Permalink to this definition">#</a></dt>
+<dd><p>A set of regular expressions used to match User-Agents that will be denied.
+On request, the User Agent Filter module will check the incoming User-Agent header value
+against the list of defined allow and deny regular expression rules.
+See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/user-agent-filter/">User Agent Filter</a> in the ngrok docs for additional details.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -308,7 +326,7 @@ See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/module
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ngrok.HttpListenerBuilder.oauth">
-<span class="sig-name descname"><span class="pre">oauth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_emails</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_domains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.oauth" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">oauth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_emails</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_domains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.HttpListenerBuilder.oauth" title="Permalink to this definition">#</a></dt>
 <dd><p>OAuth configuration.
 If not called, OAuth is disabled.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/oauth/">OAuth</a> in the ngrok docs for additional details.</p>
@@ -319,6 +337,8 @@ See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/module
 <li><p><strong>allow_emails</strong> (<em>list</em><em> or </em><em>None</em>) – A list of email addresses to allow.</p></li>
 <li><p><strong>allow_domains</strong> (<em>list</em><em> or </em><em>None</em>) – A list of domain names to allow.</p></li>
 <li><p><strong>scopes</strong> (<em>list</em><em> or </em><em>None</em>) – A list of scopes.</p></li>
+<li><p><strong>client_id</strong> (<em>str</em><em> or </em><em>None</em>) – The optional OAuth client ID, required for scopes.</p></li>
+<li><p><strong>client_secret</strong> (<em>str</em><em> or </em><em>None</em>) – The optional OAuth client secret, required for scopes.</p></li>
 </ul>
 </dd>
 </dl>
@@ -461,10 +481,12 @@ See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/module
 <li><a class="reference internal" href="#">HTTP Listener Builder</a><ul>
 <li><a class="reference internal" href="#ngrok.HttpListenerBuilder"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder</span></code></a><ul>
 <li><a class="reference internal" href="#ngrok.HttpListenerBuilder.allow_cidr"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.allow_cidr()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.allow_user_agent"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.allow_user_agent()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.HttpListenerBuilder.basic_auth"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.basic_auth()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.HttpListenerBuilder.circuit_breaker"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.circuit_breaker()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.HttpListenerBuilder.compression"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.compression()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.HttpListenerBuilder.deny_cidr"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.deny_cidr()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.HttpListenerBuilder.deny_user_agent"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.deny_user_agent()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.HttpListenerBuilder.domain"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.domain()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.HttpListenerBuilder.forwards_to"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.forwards_to()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.HttpListenerBuilder.listen"><code class="docutils literal notranslate"><span class="pre">HttpListenerBuilder.listen()</span></code></a></li>
