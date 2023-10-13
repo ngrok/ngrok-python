@@ -1,3 +1,8 @@
+## 0.12.0
+
+- Add `allow_user_agent` and `deny_user_agent` options to HTTP listeners
+- Add `client_id` and `client_secret` options to OAuth
+
 ## 0.11.0
 
 - Rename all assets to listener

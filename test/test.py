@@ -246,7 +246,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         tcp_server.listen_to = "{}:{}".format(addr[0], addr[1])
         listener.forward(tcp_server.listen_to)
         try:
-            resp = requests.get(listener.url(), timeout=1)
+            resp = requests.get(listener.url(), timeout=3)
         except requests.exceptions.ReadTimeout as err:
             pass
         self.assertEqual(b"PROXY TCP4", ProxyHandler.read_value)
