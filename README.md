@@ -33,10 +33,8 @@ pip install ngrok
 # Quickstart
 
 1. [Install `ngrok-python`](#installation)
-
 2. Export your [authtoken from the ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken) in your terminal
-
-3. Add the following code to your application to establish connectivity via the [connect method](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py) on port `9000` on `localhost`:
+3. Add the following code to your application to establish connectivity via the [connect method](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py) through port `9000` on `localhost`:
 
     ```python
     # import ngrok python sdk
@@ -360,7 +358,8 @@ Changes to `ngrok-python` are tracked under [CHANGELOG.md](https://github.com/ng
 
 # License
 
-This project is licensed under [Apache, Version 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT) license.
+This project is dual-licensed under [Apache, Version 2.0](LICENSE-APACHE) and [MIT](LICENSE-MIT).
+You can choose between one of them if you use this work.
 
 ### Contributions
 
