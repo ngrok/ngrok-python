@@ -1,4 +1,4 @@
-# The ngrok Agent SDK for Python
+# Python SDK for ngrok
 
 [![PyPI][pypi-badge]][pypi-url]
 [![Supported Versions][ver-badge]][ver-url]
@@ -18,44 +18,47 @@
 [ci-badge]: https://github.com/ngrok/ngrok-python/actions/workflows/ci.yml/badge.svg
 [ci-url]: https://github.com/ngrok/ngrok-python/actions/workflows/ci.yml
 
-**Note: This is beta-quality software. Interfaces may change without warning.**
+`ngrok-python` is the official Python SDK for ngrok that requires no binaries. Quickly enable secure production-ready connectivity to your applications and services directly from your code.
 
-[ngrok](https://ngrok.com) is a globally distributed reverse proxy commonly used for quickly getting a public URL to a
-service running inside a private network, such as on your local laptop. The ngrok agent is usually
-deployed inside a private network and is used to communicate with the ngrok cloud service.
+[ngrok](https://ngrok.com) is a globally distributed gateway that provides secure connectivity for applications and services running in any environment.
 
-This is the ngrok agent in library form, suitable for integrating directly into Python
-applications. This allows you to quickly build ngrok into your application with no separate process
-to manage.
+# Installation
 
-If you're looking for the previous agent downloader project, it's over [here](https://github.com/OpenIoTHub/ngrok).
+The `ngrok-python` SDK can be installed from [PyPI](https://pypi.org/project/ngrok) via `pip`:
 
-# Documentation
-
-A quickstart guide and a full API reference are included in the [ngrok-python API documentation](https://ngrok.github.io/ngrok-python/).
+```shell
+pip install ngrok
+```
 
 # Quickstart
 
-1. Install the `ngrok-python` package from [PyPI](https://pypi.org/project/ngrok) using `pip`:
+1. [Install `ngrok-python`](#installation)
 
-```shell
-python -m pip install ngrok
-```
+2. Export your [authtoken from the ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken) in your terminal
 
-2. After you've installed the package, you'll need an authtoken. Retrieve one on the
-[authtoken page of your ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken).
+3. Add the following code to your application to establish connectivity via the [connect method](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py) on port `9000` on `localhost`:
 
-3. Add the following code block using the [connect method](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py) to expose your python application at port `9000` on `localhost`:
+    ```python
+    # import ngrok python sdk
+    import ngrok
+    
+    # Establish connectivity
+    listener = ngrok.connect(9000, authtoken_from_env=True)
+    
+    # Output ngrok url to console
+    print(f"Ingress established at {listener.url()}")
+    ```
 
-```python
-import ngrok
-listener = ngrok.connect(9000, authtoken_from_env=True)
-print (f"Ingress established at {listener.url()}")
-```
+That's it! Your application should now be available through the url output in your terminal. 
 
-You can find more examples in [the /examples directory](https://github.com/ngrok/ngrok-python/tree/main/examples).
+> **Note**
+> You can find more examples in [the examples directory](https://github.com/ngrok/ngrok-python/tree/main/examples).
 
-## Authorization
+# Documentation
+
+A full quickstart guide and API reference can be found in the [ngrok-python documentation](https://ngrok.github.io/ngrok-python/).
+
+### Authorization
 
 To use most of ngrok's features, you'll need an authtoken. To obtain one, sign up for free at [ngrok.com](https://dashboard.ngrok.com/signup) and retrieve it from the [authtoken page in your ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken). Once you have copied your authtoken, you can reference it in several ways.
 
@@ -77,7 +80,7 @@ Or set it for all connections with the [set_auth_token](https://ngrok.github.io/
 ngrok.set_auth_token(token)
 ```
 
-## Connection
+### Connection
 
 The [connect](https://ngrok.github.io/ngrok-python/module.html) method is the easiest way to start an ngrok session and establish a listener to a specified address. If an asynchronous runtime is running, the [connect](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves to the public listener object.
 
@@ -121,7 +124,7 @@ listener = ngrok.connect(8080, **options)
 
 See [Full Configuration](#full-configuration) for the list of possible configuration options.
 
-## Disconnection
+### Disconnection
 
 To close a listener use the [disconnect](https://ngrok.github.io/ngrok-python/module.html) method with the `url` of the listener to close. If there is an asynchronous runtime running the [disconnect](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves when the call is complete.
 
@@ -141,7 +144,7 @@ The [close](https://ngrok.github.io/ngrok-python/ngrok_listener.html) method on 
 await listener.close()
 ```
 
-## Listing Listeners
+### List all Listeners
 
 To list all current non-closed listeners use the [get_listeners](https://ngrok.github.io/ngrok-python/module.html) method. If there is an asynchronous runtime running the [get_listeners](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves to the list of listener objects.
 
@@ -149,106 +152,7 @@ To list all current non-closed listeners use the [get_listeners](https://ngrok.g
 listeners = ngrok.get_listeners()
 ```
 
-# Full Configuration
-
-This example shows [all the possible configuration items of ngrok.connect](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-full.py):
-
-```python
-listener = ngrok.connect(
-    # session configuration
-    addr="localhost:8080",
-    allow_user_agent="^mozilla.*",
-    authtoken="<authtoken>",
-    authtoken_from_env=True,
-    session_metadata="Online in One Line",
-    # listener configuration
-    basic_auth=["ngrok:online1line"],
-    circuit_breaker=0.1,
-    compression=True,
-    deny_user_agent="^curl.*",
-    domain="<domain>",
-    ip_restriction_allow_cidrs="0.0.0.0/0",
-    ip_restriction_deny_cidrs="10.1.1.1/32",
-    metadata="example listener metadata from python",
-    mutual_tls_cas=load_file("ca.crt"),
-    oauth_provider="google",
-    oauth_allow_domains=["<domain>"],
-    oauth_allow_emails=["<email>"],
-    oauth_scopes=["<scope>"],
-    oauth_client_id="<id>",
-    oauth_client_secret="<id>",
-    oidc_issuer_url="<url>",
-    oidc_client_id="<id>",
-    oidc_client_secret="<secret>",
-    oidc_allow_domains=["<domain>"],
-    oidc_allow_emails=["<email>"],
-    oidc_scopes=["<scope>"],
-    proxy_proto="",  # One of: "", "1", "2"
-    request_header_remove="X-Req-Nope",
-    response_header_remove="X-Res-Nope",
-    request_header_add="X-Req-Yup:true",
-    response_header_add="X-Res-Yup:true",
-    schemes=["HTTPS"],
-    verify_webhook_provider="twilio",
-    verify_webhook_secret="asdf",
-    websocket_tcp_converter=True,
-)
-```
-
-# ASGI Runner - Listeners to Uvicorn, Gunicorn, Django and More, With No Code
-
-Prefix the command line which starts up a Uvicorn or Gunicorn web server with either `ngrok-asgi` or `python -m ngrok`. Any TCP or Unix Domain Socket arguments will be used to establish connectivity automatically. There are many command line arguments to configure the Listener used, for instance adding `--basic-auth ngrok online1line` will introduce basic authentication to the ingress listener.
-
-## Uvicorn
-Examples:
-```shell
-ngrok-asgi uvicorn mysite.asgi:application
-ngrok-asgi uvicorn mysite.asgi:application --host localhost --port 1234
-ngrok-asgi uvicorn mysite.asgi:application --host localhost --port 1234 --basic-auth ngrok online1line
-ngrok-asgi uvicorn mysite.asgi:application --uds /tmp/uvicorn.sock
-
-# Can use the module name as well, such as:
-python -m ngrok uvicorn mysite.asgi:application --oauth-provider google --allow-emails bob@example.com
-```
-
-## Gunicorn
-Examples:
-```shell
-ngrok-asgi gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker
-ngrok-asgi gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker --webhook-verification twilio s3cr3t
-ngrok-asgi gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker --bind localhost:1234
-ngrok-asgi gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker --bind unix:/tmp/gunicorn.sock
-
-# Can use the module name as well, such as:
-python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker --response-header X-Awesome True
-```
-
-# Examples
-
-## Frameworks
-* [Aiohttp](https://docs.aiohttp.org) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/aiohttp-ngrok.py)
-* [AWS App Runner](https://aws.amazon.com/apprunner/) - See the [ngrok SDK Serverless Example](https://github.com/ngrok/ngrok-sdk-serverless-example) repository, making the necessary [changes to use Python](https://docs.aws.amazon.com/apprunner/latest/dg/service-source-code-python.html) instead of NodeJS
-* [Django](https://www.djangoproject.com/) - [Single File Example](https://github.com/ngrok/ngrok-python/tree/main/examples/django-single-file.py), [Modify manage.py Example](https://github.com/ngrok/ngrok-python/tree/main/examples/djangosite/manage.py), [Modify asgi.py Example](https://github.com/ngrok/ngrok-python/tree/main/examples/djangosite/djangosite/ngrok-asgi.py), or use the `ngrok-asgi` ASGI Runner discussed above
-* [Flask](https://flask.palletsprojects.com) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/flask-ngrok.py)
-* [Gunicorn](https://gunicorn.org/) - Use the `ngrok-asgi` ASGI Runner discussed above
-* [Streamlit](https://streamlit.io) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/streamlit/streamlit-ngrok.py)
-* [Tornado](https://www.tornadoweb.org) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/tornado-ngrok.py)
-* [Uvicorn](https://www.uvicorn.org/) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/uvicorn-ngrok.py), or use the `ngrok-asgi` ASGI Runner discussed above
-
-## Machine Learning
-* [Gradio](https://gradio.app/) - [ngrok-asgi Example](https://github.com/ngrok/ngrok-python/tree/main/examples/gradio/gradio-asgi.py), [gradio CLI Example](https://github.com/ngrok/ngrok-python/tree/main/examples/gradio/gradio-ngrok.py) sharing machine learning apps
-* [OpenPlayground](https://github.com/nat/openplayground) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/openplayground/run.py) of an LLM playground you can run on your laptop
-* [GPT4ALL](https://github.com/nomic-ai/gpt4all) - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/gpt4all/run.py) of running the [GPT4All-L Snoozy 13B](https://gpt4all.io/index.html) model with a Gradio frontend
-* [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui/) by AUTOMATIC1111 - `ngrok-python` is now built-in, see the `--ngrok` and `--ngrok-options` arguments.
-* [Text Generation WebUI](https://github.com/oobabooga/text-generation-webui) by oobabooga - `ngrok-python` is now built-in using the `--extension ngrok` argument.
-
-## Listener Types
-* HTTP - [Minimal Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-http-minimal.py), [Full Configuration Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-http-full.py)
-* Labeled - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-labeled.py)
-* TCP - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tcp.py)
-* TLS - [Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tls.py)
-
-## TLS Backends
+### TLS Backends
 
 As of version `0.10.0` there is backend TLS connection support, validated by a filepath specified in the `SSL_CERT_FILE` environment variable, or falling back to the host OS installed trusted certificate authorities. So it is now possible to do this to connect:
 
@@ -258,13 +162,13 @@ ngrok.connect("https://127.0.0.1:3000", authtoken_from_env=True)
 
 If the service is using certs not trusted by the OS, such as self-signed certificates, add an environment variable like this before running: `SSL_CERT_FILE=/path/to/ca.crt`.
 
-## Unix Sockets
+### Unix Sockets
 
 You may also choose to use Unix Sockets instead of TCP. You can view an example of this [here](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-full.py).
 
 A socket address may be passed directly into the listener `forward()` call as well by prefixing the address with `unix:`, for example `unix:/tmp/socket-123`.
 
-# Builders
+### Builders
 
 For more control over Sessions and Listeners, the builder classes can be used.
 
@@ -280,6 +184,145 @@ async def create_listener():
 
 See here for a [Full Configuration Example](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-http-full.py)
 
+### Full Configuration
+
+This example shows [all the possible configuration items of ngrok.connect](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-full.py):
+
+```python
+listener = ngrok.connect(
+    # session configuration
+    addr="localhost:8080",
+    authtoken="<authtoken>",
+    authtoken_from_env=True,
+    session_metadata="Online in One Line",
+    # listener configuration
+    metadata="example listener metadata from python",
+    domain="<domain>",
+    schemes=["HTTPS"],
+    proxy_proto="",  # One of: "", "1", "2"
+    # module configuration
+    basic_auth=["ngrok:online1line"],
+    circuit_breaker=0.1,
+    compression=True,
+    allow_user_agent="^mozilla.*",
+    deny_user_agent="^curl.*",
+    ip_restriction_allow_cidrs="0.0.0.0/0",
+    ip_restriction_deny_cidrs="10.1.1.1/32",
+    mutual_tls_cas=load_file("ca.crt"),
+    oauth_provider="google",
+    oauth_allow_domains=["<domain>"],
+    oauth_allow_emails=["<email>"],
+    oauth_scopes=["<scope>"],
+    oauth_client_id="<id>",
+    oauth_client_secret="<id>",
+    oidc_issuer_url="<url>",
+    oidc_client_id="<id>",
+    oidc_client_secret="<secret>",
+    oidc_allow_domains=["<domain>"],
+    oidc_allow_emails=["<email>"],
+    oidc_scopes=["<scope>"],
+    request_header_remove="X-Req-Nope",
+    response_header_remove="X-Res-Nope",
+    request_header_add="X-Req-Yup:true",
+    response_header_add="X-Res-Yup:true",
+    verify_webhook_provider="twilio",
+    verify_webhook_secret="asdf",
+    websocket_tcp_converter=True,
+)
+```
+
+# ASGI Runner
+
+`ngrok-python` comes bundled with an ASGI (Asynchronous Server Gateway Interface) runner `ngrok-asgi` that can be used for Uvicorn, Gunicorn, Django and more, with no code. 
+
+To use prefix your start up command for a Uvicorn or Gunicorn web server with either `ngrok-asgi` or `python -m ngrok`. 
+
+Any TCP or Unix Domain Socket arguments will be used to establish connectivity automatically. The ngrok listener can be configured using command flags, for instance adding `--basic-auth ngrok online1line` will introduce basic authentication to the ingress listener.
+
+### Uvicorn
+
+```shell
+# Basic Usage
+ngrok-asgi uvicorn mysite.asgi:application
+
+# With custom host and port
+ngrok-asgi uvicorn mysite.asgi:application \
+    --host localhost \
+    --port 1234
+
+# Using basic auth
+ngrok-asgi uvicorn mysite.asgi:application \
+    --host localhost \
+    --port 1234 \
+    --basic-auth ngrok online1line
+
+# Using custom sock file
+ngrok-asgi uvicorn mysite.asgi:application \
+    --uds /tmp/uvicorn.sock
+
+# Using module name
+python -m ngrok uvicorn mysite.asgi:application \
+    --oauth-provider google \
+    --allow-emails bob@example.com
+```
+
+### Gunicorn
+
+```shell
+# Basic Usage
+ngrok-asgi gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker
+
+# With custom host and port
+ngrok-asgi gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker \
+    --bind localhost:1234
+
+# Using webhook verifications
+ngrok-asgi gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker \
+    --webhook-verification twilio s3cr3t
+
+# Using custom sock file
+ngrok-asgi gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker \
+    --bind unix:/tmp/gunicorn.sock
+
+# Using module name
+python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker --response-header X-Awesome True
+```
+
+# Examples
+
+#### Listeners
+  - [HTTP](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-http-minimal.py)
+    - [Full Configuration Example](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-http-full.py)
+  - [Labeled](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-labeled.py)
+  - [TCP](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tcp.py)
+  - [TLS](https://github.com/ngrok/ngrok-python/tree/main/examples/ngrok-tls.py)
+
+#### Frameworks
+  - [AIOHTTP](https://github.com/ngrok/ngrok-python/tree/main/examples/aiohttp-ngrok.py)
+  - [AWS APP Runner](https://github.com/ngrok/ngrok-sdk-serverless-example)
+    - with [changes for Python](https://docs.aws.amazon.com/apprunner/latest/dg/service-source-code-python.html)
+  - Django
+    - [Single File Example](https://github.com/ngrok/ngrok-python/tree/main/examples/django-single-file.py)
+    - [Modify manage.py Example](https://github.com/ngrok/ngrok-python/tree/main/examples/djangosite/manage.py)
+    - [Modify asgi.py Example](https://github.com/ngrok/ngrok-python/tree/main/examples/djangosite/djangosite/ngrok-asgi.py)
+    - or [via `ngrok-asgi`](#asgi-runner)
+  - [Flask](https://github.com/ngrok/ngrok-python/tree/main/examples/flask-ngrok.py)
+  - [Gunicorn](#gunicorn)
+  - [Streamlit](https://github.com/ngrok/ngrok-python/tree/main/examples/streamlit/streamlit-ngrok.py)
+  - [Tornado](https://github.com/ngrok/ngrok-python/tree/main/examples/tornado-ngrok.py)
+  - [Uvicorn](https://github.com/ngrok/ngrok-python/tree/main/examples/uvicorn-ngrok.py)
+
+#### Machine Learning
+  - Gradio
+    - [ngrok-asgi Example](https://github.com/ngrok/ngrok-python/tree/main/examples/gradio/gradio-asgi.py)
+    - [gradio CLI Example](https://github.com/ngrok/ngrok-python/tree/main/examples/gradio/gradio-ngrok.py)
+  - [OpenPlayground](https://github.com/ngrok/ngrok-python/tree/main/examples/openplayground/run.py)
+  - [GPT4ALL](https://github.com/ngrok/ngrok-python/tree/main/examples/gpt4all/run.py)
+  - [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui/) by AUTOMATIC1111
+    - `ngrok-python` is now built-in, see the `--ngrok` and `--ngrok-options` arguments.
+  - [Text Generation WebUI](https://github.com/oobabooga/text-generation-webui) by oobabooga
+    - `ngrok-python` is now built-in, see the `--extension ngrok` argument.
+
 # Platform Support
 
 Pre-built binaries are provided on PyPI for the following platforms:
@@ -292,16 +335,15 @@ Pre-built binaries are provided on PyPI for the following platforms:
 | Linux musl |      |  ✓  |    ✓    |     |
 | FreeBSD    |      |  *  |         |     |
 
-ngrok-python, and [ngrok-rust](https://github.com/ngrok/ngrok-rust/) which it depends on, are open source, so it may be possible to build them for other platforms.
+`ngrok-python`, and [ngrok-rust](https://github.com/ngrok/ngrok-rust/) which it depends on, are open source, so it may be possible to build them for other platforms.
 
 * Windows-aarch64 will be supported after the next release of [Ring](https://github.com/briansmith/ring/issues/1167).
 * FreeBSD-x64 is built by the release process, but PyPI won't accept BSD flavors.
 
 # Dependencies
 
-This project relies on [PyO3](https://pyo3.rs/), an excellent system to ease development and building of Rust plugins for Python.
-
-Thank you to [OpenIoTHub](https://github.com/OpenIoTHub/ngrok) for handing over the ngrok name on PyPI.
+- This project relies on [PyO3](https://pyo3.rs/), an excellent system to ease development and building of Rust plugins for Python.
+- Thank you to [OpenIoTHub](https://github.com/OpenIoTHub/ngrok) for handing over the ngrok name on PyPI.
 
 # Changelog
 
@@ -309,17 +351,13 @@ Changes are tracked in [CHANGELOG.md](https://github.com/ngrok/ngrok-python/blob
 
 # License
 
-This project is licensed under either of
+This project is licensed under either:
 
- * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
-   http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license ([LICENSE-MIT](LICENSE-MIT) or
-   http://opensource.org/licenses/MIT)
+- [Apache License, Version 2.0](LICENSE-APACHE)
+- [MIT](LICENSE-MIT)
 
-at your option.
-
-### Contribution
+### Contributions
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in ngrok-python by you, as defined in the Apache-2.0 license, shall be
+for inclusion in `ngrok-python` by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
