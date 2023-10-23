@@ -335,10 +335,10 @@ Pre-built binaries are provided on PyPI for the following platforms:
 | Linux musl |      |  ✓  |    ✓    |     |
 | FreeBSD    |      |  *  |         |     |
 
-`ngrok-python`, and [ngrok-rust](https://github.com/ngrok/ngrok-rust/) which it depends on, are open source, so it may be possible to build them for other platforms.
-
-* Windows-aarch64 will be supported after the next release of [Ring](https://github.com/briansmith/ring/issues/1167).
-* FreeBSD-x64 is built by the release process, but PyPI won't accept BSD flavors.
+> **Note**
+> `ngrok-python`, and [ngrok-rust](https://github.com/ngrok/ngrok-rust/) which it depends on, are open source, so it may be possible to build them for other platforms.
+> - Windows-aarch64 will be supported after the next release of [Ring](https://github.com/briansmith/ring/issues/1167).
+> - FreeBSD-x64 is built by the release process, but PyPI won't accept BSD flavors.
 
 # Dependencies
 
@@ -347,14 +347,20 @@ Pre-built binaries are provided on PyPI for the following platforms:
 
 # Changelog
 
-Changes are tracked in [CHANGELOG.md](https://github.com/ngrok/ngrok-python/blob/main/CHANGELOG.md).
+Changes to `ngrok-python` are tracked under [CHANGELOG.md](https://github.com/ngrok/ngrok-python/blob/main/CHANGELOG.md).
+
+# Join the ngrok Community
+
+- Check out [our official docs](https://docs.ngrok.com)
+- Read about updates on [our blog](https://blog.ngrok.com)
+- Open an [issue](https://github.com/ngrok/ngrok-python/issues) or [pull request](https://github.com/ngrok/ngrok-python/pulls)
+- Join our [Slack community](https://ngrok.com/slack)
+- Follow us on [X / Twitter (@ngrokHQ)](https://twitter.com/ngrokhq)
+- Subscribe to our [Youtube channel (@ngrokHQ)](https://www.youtube.com/@ngrokhq)
 
 # License
 
-This project is licensed under either:
-
-- [Apache License, Version 2.0](LICENSE-APACHE)
-- [MIT](LICENSE-MIT)
+This project is licensed under [Apache, Version 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT) license.
 
 ### Contributions
 
