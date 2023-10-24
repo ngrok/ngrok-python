@@ -33,7 +33,7 @@ pip install ngrok
 # Quickstart
 
 1. [Install `ngrok-python`](#installation)
-2. Export your [authtoken from the ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken) in your terminal
+2. Export your [authtoken from the ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken) as `NGROK_AUTHTOKEN` in your terminal
 3. Add the following code to your application to establish connectivity via the [connect method](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py) through port `9000` on `localhost`:
 
     ```python
