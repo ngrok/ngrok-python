@@ -148,7 +148,7 @@ fn get_byte_array(v: &PyAny) -> Result<&PyByteArray, PyDowncastError> {
 
 /// Establish ngrok ingress, returning an Listener object.
 ///
-/// :param int, str or None addr: The address to forward traffic to, this can be an integer port, or a host:port string, e.g. "localhost:8080"
+/// :param int, str or None addr: The address to forward traffic to, this can be an integer port, or a host:port string, or url, e.g. "localhost:8080" or "https://192.168.1.100:8443"
 /// :param str or None proto: The protocol type of the Listener, one of "http", "tcp", "tls", "labeled"
 /// :param options: A dict of options to pass to the Listener.
 /// :return: A Listener object.

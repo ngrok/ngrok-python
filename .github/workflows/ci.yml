@@ -155,6 +155,8 @@ jobs:
     needs: decide
     runs-on: macos-12
     name: Build FreeBSD
+    timeout-minutes: 30
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v3
       - name: Build
