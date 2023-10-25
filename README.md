@@ -197,6 +197,7 @@ listener = ngrok.connect(
     metadata="example listener metadata from python",
     domain="<domain>",
     schemes=["HTTPS"],
+    proto="http",
     proxy_proto="",  # One of: "", "1", "2"
     # module configuration
     basic_auth=["ngrok:online1line"],
@@ -206,6 +207,8 @@ listener = ngrok.connect(
     deny_user_agent="^curl.*",
     ip_restriction_allow_cidrs="0.0.0.0/0",
     ip_restriction_deny_cidrs="10.1.1.1/32",
+    crt=load_file("crt.pem"),
+    key=load_file("key.pem"),
     mutual_tls_cas=load_file("ca.crt"),
     oauth_provider="google",
     oauth_allow_domains=["<domain>"],
