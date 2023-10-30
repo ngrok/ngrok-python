@@ -223,17 +223,23 @@ listener’s ID.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ngrok.Listener.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Listener.forward" title="Permalink to this definition">#</a></dt>
-<dd><p>Forward incoming listener connections. This can be either a TCP address or a file socket path.
-For file socket paths on Linux/Darwin, addr can be a unix domain socket path, e.g. “/tmp/ngrok.sock”
-On Windows, addr can be a named pipe, e.e. “\\.\pipe\an_ngrok_pipe”</p>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.10.0.</span></p>
+</div>
+<p>Use <code class="xref py py-meth docutils literal notranslate"><span class="pre">listen_and_forward()</span></code> on Listener builders instead,
+for example <a class="reference internal" href="http_listener_builder.html#ngrok.HttpListenerBuilder.listen_and_forward" title="ngrok.HttpListenerBuilder.listen_and_forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HttpListenerBuilder.listen_and_forward()</span></code></a>.</p>
+<p>Forward incoming listener connections. This can be either a TCP address or a file socket path.
+For file socket paths on Linux/Darwin, addr can be a unix domain socket path, e.g. “/tmp/ngrok.sock”.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ngrok.Listener.forwards_to">
 <span class="sig-name descname"><span class="pre">forwards_to</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.Listener.forwards_to" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns a human-readable string presented in the ngrok dashboard
-and the API. Use the HttpListenerBuilder forwards_to, TcpListenerBuilder forwards_to, etc.
+and the API. Use the <a class="reference internal" href="http_listener_builder.html#ngrok.HttpListenerBuilder.forwards_to" title="ngrok.HttpListenerBuilder.forwards_to"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HttpListenerBuilder.forwards_to()</span></code></a>, <a class="reference internal" href="tcp_listener_builder.html#ngrok.TcpListenerBuilder.forwards_to" title="ngrok.TcpListenerBuilder.forwards_to"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TcpListenerBuilder.forwards_to()</span></code></a>, etc.
 to set this value explicitly.</p>
+<p>To automatically forward connections, you can use <a class="reference internal" href="http_listener_builder.html#ngrok.HttpListenerBuilder.listen_and_forward" title="ngrok.HttpListenerBuilder.listen_and_forward"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">listen_and_forward</span></code></a>,
+or <a class="reference internal" href="http_listener_builder.html#ngrok.HttpListenerBuilder.listen_and_serve" title="ngrok.HttpListenerBuilder.listen_and_serve"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">listen_and_serve</span></code></a> on the Listener Builder. These methods will also set this <cite>forwrads_to</cite> value.</p>
 </dd></dl>
 
 <dl class="py method">
