@@ -72,6 +72,13 @@ macro_rules! make_listener_builder {
             }
 
             /// Begin listening for new connections on this listener and forwarding them to the given url.
+            /// This url can be either a TCP/HTTP address or a file socket path, for example:
+            /// "http://localhost:8080", "https://192.168.1.100:8443", or for file socket paths on
+            /// Linux/Darwin "unix:///path/to/unix.sock".
+            ///
+            /// :param to_url: The URL to forward traffic on to
+            /// :return: A task to await for the :class:`Listener` linked with the server.
+            /// :rtype: Task
             pub fn listen_and_forward<'a>(&self, to_url: String, py: Python<'a>) -> PyResult<&'a PyAny> {
                 let url = Url::parse(&to_url).map_err(|e| py_err(format!("Url forward argument parse failure, {e}")))?;
                 let session = self.session.lock().clone();
@@ -96,9 +103,9 @@ macro_rules! make_listener_builder {
 
             /// Begin listening for new connections on this listener and forwarding them to the given http server.
             ///
-            /// :param server: The server to link with a listener.
+            /// :param server: The server to link with a :class:`Listener`.
             /// :type server: http.server.HTTPServer or None
-            /// :return: A task to await for the listener linked with the server.
+            /// :return: A task to await for the :class:`Listener` linked with the server.
             /// :rtype: Task
             pub fn listen_and_serve<'a>(
                 &self,
@@ -191,6 +198,9 @@ macro_rules! make_listener_builder {
             }
             /// Listener backend metadata. Viewable via the dashboard and API, but has no
             /// bearing on listener behavior.
+            ///
+            /// To automatically forward connections, you can use :any:`listen_and_forward`,
+            /// or :any:`listen_and_serve` on the Listener Builder.
             pub fn forwards_to(self_: PyRefMut<Self>, forwards_to: String) -> PyRefMut<Self> {
                 self_.set(|b| {b.forwards_to(forwards_to);});
                 self_

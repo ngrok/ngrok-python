@@ -227,7 +227,21 @@ See <a class="reference external" href="https://ngrok.com/docs/guides/using-labe
 <dl class="py method">
 <dt class="sig sig-object py" id="ngrok.LabeledListenerBuilder.listen_and_forward">
 <span class="sig-name descname"><span class="pre">listen_and_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.LabeledListenerBuilder.listen_and_forward" title="Permalink to this definition">#</a></dt>
-<dd><p>Begin listening for new connections on this listener and forwarding them to the given url.</p>
+<dd><p>Begin listening for new connections on this listener and forwarding them to the given url.
+This url can be either a TCP/HTTP address or a file socket path, for example:
+“<a class="reference external" href="http://localhost:8080">http://localhost:8080</a>”, “<a class="reference external" href="https://192.168.1.100:8443">https://192.168.1.100:8443</a>”, or for file socket paths on
+Linux/Darwin “unix:///path/to/unix.sock”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>to_url</strong> – The URL to forward traffic on to</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A task to await for the <a class="reference internal" href="listener.html#ngrok.Listener" title="ngrok.Listener"><code class="xref py py-class docutils literal notranslate"><span class="pre">Listener</span></code></a> linked with the server.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Task</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -236,10 +250,10 @@ See <a class="reference external" href="https://ngrok.com/docs/guides/using-labe
 <dd><p>Begin listening for new connections on this listener and forwarding them to the given http server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>server</strong> (<em>http.server.HTTPServer</em><em> or </em><em>None</em>) – The server to link with a listener.</p>
+<dd class="field-odd"><p><strong>server</strong> (<em>http.server.HTTPServer</em><em> or </em><em>None</em>) – The server to link with a <a class="reference internal" href="listener.html#ngrok.Listener" title="ngrok.Listener"><code class="xref py py-class docutils literal notranslate"><span class="pre">Listener</span></code></a>.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A task to await for the listener linked with the server.</p>
+<dd class="field-even"><p>A task to await for the <a class="reference internal" href="listener.html#ngrok.Listener" title="ngrok.Listener"><code class="xref py py-class docutils literal notranslate"><span class="pre">Listener</span></code></a> linked with the server.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Task</p>

@@ -286,8 +286,11 @@ impl Listener {
     }
 
     /// Returns a human-readable string presented in the ngrok dashboard
-    /// and the API. Use the HttpListenerBuilder forwards_to, TcpListenerBuilder forwards_to, etc.
+    /// and the API. Use the :meth:`HttpListenerBuilder.forwards_to`, :meth:`TcpListenerBuilder.forwards_to`, etc.
     /// to set this value explicitly.
+    ///
+    /// To automatically forward connections, you can use :any:`listen_and_forward`,
+    /// or :any:`listen_and_serve` on the Listener Builder. These methods will also set this `forwrads_to` value.
     pub fn forwards_to(&self) -> String {
         self.tun_meta.forwards_to.clone()
     }
@@ -297,9 +300,12 @@ impl Listener {
         self.tun_meta.metadata.clone()
     }
 
+    /// .. deprecated:: 0.10.0
+    /// Use :meth:`listen_and_forward` on Listener builders instead,
+    /// for example :meth:`HttpListenerBuilder.listen_and_forward`.
+    ///
     /// Forward incoming listener connections. This can be either a TCP address or a file socket path.
-    /// For file socket paths on Linux/Darwin, addr can be a unix domain socket path, e.g. "/tmp/ngrok.sock"
-    /// On Windows, addr can be a named pipe, e.e. "\\\\.\\pipe\\an_ngrok_pipe"
+    /// For file socket paths on Linux/Darwin, addr can be a unix domain socket path, e.g. "/tmp/ngrok.sock".
     pub fn forward<'a>(&self, py: Python<'a>, addr: String) -> PyResult<&'a PyAny> {
         let id = self.tun_meta.id.clone();
         pyo3_asyncio::tokio::future_into_py(py, async move { forward(&id, addr).await })

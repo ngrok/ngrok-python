@@ -114,7 +114,7 @@ fn default_listener_with_return(
 }
 
 /// Create and return a listening default HTTP listener.
-/// Optionally pass in an object with at "server_address" attribute,
+/// Optionally pass in an object with a "server_address" attribute,
 /// such as a http.server.HTTPServer, and the listener will
 /// forward TCP to that server_address. Optionally also pass in a previously created listener.
 ///
