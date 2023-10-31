@@ -290,7 +290,7 @@ impl Listener {
     /// to set this value explicitly.
     ///
     /// To automatically forward connections, you can use :any:`listen_and_forward`,
-    /// or :any:`listen_and_serve` on the Listener Builder. These methods will also set this `forwrads_to` value.
+    /// or :any:`listen_and_serve` on the Listener Builder. These methods will also set this `forwards_to` value.
     pub fn forwards_to(&self) -> String {
         self.tun_meta.forwards_to.clone()
     }
