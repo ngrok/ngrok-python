@@ -6,9 +6,11 @@ from typing import Union, cast
 from socketserver import TCPServer, UnixStreamServer
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.NOTSET,
     format="%(asctime)-15s %(levelname)s %(name)s %(filename)s:%(lineno)d %(message)s",
 )
+#ngrok.log_level("TRACE")
+ngrok.log_level("DEBUG")
 
 
 def on_stop():
@@ -46,6 +48,8 @@ async def create_listener(httpd: Union[TCPServer, UnixStreamServer]) -> None:
         .handle_update_command(on_update)
         .handle_heartbeat(on_heartbeat)
         .handle_disconnection(on_disconnection)
+        .server_addr("connect.us.ngrok-agent.com.lan:443")
+        .ca_cert(load_file("root.crt.pem"))
         .connect()
     )
     # create listener
@@ -75,7 +79,8 @@ async def create_listener(httpd: Union[TCPServer, UnixStreamServer]) -> None:
     )
     sock = cast(tuple[str, int], httpd.server_address)
     if os.name != "nt":
-        listener.forward(cast(str, httpd.server_address))
+        res = await listener.forward(cast(str, httpd.server_address))
+        print(f"res: {res}")
     else:
         listener.forward(f"localhost:{sock[1]}")
 

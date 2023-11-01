@@ -15,6 +15,7 @@ class HelloHandler(BaseHTTPRequestHandler):
 
 
 logging.basicConfig(level=logging.INFO)
-server = HTTPServer(("localhost", 0), HelloHandler)
-ngrok.listen(server)
+server = HTTPServer(("localhost", 8080), HelloHandler)
+# ngrok.listen(server)
+ngrok.connect("localhost:8080", server)
 server.serve_forever()
