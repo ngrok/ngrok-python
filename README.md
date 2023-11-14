@@ -33,14 +33,14 @@ pip install ngrok
 
 1. [Install `ngrok-python`](#installation)
 2. Export your [authtoken from the ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken) as `NGROK_AUTHTOKEN` in your terminal
-3. Add the following code to your application to establish connectivity via the [connect method](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-minimal.py) through port `9000` on `localhost`:
+3. Add the following code to your application to establish connectivity via the [forward method](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-forward-minimal.py) through port `9000` on `localhost`:
 
     ```python
     # import ngrok python sdk
     import ngrok
     
     # Establish connectivity
-    listener = ngrok.connect(9000, authtoken_from_env=True)
+    listener = ngrok.forward(9000, authtoken_from_env=True)
     
     # Output ngrok url to console
     print(f"Ingress established at {listener.url()}")
@@ -59,16 +59,16 @@ A full quickstart guide and API reference can be found in the [ngrok-python docu
 
 To use most of ngrok's features, you'll need an authtoken. To obtain one, sign up for free at [ngrok.com](https://dashboard.ngrok.com/signup) and retrieve it from the [authtoken page in your ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken). Once you have copied your authtoken, you can reference it in several ways.
 
-You can set it in the `NGROK_AUTHTOKEN` environment variable and pass `authtoken_from_env=True` to the [connect](https://ngrok.github.io/ngrok-python/module.html) method:
+You can set it in the `NGROK_AUTHTOKEN` environment variable and pass `authtoken_from_env=True` to the [forward](https://ngrok.github.io/ngrok-python/module.html) method:
 
 ```python
-ngrok.connect(authtoken_from_env=True, ...)
+ngrok.forward(authtoken_from_env=True, ...)
 ```
 
-Or pass the authtoken directly to the [connect](https://ngrok.github.io/ngrok-python/module.html) method:
+Or pass the authtoken directly to the [forward](https://ngrok.github.io/ngrok-python/module.html) method:
 
 ```python
-ngrok.connect(authtoken=token, ...)
+ngrok.forward(authtoken=token, ...)
 ```
 
 Or set it for all connections with the [set_auth_token](https://ngrok.github.io/ngrok-python/module.html) method:
@@ -79,44 +79,44 @@ ngrok.set_auth_token(token)
 
 ### Connection
 
-The [connect](https://ngrok.github.io/ngrok-python/module.html) method is the easiest way to start an ngrok session and establish a listener to a specified address. If an asynchronous runtime is running, the [connect](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves to the public listener object.
+The [forward](https://ngrok.github.io/ngrok-python/module.html) method is the easiest way to start an ngrok session and establish a listener to a specified address. If an asynchronous runtime is running, the [forward](https://ngrok.github.io/ngrok-python/module.html) method returns a promise that resolves to the public listener object.
 
-With no arguments, the [connect](https://ngrok.github.io/ngrok-python/module.html) method will start an HTTP listener to `localhost` port `80`:
+With no arguments, the [forward](https://ngrok.github.io/ngrok-python/module.html) method will start an HTTP listener to `localhost` port `80`:
 
 ```python
-listener = ngrok.connect()
+listener = ngrok.forward()
 ```
 
 You can pass the port number to forward on `localhost`:
 
 ```python
-listener = ngrok.connect(4242)
+listener = ngrok.forward(4242)
 ```
 
 Or you can specify the host and port via a string:
 
 ```python
-listener = ngrok.connect("localhost:4242")
+listener = ngrok.forward("localhost:4242")
 ```
 
-More options can be passed to the `connect` method to customize the connection:
+More options can be passed to the `forward` method to customize the connection:
 
 ```python
-listener = ngrok.connect(8080, basic_auth="ngrok:online1line"})
-listener = ngrok.connect(8080, oauth_provider="google", oauth_allow_domains="example.com")
+listener = ngrok.forward(8080, basic_auth="ngrok:online1line"})
+listener = ngrok.forward(8080, oauth_provider="google", oauth_allow_domains="example.com")
 ```
 
 The second (optional) argument is the listener type, which defaults to `http`. To create a TCP listener:
 
 ```python
-listener = ngrok.connect(25565, "tcp")
+listener = ngrok.forward(25565, "tcp")
 ```
 
 Since the options are kwargs, you can also use the `**` operator to pass a dictionary for configuration:
 
 ```python
 options = {"authtoken_from_env":True, "response_header_add":"X-Awesome:yes"}
-listener = ngrok.connect(8080, **options)
+listener = ngrok.forward(8080, **options)
 ```
 
 See [Full Configuration](#full-configuration) for the list of possible configuration options.
@@ -154,7 +154,7 @@ listeners = ngrok.get_listeners()
 As of version `0.10.0` there is backend TLS connection support, validated by a filepath specified in the `SSL_CERT_FILE` environment variable, or falling back to the host OS installed trusted certificate authorities. So it is now possible to do this to connect:
 
 ```python
-ngrok.connect("https://127.0.0.1:3000", authtoken_from_env=True)
+ngrok.forward("https://127.0.0.1:3000", authtoken_from_env=True)
 ```
 
 If the service is using certs not trusted by the OS, such as self-signed certificates, add an environment variable like this before running: `SSL_CERT_FILE=/path/to/ca.crt`.
@@ -183,10 +183,10 @@ See here for a [Full Configuration Example](https://github.com/ngrok/ngrok-pytho
 
 ### Full Configuration
 
-This example shows [all the possible configuration items of ngrok.connect](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-connect-full.py):
+This example shows [all the possible configuration items of ngrok.forward](https://github.com/ngrok/ngrok-python/blob/main/examples/ngrok-forward-full.py):
 
 ```python
-listener = ngrok.connect(
+listener = ngrok.forward(
     # session configuration
     addr="localhost:8080",
     authtoken="<authtoken>",

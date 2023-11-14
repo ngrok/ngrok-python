@@ -23,11 +23,11 @@ async def create_listener() -> ngrok.Listener:
     )
 
 
-# Example of using the ngrok.connect convenience function for labeled ingress
+# Example of using the ngrok.forward convenience function for labeled ingress
 def create_listener_connect(addr):
     if addr.startswith("/"):
         addr = f"unix:{addr}"
-    ngrok.connect(
+    ngrok.forward(
         addr,
         authtoken_from_env=True,
         labels="edge:edghts_<edge_id>",

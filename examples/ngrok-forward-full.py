@@ -22,7 +22,7 @@ def load_file(name):
 
 logging.basicConfig(level=logging.INFO)
 server = HTTPServer(("localhost", 8080), HelloHandler)
-listener = ngrok.connect(
+listener = ngrok.forward(
     # session configuration
     addr="localhost:8080",
     # allow_user_agent="^mozilla.*",

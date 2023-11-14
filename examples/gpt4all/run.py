@@ -20,7 +20,7 @@ def create_ngrok_listener():
 
     args, _ = parser.parse_known_args()
 
-    return ngrok.connect(f"{args.host}:{args.port}", authtoken_from_env=True)
+    return ngrok.forward(f"{args.host}:{args.port}", authtoken_from_env=True)
 
 
 # setup ngrok

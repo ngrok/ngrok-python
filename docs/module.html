@@ -210,19 +210,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="ngrok.connect">
 <span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proto</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.connect" title="Permalink to this definition">#</a></dt>
-<dd><p>Establish ngrok ingress, returning an Listener object.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>addr</strong> (<em>int</em><em>, </em><em>str</em><em> or </em><em>None</em>) – The address to forward traffic to, this can be an integer port, or a host:port string, or url, e.g. “80”, “localhost:8080”, “https://192.168.1.100:8443”, or “unix:/path/to/unix.sock”</p></li>
-<li><p><strong>proto</strong> (<em>str</em><em> or </em><em>None</em>) – The protocol type of the Listener, one of “http”, “tcp”, “tls”, “labeled”</p></li>
-<li><p><strong>options</strong> – A dict of options to pass to the Listener.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A Listener object.</p>
-</dd>
-</dl>
+<dd><p>Alias for <a class="reference internal" href="#ngrok.forward" title="ngrok.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">forward()</span></code></a></p>
+<p>See <a class="reference internal" href="#ngrok.forward" title="ngrok.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">forward()</span></code></a> for the full set of options.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -268,6 +257,24 @@
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ngrok.forward">
+<span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proto</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.forward" title="Permalink to this definition">#</a></dt>
+<dd><p>Establish ngrok ingress, returning an Listener object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>addr</strong> (<em>int</em><em>, </em><em>str</em><em> or </em><em>None</em>) – The address to forward traffic to, this can be an integer port, or a host:port string, or url, e.g. “80”, “localhost:8080”, “https://192.168.1.100:8443”, or “unix:/path/to/unix.sock”</p></li>
+<li><p><strong>proto</strong> (<em>str</em><em> or </em><em>None</em>) – The protocol type of the Listener, one of “http”, “tcp”, “tls”, “labeled”</p></li>
+<li><p><strong>options</strong> – A dict of options to pass to the Listener.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Listener object.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -413,6 +420,7 @@ Also sets WERKZEUG_RUN_MAIN to “true” to engage the use of WERKZEUG_SERVER_F
 <li><a class="reference internal" href="#ngrok.default"><code class="docutils literal notranslate"><span class="pre">default()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.disconnect"><code class="docutils literal notranslate"><span class="pre">disconnect()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.fd"><code class="docutils literal notranslate"><span class="pre">fd()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.forward"><code class="docutils literal notranslate"><span class="pre">forward()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.getsockname"><code class="docutils literal notranslate"><span class="pre">getsockname()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.kill"><code class="docutils literal notranslate"><span class="pre">kill()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.listen"><code class="docutils literal notranslate"><span class="pre">listen()</span></code></a></li>

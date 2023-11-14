@@ -146,6 +146,20 @@ fn get_byte_array(v: &PyAny) -> Result<&PyByteArray, PyDowncastError> {
     v.downcast::<PyByteArray>()
 }
 
+/// Alias for :meth:`forward`
+///
+/// See :meth:`forward` for the full set of options.
+#[pyfunction]
+#[pyo3(signature = (addr=None, proto=None, **options), text_signature = "(addr=None, proto=None, **options)")]
+pub fn connect(
+    py: Python,
+    addr: Option<&PyAny>,
+    proto: Option<String>,
+    options: Option<&PyDict>,
+) -> PyResult<Py<PyAny>> {
+    forward(py, addr, proto, options)
+}
+
 /// Establish ngrok ingress, returning an Listener object.
 ///
 /// :param int, str or None addr: The address to forward traffic to, this can be an integer port, or a host:port string, or url, e.g. "80", "localhost:8080", "https://192.168.1.100:8443", or "unix:/path/to/unix.sock"
@@ -154,7 +168,7 @@ fn get_byte_array(v: &PyAny) -> Result<&PyByteArray, PyDowncastError> {
 /// :return: A Listener object.
 #[pyfunction]
 #[pyo3(signature = (addr=None, proto=None, **options), text_signature = "(addr=None, proto=None, **options)")]
-pub fn connect(
+pub fn forward(
     py: Python,
     addr: Option<&PyAny>,
     proto: Option<String>,
@@ -341,7 +355,7 @@ async fn http_endpoint(session: &Session, addr: String, options: Py<PyDict>) -> 
         }
         Ok::<_, PyErr>(bld.replace(session.http_endpoint()))
     })?;
-    forward(bld.async_listen().await?, addr).await
+    spawn_forward(bld.async_listen().await?, addr).await
 }
 
 /// TCP Listener creation and forwarding
@@ -354,7 +368,7 @@ async fn tcp_endpoint(session: &Session, addr: String, options: Py<PyDict>) -> P
         plumb!(B, bld, cfg, remote_addr);
         Ok::<_, PyErr>(bld.replace(session.tcp_endpoint()))
     })?;
-    forward(bld.async_listen().await?, addr).await
+    spawn_forward(bld.async_listen().await?, addr).await
 }
 
 /// TLS Listener creation and forwarding
@@ -381,7 +395,7 @@ async fn tls_endpoint(session: &Session, addr: String, options: Py<PyDict>) -> P
         }
         Ok::<_, PyErr>(bld.replace(session.tls_endpoint()))
     })?;
-    forward(bld.async_listen().await?, addr).await
+    spawn_forward(bld.async_listen().await?, addr).await
 }
 
 /// Labeled Listener creation and forwarding
@@ -398,11 +412,11 @@ async fn labeled_listener(
         plumb_vec!(B, bld, cfg, label, labels, ":");
         Ok::<_, PyErr>(bld.replace(session.labeled_listener()))
     })?;
-    forward(bld.async_listen().await?, addr).await
+    spawn_forward(bld.async_listen().await?, addr).await
 }
 
 /// Background the Listener forwarding
-async fn forward(listener: Listener, addr: String) -> PyResult<Listener> {
+async fn spawn_forward(listener: Listener, addr: String) -> PyResult<Listener> {
     let id = listener.id();
     // move forwarding to another task
     tokio::spawn(async move { listener::forward(&id, addr).await.map(|_| ()) });

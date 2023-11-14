@@ -27,6 +27,7 @@ use crate::{
         async_disconnect,
         connect as connect_fn,
         disconnect,
+        forward,
         kill,
     },
     listener::{
@@ -69,6 +70,7 @@ fn ngrok(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(default, m)?)?;
     m.add_function(wrap_pyfunction!(disconnect, m)?)?;
     m.add_function(wrap_pyfunction!(fd, m)?)?;
+    m.add_function(wrap_pyfunction!(forward, m)?)?;
     m.add_function(wrap_pyfunction!(getsockname, m)?)?;
     m.add_function(wrap_pyfunction!(kill, m)?)?;
     m.add_function(wrap_pyfunction!(listen, m)?)?;

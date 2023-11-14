@@ -34,11 +34,11 @@ run: develop
 run-aio: develop examples-install
 	. $(BIN)/activate && python ./examples/aiohttp-ngrok.py
 
-run-connect-full: develop
-	. $(BIN)/activate && python ./examples/ngrok-connect-full.py
+run-forward-full: develop
+	. $(BIN)/activate && python ./examples/ngrok-forward-full.py
 
-run-connect-minimal: develop
-	. $(BIN)/activate && python ./examples/ngrok-connect-minimal.py
+run-forward-minimal: develop
+	. $(BIN)/activate && python ./examples/ngrok-forward-minimal.py
 
 run-django: develop examples-install
 	. $(BIN)/activate && python ./examples/django-single-file.py
@@ -109,8 +109,8 @@ run-uvicorn: develop examples-install
 	. $(BIN)/activate && python ./examples/uvicorn-ngrok.py
 
 mypy: develop
-	. $(BIN)/activate && mypy ./examples/ngrok-connect-minimal.py
-	. $(BIN)/activate && mypy ./examples/ngrok-connect-full.py
+	. $(BIN)/activate && mypy ./examples/ngrok-forward-minimal.py
+	. $(BIN)/activate && mypy ./examples/ngrok-forward-full.py
 	. $(BIN)/activate && mypy ./examples/ngrok-http-minimal.py
 	. $(BIN)/activate && mypy ./examples/ngrok-http-full.py
 	. $(BIN)/activate && mypy ./examples/ngrok-labeled.py
