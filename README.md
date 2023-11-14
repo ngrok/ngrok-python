@@ -55,7 +55,7 @@ That's it! Your application should now be available through the url output in yo
 
 A full quickstart guide and API reference can be found in the [ngrok-python documentation](https://ngrok.github.io/ngrok-python/).
 
-### Authorization
+### Authentication
 
 To use most of ngrok's features, you'll need an authtoken. To obtain one, sign up for free at [ngrok.com](https://dashboard.ngrok.com/signup) and retrieve it from the [authtoken page in your ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken). Once you have copied your authtoken, you can reference it in several ways.
 
