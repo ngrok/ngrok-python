@@ -24,9 +24,25 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
         shutdown(url, http_server)
         return response
 
-    async def test_https_listener_async(self):
+    async def test_connect_https_listener_async(self):
         http_server = test.make_http()
         listener = await ngrok.connect(
+            http_server.listen_to,
+            authtoken_from_env=True,
+            forwards_to="http forwards to",
+            metadata="http metadata",
+        )
+
+        self.assertIsNotNone(listener.id())
+        self.assertIsNotNone(listener.url())
+        self.assertTrue(listener.url().startswith("https://"))
+        self.assertEqual("http forwards to", listener.forwards_to())
+        self.assertEqual("http metadata", listener.metadata())
+        self.validate_shutdown(http_server, listener, listener.url())
+
+    async def test_https_listener_async(self):
+        http_server = test.make_http()
+        listener = await ngrok.forward(
             http_server.listen_to,
             authtoken_from_env=True,
             forwards_to="http forwards to",
@@ -43,7 +59,7 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
     def test_https_listener(self):
         http_server = test.make_http()
         ngrok.set_auth_token(os.environ["NGROK_AUTHTOKEN"])
-        listener = ngrok.connect(
+        listener = ngrok.forward(
             http_server.listen_to,
             forwards_to="http forwards to",
             metadata="http metadata",
@@ -58,16 +74,16 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
 
         self.validate_shutdown(http_server, listener, listener.url())
 
-    def test_connect_number(self):
+    def test_forward_number(self):
         http_server = test.make_http()
-        listener = ngrok.connect(
+        listener = ngrok.forward(
             int(http_server.listen_to.split(":")[1]), authtoken_from_env=True
         )
         self.validate_shutdown(http_server, listener, listener.url())
 
-    def test_connect_addr_protocol(self):
+    def test_forward_addr_protocol(self):
         http_server = test.make_http()
-        listener = ngrok.connect(
+        listener = ngrok.forward(
             f"http://{http_server.listen_to}",  # http:// should be ignored
             authtoken_from_env=True,
             authtoken=None,  # None's should be ignored
@@ -77,15 +93,15 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
         )
         self.validate_shutdown(http_server, listener, listener.url())
 
-    def test_connect_dots(self):
+    def test_forward_dots(self):
         http_server = test.make_http()
         options = {"authtoken.from.env": True}
-        listener = ngrok.connect(http_server.listen_to, **options)
+        listener = ngrok.forward(http_server.listen_to, **options)
         self.validate_shutdown(http_server, listener, listener.url())
 
-    def test_connect_vectorize(self):
+    def test_forward_vectorize(self):
         http_server = test.make_http()
-        listener = ngrok.connect(
+        listener = ngrok.forward(
             http_server.listen_to,
             authtoken_from_env=True,
             basic_auth="ngrok:online1line",
@@ -103,7 +119,7 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
 
     async def test_tcp_listener(self):
         http_server = test.make_http()
-        listener = await ngrok.connect(
+        listener = await ngrok.forward(
             http_server.listen_to,
             authtoken_from_env=True,
             forwards_to="tcp forwards to",
@@ -120,7 +136,7 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
 
     async def test_tls_listener(self):
         http_server = test.make_http()
-        listener = await ngrok.connect(
+        listener = await ngrok.forward(
             http_server.listen_to,
             authtoken_from_env=True,
             forwards_to="tls forwards to",
