@@ -1,3 +1,7 @@
+## 0.12.1
+
+- Move to `ngrok.forward` from `ngrok.connect`, keeping an alias
+
 ## 0.12.0
 
 - Add `allow_user_agent` and `deny_user_agent` options to HTTP listeners
