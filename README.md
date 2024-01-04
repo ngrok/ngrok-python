@@ -198,6 +198,7 @@ listener = ngrok.forward(
     schemes=["HTTPS"],
     proto="http",
     proxy_proto="",  # One of: "", "1", "2"
+    labels="edge:edghts_2G...",  # Along with proto="labeled"
     # module configuration
     basic_auth=["ngrok:online1line"],
     circuit_breaker=0.1,
