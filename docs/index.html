@@ -358,6 +358,7 @@ You can find more examples in <a class="reference external" href="https://github
     <span class="n">schemes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;HTTPS&quot;</span><span class="p">],</span>
     <span class="n">proto</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="p">,</span>
     <span class="n">proxy_proto</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># One of: &quot;&quot;, &quot;1&quot;, &quot;2&quot;</span>
+    <span class="n">labels</span><span class="o">=</span><span class="s2">&quot;edge:edghts_2G...&quot;</span><span class="p">,</span>  <span class="c1"># Along with proto=&quot;labeled&quot;</span>
     <span class="c1"># module configuration</span>
     <span class="n">basic_auth</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ngrok:online1line&quot;</span><span class="p">],</span>
     <span class="n">circuit_breaker</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
@@ -381,7 +382,6 @@ You can find more examples in <a class="reference external" href="https://github
     <span class="n">oidc_allow_domains</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;domain&gt;&quot;</span><span class="p">],</span>
     <span class="n">oidc_allow_emails</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;email&gt;&quot;</span><span class="p">],</span>
     <span class="n">oidc_scopes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;scope&gt;&quot;</span><span class="p">],</span>
-    <span class="n">remote_addr</span><span class="o">=</span><span class="s2">&quot;0.tcp.ngrok.io:15555&quot;</span><span class="p">,</span>
     <span class="n">request_header_remove</span><span class="o">=</span><span class="s2">&quot;X-Req-Nope&quot;</span><span class="p">,</span>
     <span class="n">response_header_remove</span><span class="o">=</span><span class="s2">&quot;X-Res-Nope&quot;</span><span class="p">,</span>
     <span class="n">request_header_add</span><span class="o">=</span><span class="s2">&quot;X-Req-Yup:true&quot;</span><span class="p">,</span>

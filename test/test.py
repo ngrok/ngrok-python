@@ -133,6 +133,78 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(listener.url().startswith("http://"))
         await self.forward_validate_shutdown(http_server, listener, listener.url())
 
+    async def test_https_listener_with_policy(self):
+        policy = '''
+        {
+          "inbound": [],
+          "outbound": [
+            {
+              "expressions": [],
+              "name": "",
+              "actions": [
+                {
+                  "type": "add-headers",
+                  "config": {
+                    "headers": {
+                      "added-header": "added-header-value"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        '''
+
+        http_server, session = await make_http_and_session()
+        listener = await session.http_endpoint().policy(policy).listen()
+        listener.forward(http_server.listen_to)
+        response = retry_request().get(listener.url())
+        self.assertEqual("added-header-value", response.headers["added-header"])
+        await shutdown(listener, http_server)
+
+    async def test_https_listener_with_invalid_policy_json(self):
+        try:
+            _, session = await make_http_and_session()
+            await session.http_endpoint().policy("{{").listen()
+        except ValueError as err:
+            error = err
+        self.assertIsInstance(error, ValueError)
+        self.assertTrue("parse policy" in f"{error}")
+
+    async def test_https_listener_with_invalid_policy_action(self):
+        policy = '''
+        {
+          "inbound": [],
+          "outbound": [
+            {
+              "expressions": [],
+              "name": "",
+              "actions": [
+                {
+                  "type": "not-real-action",
+                  "config": {
+                    "headers": {
+                      "added-header": "added-header-value"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        '''
+
+        try:
+            http_server, session = await make_http_and_session()
+            listener = await session.http_endpoint().policy(policy).listen()
+            listener.forward(http_server.listen_to)
+            _ = retry_request().get(listener.url())
+        except ValueError as err:
+            error = err
+        self.assertIsInstance(error, ValueError)
+        self.assertTrue("Invalid policy action type 'not-real-action'." in f"{error}")
+
     async def test_unix_socket(self):
         http_server, session = await make_http_and_session(use_unix_socket=True)
         listener = await session.http_endpoint().listen()
