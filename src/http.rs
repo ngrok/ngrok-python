@@ -156,6 +156,13 @@ impl HttpListenerBuilder {
         self_
     }
 
+    pub fn policy(self_: PyRefMut<Self>, policy_config: String) -> PyRefMut<Self> {
+        self_.set(|b| {
+            let _ = b.policy(policy_config.as_str());
+        });
+        self_
+    }
+
     /// OAuth configuration.
     /// If not called, OAuth is disabled.
     /// See `OAuth`_ in the ngrok docs for additional details.
