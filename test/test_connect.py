@@ -56,6 +56,25 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("http metadata", listener.metadata())
         self.validate_shutdown(http_server, listener, listener.url())
 
+    async def test_https_listener_with_config(self):
+        http_server = test.make_http()
+        listener = await ngrok.forward(
+            http_server.listen_to,
+            authtoken_from_env=True,
+            forwards_to="http forwards to",
+            metadata="http metadata",
+        )
+
+        self.assertIsNotNone(listener.id())
+        self.assertIsNotNone(listener.url())
+        self.assertTrue(listener.url().startswith("https://"))
+        self.assertEqual("http forwards to", listener.forwards_to())
+        self.assertEqual("http metadata", listener.metadata())
+        response = self.validate_shutdown(http_server, listener, listener.url())
+        print(response.headers)
+        print(response.headers)
+        print(response.headers)
+
     def test_https_listener(self):
         http_server = test.make_http()
         ngrok.set_auth_token(os.environ["NGROK_AUTHTOKEN"])

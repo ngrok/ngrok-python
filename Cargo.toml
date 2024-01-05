@@ -18,7 +18,7 @@ log = "0.4"
 # pin mio until all dependencies are also on windows-sys 0.48
 # https://github.com/microsoft/windows-rs/issues/2410#issuecomment-1490802715
 mio = { version = "=0.8.6" }
-ngrok = { version = "=0.14.0-pre.8" }
+ngrok = { version = "=0.14.0-pre.11" }
 pyo3 = { version = "0.18.1", features = ["abi3", "abi3-py37", "extension-module", "multiple-pymethods"]}
 pyo3-asyncio = { version = "0.18.0", features = ["attributes", "tokio-runtime"] }
 pyo3-log = { version = "0.8.1" }

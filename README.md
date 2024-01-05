@@ -369,3 +369,38 @@ You can choose between one of them if you use this work.
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in `ngrok-python` by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
+
+# Development: Getting Started
+
+**Prerequisites:**
+- a valid Ngrok `authtoken`
+-  `make` available in your PATH
+
+1. Update [Cargo.toml](./Cargo.toml) with the _latest supported_ ```ngrok = { version = "=VERSION_HERE" }``` from [ngrok-rust](https://github.com/ngrok/ngrok-rust/blob/main/ngrok/Cargo.toml#L3). `ngrok-rust` is used for the bindings in [src/rust_files_here.rs](./src)
+
+2. Run `make build` (builds the `rust` bindings / `python` dependencies)
+
+3. Happy developing!
+
+<br/>
+
+**Example Commands**:
+
+_building the project_
+```shell
+make develop
+```
+
+_running the entire test suite_
+```shell
+# running the entire test suite
+export NGROK_AUTHTOKEN="YOUR_AUTHTOKEN_HERE"; make test
+```
+
+_running an individual test_
+```shell
+# running an individual test
+export NGROK_AUTHTOKEN="YOUR_AUTHTOKEN_HERE"; make test="-k TEST_CLASS.NAME_OF_TEST" test
+```
+
+[See the MakeFile for more examples](./Makefile)
