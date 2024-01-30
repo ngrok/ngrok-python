@@ -142,13 +142,22 @@ class TlsListenerBuilder:
         self, cert_pem: bytearray, key_pem: bytearray
     ) -> TlsListenerBuilder: ...
 
-class PolicyBuilder:
-    def add_inbound():...
-    def add_outbound():...
+class Policy:
+    inbound: list[PolicyRule]
+    outbound: list[PolicyRule]
+
+class PolicyRule:
+    name: str
+    expressions: list[str]
+    actions: list[PolicyAction]
 
 class PolicyAction:
     type: str
     config: str
+
+class PolicyBuilder:
+    def add_inbound():...
+    def add_outbound():...
 
 class PolicyRuleBuilder:
     def add_expression(expression: str) -> None: ...
