@@ -108,6 +108,7 @@ class HttpListenerBuilder:
         self, provider: str, secret: str
     ) -> HttpListenerBuilder: ...
     def websocket_tcp_conversion(self) -> HttpListenerBuilder: ...
+    def policy(self, policy: str) -> HttpListenerBuilder: ...
 
 class LabeledListenerBuilder:
     def label(self, label: str, value: str) -> LabeledListenerBuilder: ...
@@ -141,28 +142,3 @@ class TlsListenerBuilder:
     def termination(
         self, cert_pem: bytearray, key_pem: bytearray
     ) -> TlsListenerBuilder: ...
-
-class Policy:
-    inbound: list[PolicyRule]
-    outbound: list[PolicyRule]
-
-class PolicyRule:
-    name: str
-    expressions: list[str]
-    actions: list[PolicyAction]
-
-class PolicyAction:
-    type: str
-    config: str
-
-class PolicyBuilder:
-    def add_inbound():...
-    def add_outbound():...
-
-class PolicyRuleBuilder:
-    def add_expression(expression: str) -> None: ...
-    def add_action(action: PolicyAction) -> None: ...
-
-class PolicyActionBuilder:
-    def set_type(action_type: str) -> None: ...
-    def set_action_config(config: str) -> None: ...

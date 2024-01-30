@@ -133,6 +133,44 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(listener.url().startswith("http://"))
         await self.forward_validate_shutdown(http_server, listener, listener.url())
 
+    async def test_https_listener_with_config(self):
+        policy = '''
+        {
+          "inbound": [],
+          "outbound": [
+            {
+              "expressions": [],
+              "name": "",
+              "actions": [
+                {
+                  "type": "add-headers",
+                  "config": {
+                    "headers": {
+                      "added-header": "added-header-value"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        '''
+
+        http_server, session = await make_http_and_session()
+        listener = await session.http_endpoint().policy(policy).listen()
+        listener.forward(http_server.listen_to)
+        response = retry_request().get(listener.url())
+        self.assertEqual("added-header-value", response.headers["added-header"])
+        await shutdown(listener, http_server)
+
+    async def test_https_listener_without_config(self):
+        http_server, session = await make_http_and_session()
+        listener = await session.http_endpoint().policy('{{').listen()
+        listener.forward(http_server.listen_to)
+        response = retry_request().get(listener.url())
+        self.assertNotEqual("added-header-value", response.headers.get("added-header"))
+        await shutdown(listener, http_server)
+
     async def test_unix_socket(self):
         http_server, session = await make_http_and_session(use_unix_socket=True)
         listener = await session.http_endpoint().listen()
