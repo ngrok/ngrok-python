@@ -7,12 +7,10 @@ use ngrok::config::{
     Scheme,
 };
 use pyo3::{
-    pymethods,
-    types::PyByteArray,
-    PyRefMut,
+    pymethods, types::PyByteArray, PyRefMut, PyResult
 };
 
-use crate::listener_builder::HttpListenerBuilder;
+use crate::{listener_builder::HttpListenerBuilder, py_err};
 
 #[pymethods]
 #[allow(dead_code)]
@@ -156,11 +154,12 @@ impl HttpListenerBuilder {
         self_
     }
 
-    pub fn policy(self_: PyRefMut<Self>, policy_config: String) -> PyRefMut<Self> {
-        self_.set(|b| {
-            let _ = b.policy(policy_config.as_str());
-        });
-        self_
+    pub fn policy(self_: PyRefMut<Self>, policy_config: String) -> PyResult<PyRefMut<Self>> {
+        let mut builder = self_.listener_builder.lock();
+        builder.policy(policy_config.as_str())
+            .map_err(|e| py_err(format!("Cannot parse policy: {e}")))?;
+        drop(builder);
+        Ok(self_)
     }
 
     /// OAuth configuration.

@@ -165,11 +165,13 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
     async def test_https_listener_without_config(self):
         http_server, session = await make_http_and_session()
-        listener = await session.http_endpoint().policy('{{').listen()
-        listener.forward(http_server.listen_to)
-        response = retry_request().get(listener.url())
-        self.assertNotEqual("added-header-value", response.headers.get("added-header"))
-        await shutdown(listener, http_server)
+
+        try:
+            await session.http_endpoint().policy('{{').listen()
+        except ValueError as err:
+            error = err
+        self.assertIsInstance(error, ValueError)
+        self.assertTrue("parse policy" in f"{error}")
 
     async def test_unix_socket(self):
         http_server, session = await make_http_and_session(use_unix_socket=True)
