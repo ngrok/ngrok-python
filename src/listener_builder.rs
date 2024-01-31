@@ -1,20 +1,42 @@
-use std::{str::FromStr, sync::Arc};
+use std::{
+    str::FromStr,
+    sync::Arc,
+};
 
 use ngrok::{
     config::{
-        HttpTunnelBuilder, LabeledTunnelBuilder, ProxyProto, TcpTunnelBuilder, TlsTunnelBuilder,
+        HttpTunnelBuilder,
+        LabeledTunnelBuilder,
+        ProxyProto,
+        TcpTunnelBuilder,
+        TlsTunnelBuilder,
     },
     prelude::*,
     Session,
 };
 use parking_lot::Mutex;
-use pyo3::{pyclass, pymethods, Py, PyAny, PyRefMut, PyResult, Python};
+use pyo3::{
+    pyclass,
+    pymethods,
+    Py,
+    PyAny,
+    PyRefMut,
+    PyResult,
+    Python,
+};
 use tracing::debug;
 use url::Url;
 
 use crate::{
-    listener::{HttpListener, LabeledListener, Listener, TcpListener, TlsListener},
-    py_err, py_ngrok_err,
+    listener::{
+        HttpListener,
+        LabeledListener,
+        Listener,
+        TcpListener,
+        TlsListener,
+    },
+    py_err,
+    py_ngrok_err,
     wrapper::address_from_server,
 };
 

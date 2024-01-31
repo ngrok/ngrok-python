@@ -164,9 +164,10 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         await shutdown(listener, http_server)
 
     async def test_https_listener_with_invalid_policy_json(self):
+        error = None
         try:
             _, session = await make_http_and_session()
-            await session.http_endpoint().policy('{ "not": "valid policy" }').listen()
+            await session.http_endpoint().policy('{ "inbound": "not valid" }').listen()
         except ValueError as err:
             error = err
         self.assertIsInstance(error, ValueError)
