@@ -177,6 +177,52 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
 
         shutdown(listener.url(), http_server)
 
+    async def test_connect_policy(self):
+        policy = '''
+        {
+          "inbound": [],
+          "outbound": [
+            {
+              "expressions": [],
+              "name": "",
+              "actions": [
+                {
+                  "type": "add-headers",
+                  "config": {
+                    "headers": {
+                      "added-header": "added-header-value"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        '''
+
+        http_server = test.make_http()
+        listener = await ngrok.connect(
+            http_server.listen_to,
+            authtoken_from_env=True,
+            policy=policy,
+        )
+        response = retry_request().get(listener.url())
+        self.assertEqual("added-header-value", response.headers["added-header"])
+        self.validate_shutdown(http_server, listener, listener.url())
+
+    async def test_invalid_connect_policy(self):
+        http_server = test.make_http()
+        try:
+            listener = await ngrok.connect(
+                http_server.listen_to,
+                authtoken_from_env=True,
+                policy="{{",
+            )
+        except ValueError as err:
+            error = err
+        self.assertIsInstance(error, ValueError)
+        self.assertTrue("parse policy" in f"{error}")
+
 
 if __name__ == "__main__":
     unittest.main()
