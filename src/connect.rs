@@ -115,6 +115,11 @@ macro_rules! config_common {
         plumb_vec!($builder, $self, $config, deny_cidr);
         plumb!($builder, $self, $config, proxy_proto);
         plumb!($builder, $self, $config, forwards_to);
+
+        // returns a Result, so we can't use the macro
+        if let Some(v) = $config.get_item("policy") {
+            $builder::policy($self.borrow_mut(), get_string(v)?)?;
+        }
     };
 }
 

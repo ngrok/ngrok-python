@@ -56,6 +56,25 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("http metadata", listener.metadata())
         self.validate_shutdown(http_server, listener, listener.url())
 
+    async def test_https_listener_with_config(self):
+        http_server = test.make_http()
+        listener = await ngrok.forward(
+            http_server.listen_to,
+            authtoken_from_env=True,
+            forwards_to="http forwards to",
+            metadata="http metadata",
+        )
+
+        self.assertIsNotNone(listener.id())
+        self.assertIsNotNone(listener.url())
+        self.assertTrue(listener.url().startswith("https://"))
+        self.assertEqual("http forwards to", listener.forwards_to())
+        self.assertEqual("http metadata", listener.metadata())
+        response = self.validate_shutdown(http_server, listener, listener.url())
+        print(response.headers)
+        print(response.headers)
+        print(response.headers)
+
     def test_https_listener(self):
         http_server = test.make_http()
         ngrok.set_auth_token(os.environ["NGROK_AUTHTOKEN"])
@@ -157,6 +176,52 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
         self.assertIsInstance(error, requests.exceptions.SSLError)
 
         shutdown(listener.url(), http_server)
+
+    async def test_connect_policy(self):
+        policy = '''
+        {
+          "inbound": [],
+          "outbound": [
+            {
+              "expressions": [],
+              "name": "",
+              "actions": [
+                {
+                  "type": "add-headers",
+                  "config": {
+                    "headers": {
+                      "added-header": "added-header-value"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        '''
+
+        http_server = test.make_http()
+        listener = await ngrok.connect(
+            http_server.listen_to,
+            authtoken_from_env=True,
+            policy=policy,
+        )
+        response = retry_request().get(listener.url())
+        self.assertEqual("added-header-value", response.headers["added-header"])
+        self.validate_shutdown(http_server, listener, listener.url())
+
+    async def test_invalid_connect_policy(self):
+        http_server = test.make_http()
+        try:
+            listener = await ngrok.connect(
+                http_server.listen_to,
+                authtoken_from_env=True,
+                policy="{{",
+            )
+        except ValueError as err:
+            error = err
+        self.assertIsInstance(error, ValueError)
+        self.assertTrue("parse policy" in f"{error}")
 
 
 if __name__ == "__main__":
