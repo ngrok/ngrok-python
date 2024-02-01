@@ -134,7 +134,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         await self.forward_validate_shutdown(http_server, listener, listener.url())
 
     async def test_https_listener_with_policy(self):
-        policy = '''
+        policy = """
         {
           "inbound": [],
           "outbound": [
@@ -154,7 +154,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
             }
           ]
         }
-        '''
+        """
 
         http_server, session = await make_http_and_session()
         listener = await session.http_endpoint().policy(policy).listen()
@@ -174,7 +174,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         self.assertTrue("parse policy" in f"{error}")
 
     async def test_https_listener_with_invalid_policy_action(self):
-        policy = '''
+        policy = """
         {
           "inbound": [],
           "outbound": [
@@ -194,7 +194,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
             }
           ]
         }
-        '''
+        """
 
         try:
             http_server, session = await make_http_and_session()

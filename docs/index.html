@@ -382,6 +382,7 @@ You can find more examples in <a class="reference external" href="https://github
     <span class="n">oidc_allow_domains</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;domain&gt;&quot;</span><span class="p">],</span>
     <span class="n">oidc_allow_emails</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;email&gt;&quot;</span><span class="p">],</span>
     <span class="n">oidc_scopes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;scope&gt;&quot;</span><span class="p">],</span>
+    <span class="n">policy</span><span class="o">=</span><span class="s2">&quot;&lt;policy_json&gt;&quot;</span><span class="p">,</span>
     <span class="n">request_header_remove</span><span class="o">=</span><span class="s2">&quot;X-Req-Nope&quot;</span><span class="p">,</span>
     <span class="n">response_header_remove</span><span class="o">=</span><span class="s2">&quot;X-Res-Nope&quot;</span><span class="p">,</span>
     <span class="n">request_header_add</span><span class="o">=</span><span class="s2">&quot;X-Req-Yup:true&quot;</span><span class="p">,</span>
@@ -600,6 +601,36 @@ You can choose between one of them if you use this work.</p>
 for inclusion in <code class="docutils literal notranslate"><span class="pre">ngrok-python</span></code> by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.</p>
 </section>
+</section>
+<section id="development-getting-started">
+<h1>Development: Getting Started<a class="headerlink" href="#development-getting-started" title="Permalink to this heading">#</a></h1>
+<p><strong>Prerequisites:</strong></p>
+<ul class="simple">
+<li><p>a valid Ngrok <code class="docutils literal notranslate"><span class="pre">authtoken</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">make</span></code> available in your PATH</p></li>
+</ul>
+<ol class="arabic simple">
+<li><p>Update <a class="reference internal" href="#./Cargo.toml"><span class="xref myst">Cargo.toml</span></a> with the <em>latest supported</em> <code class="docutils literal notranslate"><span class="pre">ngrok</span> <span class="pre">=</span> <span class="pre">{</span> <span class="pre">version</span> <span class="pre">=</span> <span class="pre">&quot;=VERSION_HERE&quot;</span> <span class="pre">}</span></code> from <a class="reference external" href="https://github.com/ngrok/ngrok-rust/blob/main/ngrok/Cargo.toml#L3">ngrok-rust</a>. <code class="docutils literal notranslate"><span class="pre">ngrok-rust</span></code> is used for the bindings in <a class="reference internal" href="#./src"><span class="xref myst">src/rust_files_here.rs</span></a></p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">build</span></code> (builds the <code class="docutils literal notranslate"><span class="pre">rust</span></code> bindings / <code class="docutils literal notranslate"><span class="pre">python</span></code> dependencies)</p></li>
+<li><p>Happy developing!</p></li>
+</ol>
+<br/>
+<p><strong>Example Commands</strong>:</p>
+<p><em>building the project</em></p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>develop
+</pre></div>
+</div>
+<p><em>running the entire test suite</em></p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># running the entire test suite</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">NGROK_AUTHTOKEN</span><span class="o">=</span><span class="s2">&quot;YOUR_AUTHTOKEN_HERE&quot;</span><span class="p">;</span><span class="w"> </span>make<span class="w"> </span><span class="nb">test</span>
+</pre></div>
+</div>
+<p><em>running an individual test</em></p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># running an individual test</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">NGROK_AUTHTOKEN</span><span class="o">=</span><span class="s2">&quot;YOUR_AUTHTOKEN_HERE&quot;</span><span class="p">;</span><span class="w"> </span>make<span class="w"> </span><span class="nv">test</span><span class="o">=</span><span class="s2">&quot;-k TEST_CLASS.NAME_OF_TEST&quot;</span><span class="w"> </span><span class="nb">test</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#./Makefile"><span class="xref myst">See the MakeFile for more examples</span></a></p>
 </section>
 <section id="api-reference">
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this heading">#</a></h1>
