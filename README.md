@@ -222,6 +222,7 @@ listener = ngrok.forward(
     oidc_allow_domains=["<domain>"],
     oidc_allow_emails=["<email>"],
     oidc_scopes=["<scope>"],
+    policy="<policy_json>",
     request_header_remove="X-Req-Nope",
     response_header_remove="X-Res-Nope",
     request_header_add="X-Req-Yup:true",

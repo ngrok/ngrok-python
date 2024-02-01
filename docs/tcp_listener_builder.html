@@ -286,6 +286,13 @@ Linux/Darwin “unix:///path/to/unix.sock”.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="ngrok.TcpListenerBuilder.policy">
+<span class="sig-name descname"><span class="pre">policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy_config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.TcpListenerBuilder.policy" title="Permalink to this definition">#</a></dt>
+<dd><p>Traffic Policy configuration.
+:param str policy_config: Traffic policy configuration to be attached to the listener.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ngrok.TcpListenerBuilder.proxy_proto">
 <span class="sig-name descname"><span class="pre">proxy_proto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxy_proto</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.TcpListenerBuilder.proxy_proto" title="Permalink to this definition">#</a></dt>
 <dd><p>The version of PROXY protocol to use with this listener “1”, “2”, or “” if not using.</p>
@@ -366,6 +373,7 @@ These addresses can be reserved in the <a class="reference external" href="https
 <li><a class="reference internal" href="#ngrok.TcpListenerBuilder.listen_and_forward"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.listen_and_forward()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.TcpListenerBuilder.listen_and_serve"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.listen_and_serve()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.TcpListenerBuilder.metadata"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.metadata()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.TcpListenerBuilder.policy"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.policy()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.TcpListenerBuilder.proxy_proto"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.proxy_proto()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.TcpListenerBuilder.remote_addr"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.remote_addr()</span></code></a></li>
 </ul>

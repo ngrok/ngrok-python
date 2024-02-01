@@ -178,7 +178,7 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
         shutdown(listener.url(), http_server)
 
     async def test_connect_policy(self):
-        policy = '''
+        policy = """
         {
           "inbound": [],
           "outbound": [
@@ -198,7 +198,7 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
             }
           ]
         }
-        '''
+        """
 
         http_server = test.make_http()
         listener = await ngrok.connect(

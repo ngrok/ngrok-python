@@ -1,3 +1,7 @@
+## 1.0.0
+
+- Add policy support to Listener builders and `ngrok.forward`
+
 ## 0.12.1
 
 - Move to `ngrok.forward` from `ngrok.connect`, keeping an alias
