@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    # """Added by ngrok"""
+    "ngrok_extra.django", # ngrok must come before staticfiles as they both override runserver
+    # """End added by ngrok"""
     "django.contrib.staticfiles",
 ]
 
