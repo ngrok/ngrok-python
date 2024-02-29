@@ -129,32 +129,21 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+from ngrok_extra.policy import policy_builder
+
 NGROK_CONFIG = {
     "domain": "",  # Warning: Only when a domain is specified here is hot reloading of this config is supported.
-    "policies": {
-        "inbound": [
-            {
-                "expressions": [
-                    "req.URL.contains('/admin')",
-                ],
-                "actions": [
-                    {
-                        "type": "deny"  # by denying access we can make "admin" only available locally.
-                    }
-                ],
-            }
-        ],
-        "outbound": [
-            {
-                "expressions": [],
-                "name": "",
-                "actions": [
-                    {
-                        "type": "add-headers",
-                        "config": {"headers": {"added-header": "added-header-value"}},
-                    }
-                ],
-            }
-        ],
-    },
+    "policies": policy_builder.PolicyBuilder()
+    .with_inbound_policy_rule(
+        policy_builder.PolicyRule(expressions=["req.URL.contains('/admin')"]).with_deny(
+            policy_builder.DenyConfig(status_code=403)
+        )
+    )
+    .with_outbound_policy_rule(
+        policy_builder.PolicyRule().with_add_headers(
+            policy_builder.AddHeadersConfig(
+                headers={"added-header": "added-header-value"}
+            )
+        )
+    ),
 }

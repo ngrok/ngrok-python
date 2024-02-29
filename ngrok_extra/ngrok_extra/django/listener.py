@@ -2,6 +2,8 @@ import json
 from django.conf import settings
 from typing import Dict
 
+from ngrok_extra.policy import policy_builder
+
 
 async def setup(listen="localhost:8000"):
     import ngrok
@@ -26,7 +28,7 @@ async def listener_from_config(config: Dict):
     domain = config.get("domain", "")
     if domain:
         listener = listener.domain(domain)
-    policies = config.get("policies", {})
+    policies: policy_builder.PolicyBuilder = config.get("policies", None)
     if policies:
-        listener = listener.policy(json.dumps(policies))
+        listener = listener.policy(policies.build())
     return await listener.listen()
