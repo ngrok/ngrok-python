@@ -4,7 +4,7 @@ from django.conf import settings
 async def setup(listen="localhost:8000"):
     import ngrok
     # Note (james): This is where we can get settings for this app and pass them in if we want to.
-    # If hot reload is on though we'll need to handle that some other way.
+    # Hot reloading of this config is not supported.
     ngrok_config = getattr(settings, "NGROK_CONFIG", {})
     listener = None
     if ngrok_config:
