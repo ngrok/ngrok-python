@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     # """Added by ngrok"""
-    "ngrok_extra.django", # ngrok must come before staticfiles as they both override runserver
+    "ngrok_extra.django",  # ngrok must come before staticfiles as they both override runserver
     # """End added by ngrok"""
     "django.contrib.staticfiles",
 ]
@@ -130,35 +130,31 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 NGROK_CONFIG = {
-    "domain": "", # Warning: Only when a domain is specified here is hot reloading of this config is supported.
+    "domain": "",  # Warning: Only when a domain is specified here is hot reloading of this config is supported.
     "policies": {
         "inbound": [
-        {
-            "expressions": [
-                "req.URL.contains('/admin')",
-            ],
-            "actions": [
             {
-                "type": "deny" # by denying access we can make "admin" only available locally.
+                "expressions": [
+                    "req.URL.contains('/admin')",
+                ],
+                "actions": [
+                    {
+                        "type": "deny"  # by denying access we can make "admin" only available locally.
+                    }
+                ],
             }
-            ]
-        }
         ],
         "outbound": [
             {
                 "expressions": [],
                 "name": "",
                 "actions": [
-                {
-                    "type": "add-headers",
-                    "config": {
-                    "headers": {
-                        "added-header": "added-header-value"
+                    {
+                        "type": "add-headers",
+                        "config": {"headers": {"added-header": "added-header-value"}},
                     }
-                    }
-                }
-                ]
+                ],
             }
-        ]
-    }
+        ],
+    },
 }

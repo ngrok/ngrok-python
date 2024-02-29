@@ -134,7 +134,7 @@ docsfast : develop
 	. $(BIN)/activate && sphinx-build -a -E -b html doc_source/ docs/
 
 black: develop
-	. $(BIN)/activate && black examples/ test/ python/
+	. $(BIN)/activate && black examples/ test/ python/ ngrok_extra/
 
 clean:
 	rm -rf $(VENV) target/
