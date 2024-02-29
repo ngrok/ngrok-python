@@ -1,8 +1,23 @@
 import copy
 import json
+from typing import Dict
+
+from ngrok_extra.policy.policy_configs import (
+    AddHeadersConfig,
+    CustomResponseConfig,
+    DenyConfig,
+    JWTValidationConfig,
+    LogConfig,
+    RateLimitConfig,
+    RemoveHeadersConfig,
+    URLRewriteConfig,
+)
+
 
 class PolicyBuilder:
-    def __init__(self, inbound_policy_rules=None, outbound_policy_rules=None, enabled=True):
+    def __init__(
+        self, inbound_policy_rules=None, outbound_policy_rules=None, enabled=True
+    ):
         if inbound_policy_rules is None:
             self.inbound_policy_rules = []
         else:
@@ -14,7 +29,7 @@ class PolicyBuilder:
             self.outbound_policy_rules = inbound_policy_rules
 
         self.enabled = enabled
-            
+
     def with_inbound_policy_rule(self, rule: str):
         builder_copy = self.copy()
         builder_copy.inbound_policy_rules.append(rule)
@@ -36,16 +51,19 @@ class PolicyBuilder:
         builder_copy.outbound_policy_rules = copy.deepcopy(self.outbound_policy_rules)
         builder_copy.enabled = self.enabled
         return builder_copy
-    
+
     def encode(self):
         return {
             "inbound": self.inbound_policy_rules,
             "outbound": self.outbound_policy_rules,
-            "enabled": self.enabled
+            "enabled": self.enabled,
         }
-    
+
     def build(self):
-        return json.dumps(self.encode(), default=lambda o: o._as_json() if hasattr(o, "_as_json") else o.__dict__)
+        return json.dumps(
+            self.encode(),
+            default=lambda o: o._as_json() if hasattr(o, "_as_json") else o.__dict__,
+        )
 
 
 class PolicyRule:
@@ -65,14 +83,14 @@ class PolicyRule:
         rule_copy.expressions.append(expression)
         return rule_copy
 
-    def with_action(self, type: str, config: dict):
+    def with_action(self, type: str, config: Dict):
         rule_copy = self.copy()
         rule_copy.actions.append({"type": type, "config": config})
         return rule_copy
 
     def with_custom_response(self, config: CustomResponseConfig):
         return self.with_action("custom-response", config)
-    
+
     def with_log(self, config: LogConfig):
         return self.with_action("log", config)
 
@@ -90,10 +108,10 @@ class PolicyRule:
 
     def with_jwt_validation(self, config: JWTValidationConfig):
         return self.with_action("url-rewrite", config)
-    
+
     def with_rate_limit(self, config: RateLimitConfig):
         return self.with_action("rate-limit", config)
-    
+
     def copy(self):
         rule_copy = PolicyRule()
         rule_copy.expressions = copy.deepcopy(self.expressions)

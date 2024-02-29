@@ -1,18 +1,23 @@
 from dataclasses import dataclass
+from typing import Dict, List
+
 
 @dataclass
 class LogConfig:
-    metadata: dict
+    metadata: Dict
+
 
 @dataclass
 class CustomResponseConfig:
     status_code: int
     content: str
-    headers: dict
+    headers: Dict
+
 
 @dataclass
 class DenyConfig:
     status_code: int
+
 
 @dataclass
 class RateLimitConfig:
@@ -20,7 +25,8 @@ class RateLimitConfig:
     algorithm: str
     capacity: int
     rate: str
-    bucket_key: dict
+    bucket_key: Dict
+
 
 @dataclass
 class URLRewriteConfig:
@@ -30,26 +36,28 @@ class URLRewriteConfig:
     replacement: str
 
     def _as_json(self):
-        return {
-            "from": self.match,
-            "to": self.replacement
-        }
+        return {"from": self.match, "to": self.replacement}
+
 
 @dataclass
 class AddHeadersConfig:
-    headers: dict
+    headers: Dict
+
 
 @dataclass
 class RemoveHeadersConfig:
-    headers: dict
+    headers: Dict
+
 
 @dataclass
 class JWTIssuerConfig:
-    allow_list: [dict]
+    allow_list: List[Dict]
+
 
 @dataclass
 class JWTAudienceConfig:
-    allow_list: [dict]
+    allow_list: List[Dict]
+
 
 @dataclass
 class JWTHttpToken:
@@ -57,23 +65,28 @@ class JWTHttpToken:
     method: str
     name: str
     prefix: str
-    
+
+
 @dataclass
 class JWTHttpConfig:
-    tokens: [JWTHttpToken]
-    
+    tokens: List[JWTHttpToken]
+
+
 @dataclass
 class JWTSigningKeySources:
-    additional_jkus: [str]
+    additional_jkus: List[str]
+
 
 @dataclass
 class JWTSigningKeys:
-    sources: [JWTSigningKeySources]
-    
+    sources: List[JWTSigningKeySources]
+
+
 @dataclass
 class JWTSigningConfig:
-    allowed_algorithms: [str]
+    allowed_algorithms: List[str]
     keys: JWTSigningKeys
+
 
 @dataclass
 class JWTValidationConfig:
@@ -81,4 +94,3 @@ class JWTValidationConfig:
     audience: JWTAudienceConfig
     http: JWTHttpConfig
     jwt: JWTSigningConfig
-
