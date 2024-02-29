@@ -1,4 +1,4 @@
-from ngrok_extra.flask import NgrokFlask, Gunicorn
+from ngrok_extra.flask import NgrokFlask, Gunicorn, Werkzeug
 
 app = NgrokFlask(__name__, runner=Gunicorn)
 

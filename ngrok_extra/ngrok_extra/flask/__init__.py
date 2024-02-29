@@ -3,7 +3,7 @@ from enum import Enum
 import gunicorn.app.base
 import ngrok
 
-from typing import Awaitable, Dict
+from typing import Awaitable, Dict, Callable
 from flask import Flask
 from ngrok import Listener
 
@@ -32,7 +32,10 @@ class NgrokFlask(Flask):
     ngrok_options: Dict[str, object]
     runner: RunnerType
 
-    def __init__(self, name: str, *args, ngrok_options: Dict[str, object] | None = None, gunicorn_options: Dict[str, object] | None = None, runner: RunnerType = RunnerType.Werkzeug, **kwargs):
+    def __init__(self, name: str, *args: object, ngrok_options: Dict[str, object] | None = None,
+                 gunicorn_options: Dict[str, object] | None = None,
+                 runner: RunnerType = RunnerType.Werkzeug,
+                 **kwargs: object):
         self.ngrok_options = ngrok_options or {}
         self.gunicorn_options = gunicorn_options or {}
         self.runner = runner
@@ -53,7 +56,7 @@ class NgrokFlask(Flask):
 
         bind = '{}:{}'.format(host, port)
 
-        if self.runner == self.RunnerType.Gunicorn.value:
+        if self.runner == self.RunnerType.Gunicorn:
             if self.gunicorn_options.get('bind') is not None:
                 bind = str(self.gunicorn_options['bind'])
             else:
@@ -68,5 +71,5 @@ class NgrokFlask(Flask):
             super(NgrokFlask, self).run(**kwargs)
 
 
-Werkzeug = NgrokFlask.RunnerType.Werkzeug.value
-Gunicorn = NgrokFlask.RunnerType.Gunicorn.value
+Werkzeug = NgrokFlask.RunnerType.Werkzeug
+Gunicorn = NgrokFlask.RunnerType.Gunicorn
