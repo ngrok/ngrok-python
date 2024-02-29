@@ -10,9 +10,13 @@ from urllib.parse import urlparse
 
 class TestNgrokUtils(unittest.TestCase):
     def test_scoped_endpoint(self):
-        with ngrok.utils.scoped_endpoint(11222, authtoken_from_env=True, proto="tcp") as endpoint:
+        with ngrok.utils.scoped_endpoint(
+            11222, authtoken_from_env=True, proto="tcp"
+        ) as endpoint:
             endpoint: ngrok.Listener
-            nc_recv = subprocess.Popen(["nc", "-l", "11222"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            nc_recv = subprocess.Popen(
+                ["nc", "-l", "11222"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
             url = urlparse(endpoint.url())
 
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -34,5 +38,5 @@ class TestNgrokUtils(unittest.TestCase):
         foo()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
