@@ -1,3 +1,4 @@
+import asyncio
 import os
 from django.core.asgi import get_asgi_application as _get_asgi_application
 from ngrok_extra.django.listener import setup
@@ -7,7 +8,6 @@ def get_asgi_application():
     # Set env variable to protect against the gunicorn autoreloader.
     if os.getenv("NGROK_LISTENER_RUNNING") is None:
         os.environ["NGROK_LISTENER_RUNNING"] = "true"
-        import asyncio
 
         try:
             running_loop = asyncio.get_running_loop()

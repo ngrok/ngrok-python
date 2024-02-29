@@ -129,8 +129,8 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Warning: Hot reloading of this config is not supported.
 NGROK_CONFIG = {
+    "domain": "", # Warning: Only when a domain is specified here is hot reloading of this config is supported.
     "policies": {
         "inbound": [
         {
