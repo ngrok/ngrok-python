@@ -128,3 +128,37 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Warning: Hot reloading of this config is not supported.
+NGROK_CONFIG = {
+    "policies": {
+        "inbound": [
+        {
+            "expressions": [
+                "req.URL.contains('/admin')",
+            ],
+            "actions": [
+            {
+                "type": "deny" # by denying access we can make "admin" only available locally.
+            }
+            ]
+        }
+        ],
+        "outbound": [
+            {
+                "expressions": [],
+                "name": "",
+                "actions": [
+                {
+                    "type": "add-headers",
+                    "config": {
+                    "headers": {
+                        "added-header": "added-header-value"
+                    }
+                    }
+                }
+                ]
+            }
+        ]
+    }
+}
