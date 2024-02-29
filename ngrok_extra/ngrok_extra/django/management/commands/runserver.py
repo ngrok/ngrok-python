@@ -1,8 +1,9 @@
 import os
-from django.conf import settings
 
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.apps import apps
+
+from ngrok_extra.django.listener import setup
 
 if apps.is_installed('django.contrib.staticfiles'):
     # If the user wants to use the staticfiles app, we need to call the overriden the runserver command.
@@ -19,17 +20,8 @@ class Command(RunserverCommand):
         # Set env variable to protect against the autoreloader.
         if os.getenv("NGROK_LISTENER_RUNNING") is None:
             os.environ["NGROK_LISTENER_RUNNING"] = "true"
-            import asyncio, ngrok
-
-            async def setup():
-                listen = f"{self.addr}:{self.port}" # RunserverCommand.handle sets this value for us.
-                # Note (james): This is where we can get settings for this app and pass them in if we want to.
-                # ngrok_config = getattr(settings, "NGROK_CONFIG", {})
-                listener = await ngrok.default()
-                print(f"Forwarding to {listen} from ingress url: {listener.url()}")
-                print("ngrok connection established, starting django server...")
-                print(f"Delegating django runserver to {RunserverCommand.__module__}")
-                listener.forward(listen)
-
-            asyncio.run(setup())
+            import asyncio
+            listen = f"{self.addr}:{self.port}" # RunserverCommand.handle sets this value for us.
+            asyncio.run(setup(listen))
+            print(f"Delegating django runserver to {RunserverCommand.__module__}")
         super().run(**options)
