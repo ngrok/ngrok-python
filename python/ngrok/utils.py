@@ -3,7 +3,6 @@ from contextlib import contextmanager
 import ngrok
 
 
-
 @contextmanager
 def scoped_endpoint(*args, **kwds):
     listener = ngrok.forward(*args, **kwds)
