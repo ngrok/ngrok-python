@@ -110,6 +110,9 @@
           OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
           OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
           RUSTC_WRAPPER="${pkgs.sccache}/bin/sccache";
+          LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [
+            pkgs.stdenv.cc.cc
+          ]}";
           buildInputs = with pkgs; [
             toolchain
             python-toolchain
@@ -118,6 +121,7 @@
             cargo-udeps
             semver-checks
             extract-version
+            stdenv.cc.cc.lib
           ] ++ lib.optionals stdenv.isDarwin [
             # nix darwin stdenv has broken libiconv: https://github.com/NixOS/nixpkgs/issues/158331
             libiconv
