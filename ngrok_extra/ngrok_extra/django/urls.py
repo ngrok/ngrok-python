@@ -7,22 +7,22 @@ from django.urls import re_path as django_re_path
 
 @dataclass
 class RoutePolicies:
-    inbound_policies: List[PolicyRule]
-    outbound_policies: List[PolicyRule]
+    inbound_rules: List[PolicyRule]
+    outbound_rules: List[PolicyRule]
     base_domain: str = ""
 
     def __post_init__(self):
         if not self.base_domain.endswith("/"):
             self.base_domain = self.base_domain + "/"
 
-    def add_inbound_policy(self, policy):
-        self.inbound_policies.append(policy)
+    def add_inbound_rule(self, policy):
+        self.inbound_rules.append(policy)
 
-    def add_outbound_policy(self, policy):
-        self.outbound_policies.append(policy)
+    def add_outbound_rule(self, policy):
+        self.outbound_rules.append(policy)
 
     def has_policies(self):
-        return bool(self.inbound_policies or self.outbound_policies)
+        return bool(self.inbound_rules or self.outbound_rules)
 
     def add_routes(self, url_patterns, parent=None):
         for pattern in url_patterns:
@@ -37,11 +37,11 @@ class RoutePolicies:
     def add_route_policies(self, pattern, parent=None):
         regex_pattern = self.fix_regex(pattern.pattern.regex.pattern, parent)
         expression = "req.URL.matches('" + regex_pattern + "')"
-        if hasattr(pattern, "inbound_policy"):
-            self.add_inbound_policy(pattern.inbound_policy.with_expression(expression))
-        if hasattr(pattern, "outbound_policy"):
-            self.add_outbound_policy(
-                pattern.outbound_policy.with_expression(expression)
+        if hasattr(pattern, "inbound_rule"):
+            self.add_inbound_rule(pattern.inbound_rule.with_expression(expression))
+        if hasattr(pattern, "outbound_rule"):
+            self.add_outbound_rule(
+                pattern.outbound_rule.with_expression(expression)
             )
         return regex_pattern
 
@@ -58,22 +58,22 @@ class RoutePolicies:
 
 
 def path(
-    route, view, kwargs=None, name=None, inbound_policy=None, outbound_policy=None
+    route, view, kwargs=None, name=None, inbound_rule=None, outbound_rule=None
 ):
     url = django_path(route, view, kwargs, name)
-    if inbound_policy:
-        url.inbound_policy = inbound_policy
-    if outbound_policy:
-        url.outbound_policy = outbound_policy
+    if inbound_rule:
+        url.inbound_rule = inbound_rule
+    if outbound_rule:
+        url.outbound_rule = outbound_rule
     return url
 
 
 def re_path(
-    route, view, kwargs=None, name=None, inbound_policy=None, outbound_policy=None
+    route, view, kwargs=None, name=None, inbound_rule=None, outbound_rule=None
 ):
     url = django_re_path(route, view, kwargs, name)
-    if inbound_policy:
-        url.inbound_policy = inbound_policy
-    if outbound_policy:
-        url.outbound_policy = outbound_policy
+    if inbound_rule:
+        url.inbound_rule = inbound_rule
+    if outbound_rule:
+        url.outbound_rule = outbound_rule
     return url

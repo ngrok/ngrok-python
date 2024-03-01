@@ -40,9 +40,9 @@ async def listener_from_config(config: Dict, route_policies: RoutePolicies):
         listener = listener.domain(domain)
     policies: PolicyBuilder = config.get("policies", PolicyBuilder())
     if route_policies.has_policies():
-        for policy in route_policies.inbound_policies:
+        for policy in route_policies.inbound_rules:
             policies = policies.with_inbound_policy_rule(policy)
-        for policy in route_policies.outbound_policies:
+        for policy in route_policies.outbound_rules:
             policies = policies.with_outbound_policy_rule(policy)
     print(f"Applied Policies:")
     print(json.dumps(json.loads(policies.build()), indent=2))

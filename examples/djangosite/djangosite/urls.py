@@ -26,14 +26,14 @@ extra_patterns = [
     path(
         "admin/",
         creditadmin,
-        # inbound_policy=policy_builder.PolicyRule().with_deny(
+        # inbound_rule=policy_builder.PolicyRule().with_deny(
         #     policy_builder.DenyConfig(status_code=403)
         # ),
     ),
     path(
         "reports/",
         report,
-        outbound_policy=policy_builder.PolicyRule().with_add_headers(
+        outbound_rule=policy_builder.PolicyRule().with_add_headers(
             policy_builder.AddHeadersConfig(
                 headers={"added-header-urls": "nested, no route param"}
             )
@@ -42,7 +42,7 @@ extra_patterns = [
     path(
         "reports/<int:id>/",
         report,
-        outbound_policy=policy_builder.PolicyRule().with_add_headers(
+        outbound_rule=policy_builder.PolicyRule().with_add_headers(
             policy_builder.AddHeadersConfig(
                 headers={"added-header-urls": "nested, with route param"}
             )
@@ -54,14 +54,14 @@ urlpatterns = [
     path(
         "",
         home,
-        outbound_policy=policy_builder.PolicyRule().with_add_headers(
+        outbound_rule=policy_builder.PolicyRule().with_add_headers(
             policy_builder.AddHeadersConfig(headers={"added-header-urls": "home-page"})
         ),
     ),
     path(
         "year/<int:year>/",
         routeparams,
-        outbound_policy=policy_builder.PolicyRule().with_add_headers(
+        outbound_rule=policy_builder.PolicyRule().with_add_headers(
             policy_builder.AddHeadersConfig(
                 headers={"added-header-urls": "route-params"}
             )
@@ -77,14 +77,14 @@ urlpatterns = [
     path(
         "admin/",
         admin.site.urls,
-        inbound_policy=policy_builder.PolicyRule().with_deny(
+        inbound_rule=policy_builder.PolicyRule().with_deny(
             policy_builder.DenyConfig(status_code=403)
         ),
     ),
     path(
         "credit/",
         include(extra_patterns),
-        # inbound_policy=policy_builder.PolicyRule().with_deny(
+        # inbound_rule=policy_builder.PolicyRule().with_deny(
         #     policy_builder.DenyConfig(status_code=403)
         # ),
     ),
