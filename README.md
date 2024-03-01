@@ -188,6 +188,7 @@ This example shows [all the possible configuration items of ngrok.forward](https
 ```python
 listener = ngrok.forward(
     # session configuration
+    app_protocol="http2",
     addr="localhost:8080",
     authtoken="<authtoken>",
     authtoken_from_env=True,
