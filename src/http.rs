@@ -17,6 +17,14 @@ use crate::listener_builder::HttpListenerBuilder;
 #[pymethods]
 #[allow(dead_code)]
 impl HttpListenerBuilder {
+    /// The L7 protocol to use for this edge: "http1" or "http2".
+    pub fn app_protocol(self_: PyRefMut<Self>, app_protocol: String) -> PyRefMut<Self> {
+        self_.set(|b| {
+            b.app_protocol(app_protocol);
+        });
+        self_
+    }
+
     /// The scheme that this edge should use.
     /// "HTTPS" or "HTTP", defaults to "HTTPS".
     pub fn scheme(self_: PyRefMut<Self>, scheme: String) -> PyRefMut<Self> {

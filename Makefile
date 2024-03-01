@@ -34,6 +34,9 @@ run: develop
 run-aio: develop examples-install
 	. $(BIN)/activate && python ./examples/aiohttp-ngrok.py
 
+run-http2: develop examples-install
+	. $(BIN)/activate && python ./examples/hypercorn-http2-ngrok.py
+
 run-forward-full: develop
 	. $(BIN)/activate && python ./examples/ngrok-forward-full.py
 

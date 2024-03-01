@@ -53,6 +53,7 @@ async def create_listener(httpd: Union[TCPServer, UnixStreamServer]) -> None:
         await session.http_endpoint()
         # .allow_cidr("0.0.0.0/0")
         # .allow_user_agent("^mozilla.*")
+        # .app_protocol("http2")
         # .basic_auth("ngrok", "online1line")
         # .circuit_breaker(0.5)
         # .compression()
