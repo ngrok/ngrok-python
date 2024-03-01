@@ -70,7 +70,7 @@ urlpatterns = [
     re_path(
         r"^regex/(?:test-(?P<number>[0-9]+)/)?$",
         regex_test,
-        outbound_policy=policy_builder.PolicyRule().with_add_headers(
+        outbound_rule=policy_builder.PolicyRule().with_add_headers(
             policy_builder.AddHeadersConfig(headers={"added-header-urls": "regex"})
         ),
     ),

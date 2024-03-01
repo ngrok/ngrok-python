@@ -39,7 +39,7 @@ async def listener_from_config(config: Dict, route_policies: RoutePolicies):
     if domain:
         listener = listener.domain(domain)
     policies: PolicyBuilder = config.get("policies", PolicyBuilder())
-    if route_policies.has_policies():
+    if route_policies is not None and route_policies.has_policies():
         for policy in route_policies.inbound_rules:
             policies = policies.with_inbound_policy_rule(policy)
         for policy in route_policies.outbound_rules:
