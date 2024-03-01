@@ -21,10 +21,6 @@ async def app(scope, receive, send):
 
 
 logging.basicConfig(level=logging.INFO)
-tun = ngrok.forward(addr="localhost:8080", authtoken_from_env=True, app_protocol="http2")
+ngrok.forward(addr="localhost:8080", authtoken_from_env=True, app_protocol="http2")
 config.bind = ["localhost:8080"]
 asyncio.run(serve(app, config))
-
-
-
-
