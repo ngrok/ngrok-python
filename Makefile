@@ -71,6 +71,9 @@ run-ngrok-asgi: develop examples-install
 run-flask: develop examples-install
 	. $(BIN)/activate && python ./examples/flask-ngrok.py
 
+run-flasksite: develop examples-install
+	. $(BIN)/activate && python ./examples/flasksite/app.py
+
 run-gradio: develop
 	. $(BIN)/activate && pip install -r examples/gradio/requirements.txt
 	. $(BIN)/activate && gradio ./examples/gradio/gradio-ngrok.py
