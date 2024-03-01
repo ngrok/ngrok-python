@@ -3,9 +3,14 @@ from enum import Enum
 import gunicorn.app.base
 import ngrok
 
-from typing import Awaitable, Dict, Callable
+from typing import Awaitable, Dict
+import typing as t
 from flask import Flask
+from flask import typing as ft
 from ngrok import Listener
+from ngrok_extra.policy.policy_builder import PolicyBuilder, PolicyRule
+
+T_route = t.TypeVar("T_route", bound=ft.RouteCallable)
 
 
 class NgrokFlask(Flask):
@@ -31,7 +36,8 @@ class NgrokFlask(Flask):
     listener: Listener | Awaitable[Listener]
     ngrok_options: Dict[str, object]
     runner: RunnerType
-
+    policy: PolicyBuilder
+    
     def __init__(self, name: str, *args: object, ngrok_options: Dict[str, object] | None = None,
                  gunicorn_options: Dict[str, object] | None = None,
                  runner: RunnerType = RunnerType.Werkzeug,
@@ -39,7 +45,34 @@ class NgrokFlask(Flask):
         self.ngrok_options = ngrok_options or {}
         self.gunicorn_options = gunicorn_options or {}
         self.runner = runner
+        self.policy = PolicyBuilder()
         super().__init__(name, *args, **kwargs)
+
+    def add_inbound_rule(self, rule: PolicyRule):
+        self.policy = self.policy.with_inbound_policy_rule(rule)
+
+    def add_outbound_rule(self, rule: PolicyRule):
+        self.policy = self.policy.with_outbound_policy_rule(rule)
+
+    def route(self, route: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
+        def decorator(f: T_route) -> T_route:
+            endpoint = options.pop("endpoint", None)
+            inbound_rule: PolicyRule | None = options.pop("inbound_rule", None)
+            outbound_rule: PolicyRule | None = options.pop("outbound_rule", None)
+
+            if inbound_rule is not None:
+                inbound_rule = inbound_rule.with_expression("req.URL.contains('{}')".format(route))
+                self.add_inbound_rule(inbound_rule)
+
+            if outbound_rule is not None:
+                outbound_rule = outbound_rule.with_expression("req.URL.contains('{}')".format(route))
+                self.add_outbound_rule(outbound_rule)
+
+            self.add_url_rule(route, endpoint, f, **options)
+
+            return f
+
+        return decorator
 
     def run(self, **kwargs):
         host, port = '127.0.0.1', 5000
@@ -55,6 +88,13 @@ class NgrokFlask(Flask):
             port = int(kwargs['port'])
 
         bind = '{}:{}'.format(host, port)
+
+        policy = self.ngrok_options.get('policy', None)
+        if policy is None and len(self.policy) != 0:
+            policy = self.policy.build()
+
+        if policy is not None:
+            self.ngrok_options['policy'] = policy
 
         if self.runner == self.RunnerType.Gunicorn:
             if self.gunicorn_options.get('bind') is not None:

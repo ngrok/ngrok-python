@@ -52,6 +52,9 @@ class PolicyBuilder:
         builder_copy.enabled = self.enabled
         return builder_copy
 
+    def __len__(self):
+        return len(self.inbound_policy_rules) + len(self.outbound_policy_rules)
+
     def encode(self):
         return {
             "inbound": self.inbound_policy_rules,
