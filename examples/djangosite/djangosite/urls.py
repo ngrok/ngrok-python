@@ -14,10 +14,78 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from .views import home
+from django.urls import include
+
+# from django.urls import path, re_path
+from ngrok_extra.django.urls import path, re_path
+from ngrok_extra.policy import policy_builder
+
+from .views import home, routeparams, regex_test, report, creditadmin
+
+extra_patterns = [
+    path(
+        "admin/",
+        creditadmin,
+        # inbound_policy=policy_builder.PolicyRule().with_deny(
+        #     policy_builder.DenyConfig(status_code=403)
+        # ),
+    ),
+    path(
+        "reports/",
+        report,
+        outbound_policy=policy_builder.PolicyRule().with_add_headers(
+            policy_builder.AddHeadersConfig(
+                headers={"added-header-urls": "nested, no route param"}
+            )
+        ),
+    ),
+    path(
+        "reports/<int:id>/",
+        report,
+        outbound_policy=policy_builder.PolicyRule().with_add_headers(
+            policy_builder.AddHeadersConfig(
+                headers={"added-header-urls": "nested, with route param"}
+            )
+        ),
+    ),
+]
 
 urlpatterns = [
-    path("", home),
-    path("admin/", admin.site.urls),
+    path(
+        "",
+        home,
+        outbound_policy=policy_builder.PolicyRule().with_add_headers(
+            policy_builder.AddHeadersConfig(headers={"added-header-urls": "home-page"})
+        ),
+    ),
+    path(
+        "year/<int:year>/",
+        routeparams,
+        outbound_policy=policy_builder.PolicyRule().with_add_headers(
+            policy_builder.AddHeadersConfig(
+                headers={"added-header-urls": "route-params"}
+            )
+        ),
+    ),
+    re_path(
+        r"^regex/(?:test-(?P<number>[0-9]+)/)?$",
+        regex_test,
+        outbound_policy=policy_builder.PolicyRule().with_add_headers(
+            policy_builder.AddHeadersConfig(headers={"added-header-urls": "regex"})
+        ),
+    ),
+    path(
+        "admin/",
+        admin.site.urls,
+        inbound_policy=policy_builder.PolicyRule().with_deny(
+            policy_builder.DenyConfig(status_code=403)
+        ),
+    ),
+    path(
+        "credit/",
+        include(extra_patterns),
+        # inbound_policy=policy_builder.PolicyRule().with_deny(
+        #     policy_builder.DenyConfig(status_code=403)
+        # ),
+    ),
 ]
