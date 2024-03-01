@@ -133,17 +133,16 @@ from ngrok_extra.policy import policy_builder
 
 NGROK_CONFIG = {
     "domain": "",  # Warning: Only when a domain is specified here is hot reloading of this config is supported.
+    # "domain": "python.ngrok.app",  # Warning: Only when a domain is specified here is hot reloading of this config is supported.
     "policies": policy_builder.PolicyBuilder()
-    .with_inbound_policy_rule(
-        policy_builder.PolicyRule(expressions=["req.URL.contains('/admin')"]).with_deny(
-            policy_builder.DenyConfig(status_code=403)
-        )
-    )
+    # .with_inbound_policy_rule(
+    #     policy_builder.PolicyRule(expressions=["req.URL.matches('python.ngrok.app/adminfoo/')"]).with_deny(
+    #         policy_builder.DenyConfig(status_code=403)
+    #     )
+    # )
     .with_outbound_policy_rule(
         policy_builder.PolicyRule().with_add_headers(
-            policy_builder.AddHeadersConfig(
-                headers={"added-header": "added-header-value"}
-            )
+            policy_builder.AddHeadersConfig(headers={"global-config": "true"})
         )
     ),
 }
