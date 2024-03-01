@@ -40,9 +40,7 @@ class RoutePolicies:
         if hasattr(pattern, "inbound_rule"):
             self.add_inbound_rule(pattern.inbound_rule.with_expression(expression))
         if hasattr(pattern, "outbound_rule"):
-            self.add_outbound_rule(
-                pattern.outbound_rule.with_expression(expression)
-            )
+            self.add_outbound_rule(pattern.outbound_rule.with_expression(expression))
         return regex_pattern
 
     def fix_regex(self, pattern, parent):
@@ -57,9 +55,7 @@ class RoutePolicies:
         return pattern
 
 
-def path(
-    route, view, kwargs=None, name=None, inbound_rule=None, outbound_rule=None
-):
+def path(route, view, kwargs=None, name=None, inbound_rule=None, outbound_rule=None):
     url = django_path(route, view, kwargs, name)
     if inbound_rule:
         url.inbound_rule = inbound_rule
@@ -68,9 +64,7 @@ def path(
     return url
 
 
-def re_path(
-    route, view, kwargs=None, name=None, inbound_rule=None, outbound_rule=None
-):
+def re_path(route, view, kwargs=None, name=None, inbound_rule=None, outbound_rule=None):
     url = django_re_path(route, view, kwargs, name)
     if inbound_rule:
         url.inbound_rule = inbound_rule

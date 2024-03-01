@@ -25,8 +25,11 @@ class NgrokFlask(Flask):
             super().__init__()
 
         def load_config(self):
-            config = {key: value for key, value in self.options.items()
-                      if key in self.cfg.settings and value is not None}
+            config = {
+                key: value
+                for key, value in self.options.items()
+                if key in self.cfg.settings and value is not None
+            }
             for key, value in config.items():
                 self.cfg.set(key.lower(), value)
 
@@ -37,11 +40,16 @@ class NgrokFlask(Flask):
     ngrok_options: Dict[str, object]
     runner: RunnerType
     policy: PolicyBuilder
-    
-    def __init__(self, name: str, *args: object, ngrok_options: Dict[str, object] | None = None,
-                 gunicorn_options: Dict[str, object] | None = None,
-                 runner: RunnerType = RunnerType.Werkzeug,
-                 **kwargs: object):
+
+    def __init__(
+        self,
+        name: str,
+        *args: object,
+        ngrok_options: Dict[str, object] | None = None,
+        gunicorn_options: Dict[str, object] | None = None,
+        runner: RunnerType = RunnerType.Werkzeug,
+        **kwargs: object,
+    ):
         self.ngrok_options = ngrok_options or {}
         self.gunicorn_options = gunicorn_options or {}
         self.runner = runner
@@ -61,11 +69,15 @@ class NgrokFlask(Flask):
             outbound_rule: PolicyRule | None = options.pop("outbound_rule", None)
 
             if inbound_rule is not None:
-                inbound_rule = inbound_rule.with_expression("req.URL.contains('{}')".format(route))
+                inbound_rule = inbound_rule.with_expression(
+                    "req.URL.contains('{}')".format(route)
+                )
                 self.add_inbound_rule(inbound_rule)
 
             if outbound_rule is not None:
-                outbound_rule = outbound_rule.with_expression("req.URL.contains('{}')".format(route))
+                outbound_rule = outbound_rule.with_expression(
+                    "req.URL.contains('{}')".format(route)
+                )
                 self.add_outbound_rule(outbound_rule)
 
             self.add_url_rule(route, endpoint, f, **options)
@@ -75,38 +87,42 @@ class NgrokFlask(Flask):
         return decorator
 
     def run(self, **kwargs):
-        host, port = '127.0.0.1', 5000
+        host, port = "127.0.0.1", 5000
 
-        if self.config.get('host') is not None:
-            host = self.config['host']
-        if self.config.get('port') is not None:
-            port = int(self.config['port'])
+        if self.config.get("host") is not None:
+            host = self.config["host"]
+        if self.config.get("port") is not None:
+            port = int(self.config["port"])
 
-        if kwargs.get('host') is not None:
-            host = kwargs['host']
-        if kwargs.get('port') is not None:
-            port = int(kwargs['port'])
+        if kwargs.get("host") is not None:
+            host = kwargs["host"]
+        if kwargs.get("port") is not None:
+            port = int(kwargs["port"])
 
-        bind = '{}:{}'.format(host, port)
+        bind = "{}:{}".format(host, port)
 
-        policy = self.ngrok_options.get('policy', None)
+        policy = self.ngrok_options.get("policy", None)
         if policy is None and len(self.policy) != 0:
             policy = self.policy.build()
 
         if policy is not None:
-            self.ngrok_options['policy'] = policy
+            self.ngrok_options["policy"] = policy
 
         if self.runner == self.RunnerType.Gunicorn:
-            if self.gunicorn_options.get('bind') is not None:
-                bind = str(self.gunicorn_options['bind'])
+            if self.gunicorn_options.get("bind") is not None:
+                bind = str(self.gunicorn_options["bind"])
             else:
-                self.gunicorn_options['bind'] = bind
+                self.gunicorn_options["bind"] = bind
 
-            self.listener = ngrok.forward(addr=bind, authtoken_from_env=True, **self.ngrok_options)
+            self.listener = ngrok.forward(
+                addr=bind, authtoken_from_env=True, **self.ngrok_options
+            )
             print("Ngrok tunnel available at {}".format(self.listener.url()))
             self._GunicornApp(self, self.gunicorn_options).run()
         else:
-            self.listener = ngrok.forward(addr=bind, authtoken_from_env=True, **self.ngrok_options)
+            self.listener = ngrok.forward(
+                addr=bind, authtoken_from_env=True, **self.ngrok_options
+            )
             print("Ngrok tunnel available at {}".format(self.listener.url()))
             super(NgrokFlask, self).run(**kwargs)
 
