@@ -188,10 +188,10 @@ This example shows [all the possible configuration items of ngrok.forward](https
 ```python
 listener = ngrok.forward(
     # session configuration
-    app_protocol="http2",
     addr="localhost:8080",
     authtoken="<authtoken>",
     authtoken_from_env=True,
+    app_protocol="http2",
     session_metadata="Online in One Line",
     # listener configuration
     metadata="example listener metadata from python",
@@ -311,6 +311,7 @@ python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorke
     - or [via `ngrok-asgi`](#asgi-runner)
   - [Flask](https://github.com/ngrok/ngrok-python/tree/main/examples/flask-ngrok.py)
   - [Gunicorn](#gunicorn)
+  - [Hypercorn](https://github.com/ngrok/ngrok-python/tree/main/examples/hypercorn-http2-ngrok.py)
   - [Streamlit](https://github.com/ngrok/ngrok-python/tree/main/examples/streamlit/streamlit-ngrok.py)
   - [Tornado](https://github.com/ngrok/ngrok-python/tree/main/examples/tornado-ngrok.py)
   - [Uvicorn](https://github.com/ngrok/ngrok-python/tree/main/examples/uvicorn-ngrok.py)
