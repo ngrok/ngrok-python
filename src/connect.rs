@@ -291,6 +291,7 @@ async fn http_endpoint(session: &Session, addr: String, options: Py<PyDict>) -> 
         plumb_vec!(B, bld, cfg, scheme, schemes);
         plumb!(B, bld, cfg, domain, hostname); // synonym for domain
         plumb!(B, bld, cfg, domain);
+        plumb!(B, bld, cfg, app_protocol);
         plumb_vec!(B, bld, cfg, mutual_tlsca, mutual_tls_cas, vecu8);
         plumb_bool!(B, bld, cfg, compression);
         plumb_bool!(

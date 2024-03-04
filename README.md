@@ -191,6 +191,7 @@ listener = ngrok.forward(
     addr="localhost:8080",
     authtoken="<authtoken>",
     authtoken_from_env=True,
+    app_protocol="http2",
     session_metadata="Online in One Line",
     # listener configuration
     metadata="example listener metadata from python",
@@ -310,6 +311,7 @@ python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorke
     - or [via `ngrok-asgi`](#asgi-runner)
   - [Flask](https://github.com/ngrok/ngrok-python/tree/main/examples/flask-ngrok.py)
   - [Gunicorn](#gunicorn)
+  - [Hypercorn](https://github.com/ngrok/ngrok-python/tree/main/examples/hypercorn-http2-ngrok.py)
   - [Streamlit](https://github.com/ngrok/ngrok-python/tree/main/examples/streamlit/streamlit-ngrok.py)
   - [Tornado](https://github.com/ngrok/ngrok-python/tree/main/examples/tornado-ngrok.py)
   - [Uvicorn](https://github.com/ngrok/ngrok-python/tree/main/examples/uvicorn-ngrok.py)
@@ -405,3 +407,33 @@ export NGROK_AUTHTOKEN="YOUR_AUTHTOKEN_HERE"; make test="-k TEST_CLASS.NAME_OF_T
 ```
 
 [See the MakeFile for more examples](./Makefile)
+
+### HTTP2 
+
+The examples include a minimal `hypercorn` HTTP/2 example if you run `make http2`. You can curl the endpoint logged with `INFO:ngrok.listener:Created` and verify the HTTP/2 response from `hypercorn`.
+
+```bash
+curl --http2 -v https://<YOUR_LISTENER_URL>
+*   Trying <YOUR_IP>:443...
+* Connected to a6278d6c07ce.ngrok.app (<YOUR_IP>) port 443 (#0)
+* ALPN, offering h2
+* ALPN, offering http/1.1
+...
+> GET / HTTP/2
+> Host: a6278d6c07ce.ngrok.app
+> user-agent: curl/7.81.0
+> accept: */*
+>
+...
+< HTTP/2 200
+< content-type: text/plain
+< date: Fri, 01 Mar 2024 18:50:23 GMT
+< ngrok-agent-ips: <YOUR_AGENT_IP>
+< ngrok-trace-id: ed038ace04876818149cf0769bd43e38
+< server: hypercorn-h2
+<
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* Connection #0 to host <YOUR_LISTENER_URL> left intact
+hello
+```
