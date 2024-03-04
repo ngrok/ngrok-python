@@ -1,7 +1,6 @@
 aiohttp==3.8.4
 black==23.3.0
 furo==2022.12.7
-Hypercorn==0.16.0
 maturin==0.14.16
 mypy==1.5.1
 myst_parser==1.0.0
