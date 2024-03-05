@@ -212,6 +212,12 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ngrok.</span></span><span class="sig-name descname"><span class="pre">LabeledListenerBuilder</span></span><a class="headerlink" href="#ngrok.LabeledListenerBuilder" title="Permalink to this definition">#</a></dt>
 <dd><p>A labeled ngrok listener.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="ngrok.LabeledListenerBuilder.app_protocol">
+<span class="sig-name descname"><span class="pre">app_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_protocol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.LabeledListenerBuilder.app_protocol" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the L7 application protocol used for this listener, i.e. “http1” or “http2” (default “http1”)</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ngrok.LabeledListenerBuilder.label">
 <span class="sig-name descname"><span class="pre">label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.LabeledListenerBuilder.label" title="Permalink to this definition">#</a></dt>
 <dd><p>Add a label, value pair for this listener.
@@ -328,6 +334,7 @@ Linux/Darwin “unix:///path/to/unix.sock”.</p>
             <ul>
 <li><a class="reference internal" href="#">Labeled Listener Builder</a><ul>
 <li><a class="reference internal" href="#ngrok.LabeledListenerBuilder"><code class="docutils literal notranslate"><span class="pre">LabeledListenerBuilder</span></code></a><ul>
+<li><a class="reference internal" href="#ngrok.LabeledListenerBuilder.app_protocol"><code class="docutils literal notranslate"><span class="pre">LabeledListenerBuilder.app_protocol()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.LabeledListenerBuilder.label"><code class="docutils literal notranslate"><span class="pre">LabeledListenerBuilder.label()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.LabeledListenerBuilder.listen"><code class="docutils literal notranslate"><span class="pre">LabeledListenerBuilder.listen()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.LabeledListenerBuilder.listen_and_forward"><code class="docutils literal notranslate"><span class="pre">LabeledListenerBuilder.listen_and_forward()</span></code></a></li>
