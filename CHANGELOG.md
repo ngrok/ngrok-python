@@ -1,3 +1,7 @@
+## 1.1.0:
+
+- Add `app_protocol(string)` to http and labeled listener builders, and `app_protocol: string` as a `ngrok.forward()` argument. Setting this to "http2" will enable HTTP/2 support to the backend application.
+
 ## 1.0.0
 
 - Add policy support to Listener builders and `ngrok.forward`

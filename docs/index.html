@@ -351,6 +351,7 @@ You can find more examples in <a class="reference external" href="https://github
     <span class="n">addr</span><span class="o">=</span><span class="s2">&quot;localhost:8080&quot;</span><span class="p">,</span>
     <span class="n">authtoken</span><span class="o">=</span><span class="s2">&quot;&lt;authtoken&gt;&quot;</span><span class="p">,</span>
     <span class="n">authtoken_from_env</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">app_protocol</span><span class="o">=</span><span class="s2">&quot;http2&quot;</span><span class="p">,</span>
     <span class="n">session_metadata</span><span class="o">=</span><span class="s2">&quot;Online in One Line&quot;</span><span class="p">,</span>
     <span class="c1"># listener configuration</span>
     <span class="n">metadata</span><span class="o">=</span><span class="s2">&quot;example listener metadata from python&quot;</span><span class="p">,</span>
@@ -484,6 +485,7 @@ python<span class="w"> </span>-m<span class="w"> </span>ngrok<span class="w"> </
 </li>
 <li><p><a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples/flask-ngrok.py">Flask</a></p></li>
 <li><p><a class="reference internal" href="#gunicorn"><span class="xref myst">Gunicorn</span></a></p></li>
+<li><p><a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples/hypercorn-http2-ngrok.py">Hypercorn</a></p></li>
 <li><p><a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples/streamlit/streamlit-ngrok.py">Streamlit</a></p></li>
 <li><p><a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples/tornado-ngrok.py">Tornado</a></p></li>
 <li><p><a class="reference external" href="https://github.com/ngrok/ngrok-python/tree/main/examples/uvicorn-ngrok.py">Uvicorn</a></p></li>
@@ -631,6 +633,35 @@ dual licensed as above, without any additional terms or conditions.</p>
 </pre></div>
 </div>
 <p><a class="reference internal" href="#./Makefile"><span class="xref myst">See the MakeFile for more examples</span></a></p>
+<section id="http2">
+<h2>HTTP2<a class="headerlink" href="#http2" title="Permalink to this heading">#</a></h2>
+<p>The examples include a minimal <code class="docutils literal notranslate"><span class="pre">hypercorn</span></code> HTTP/2 example if you run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">http2</span></code>. You can curl the endpoint logged with <code class="docutils literal notranslate"><span class="pre">INFO:ngrok.listener:Created</span></code> and verify the HTTP/2 response from <code class="docutils literal notranslate"><span class="pre">hypercorn</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>--http2<span class="w"> </span>-v<span class="w"> </span>https://&lt;YOUR_LISTENER_URL&gt;
+*<span class="w">   </span>Trying<span class="w"> </span>&lt;YOUR_IP&gt;:443...
+*<span class="w"> </span>Connected<span class="w"> </span>to<span class="w"> </span>a6278d6c07ce.ngrok.app<span class="w"> </span><span class="o">(</span>&lt;YOUR_IP&gt;<span class="o">)</span><span class="w"> </span>port<span class="w"> </span><span class="m">443</span><span class="w"> </span><span class="o">(</span><span class="c1">#0)</span>
+*<span class="w"> </span>ALPN,<span class="w"> </span>offering<span class="w"> </span>h2
+*<span class="w"> </span>ALPN,<span class="w"> </span>offering<span class="w"> </span>http/1.1
+...
+&gt;<span class="w"> </span>GET<span class="w"> </span>/<span class="w"> </span>HTTP/2
+&gt;<span class="w"> </span>Host:<span class="w"> </span>a6278d6c07ce.ngrok.app
+&gt;<span class="w"> </span>user-agent:<span class="w"> </span>curl/7.81.0
+&gt;<span class="w"> </span>accept:<span class="w"> </span>*/*
+&gt;
+...
+&lt;<span class="w"> </span>HTTP/2<span class="w"> </span><span class="m">200</span>
+&lt;<span class="w"> </span>content-type:<span class="w"> </span>text/plain
+&lt;<span class="w"> </span>date:<span class="w"> </span>Fri,<span class="w"> </span><span class="m">01</span><span class="w"> </span>Mar<span class="w"> </span><span class="m">2024</span><span class="w"> </span><span class="m">18</span>:50:23<span class="w"> </span>GMT
+&lt;<span class="w"> </span>ngrok-agent-ips:<span class="w"> </span>&lt;YOUR_AGENT_IP&gt;
+&lt;<span class="w"> </span>ngrok-trace-id:<span class="w"> </span>ed038ace04876818149cf0769bd43e38
+&lt;<span class="w"> </span>server:<span class="w"> </span>hypercorn-h2
+&lt;
+*<span class="w"> </span>TLSv1.2<span class="w"> </span><span class="o">(</span>IN<span class="o">)</span>,<span class="w"> </span>TLS<span class="w"> </span>header,<span class="w"> </span>Supplemental<span class="w"> </span>data<span class="w"> </span><span class="o">(</span><span class="m">23</span><span class="o">)</span>:
+*<span class="w"> </span>TLSv1.2<span class="w"> </span><span class="o">(</span>IN<span class="o">)</span>,<span class="w"> </span>TLS<span class="w"> </span>header,<span class="w"> </span>Supplemental<span class="w"> </span>data<span class="w"> </span><span class="o">(</span><span class="m">23</span><span class="o">)</span>:
+*<span class="w"> </span>Connection<span class="w"> </span><span class="c1">#0 to host &lt;YOUR_LISTENER_URL&gt; left intact</span>
+hello
+</pre></div>
+</div>
+</section>
 </section>
 <section id="api-reference">
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this heading">#</a></h1>
