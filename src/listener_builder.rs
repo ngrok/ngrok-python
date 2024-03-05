@@ -231,6 +231,12 @@ macro_rules! make_listener_builder {
                 self_.set(|b| {b.label(label, value);});
                 self_
             }
+
+            /// Set the L7 application protocol used for this listener, i.e. "http1" or "http2" (default "http1")
+            pub fn app_protocol(self_: PyRefMut<Self>, app_protocol: String) -> PyRefMut<Self> {
+                self_.set(|b| {b.app_protocol(app_protocol);});
+                self_
+            }
         }
     };
 }
