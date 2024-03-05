@@ -19,6 +19,8 @@ async def create_listener() -> ngrok.Listener:
         await session.labeled_listener()
         .label("edge", "edghts_<edge_id>")
         .metadata("example listener metadata from python")
+        # Set the application protocol to "http1" or "http2"
+        # .app_protocol("http2")
         .listen()
     )
 
@@ -32,6 +34,8 @@ def create_listener_connect(addr):
         authtoken_from_env=True,
         labels="edge:edghts_<edge_id>",
         proto="labeled",
+        # Set the application protocol to "http1" or "http2"
+        # app_protocol="http2",
     )
 
 

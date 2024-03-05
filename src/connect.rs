@@ -415,6 +415,7 @@ async fn labeled_listener(
         let cfg = options.as_ref(py);
         type B = LabeledListenerBuilder;
         plumb!(B, bld, cfg, metadata);
+        plumb!(B, bld, cfg, app_protocol);
         plumb_vec!(B, bld, cfg, label, labels, ":");
         Ok::<_, PyErr>(bld.replace(session.labeled_listener()))
     })?;
