@@ -248,6 +248,17 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(421, response.status_code)
         self.assertTrue(response.headers["ngrok-trace-id"])
         await listener.close()
+    
+    async def test_tls_backend_no_verify(self):
+        session = await make_session()
+        listener = await session.http_endpoint().verify_upstream_tls(False).listen_and_forward(
+            "https://dashboard.ngrok.com"
+        )
+
+        response = retry_request().get(listener.url())
+        self.assertEqual(421, response.status_code)
+        self.assertTrue(response.headers["ngrok-trace-id"])
+        await listener.close()
 
     async def test_http_headers(self):
         http_server, session = await make_http_and_session()

@@ -8,7 +8,6 @@ use std::{
 // the lib.name and the pymodule below need to be 'ngrok' for that to be the python library
 // name, so this has to explicitly set this as a crate with the '::' prefix
 use ::ngrok::session::Session as NgrokSession;
-use async_rustls::rustls::ClientConfig;
 use bytes::Bytes;
 use lazy_static::lazy_static;
 use ngrok::{
@@ -33,6 +32,7 @@ use pyo3::{
     PyResult,
     Python,
 };
+use rustls::ClientConfig;
 use tracing::{
     debug,
     info,

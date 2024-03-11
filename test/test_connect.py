@@ -93,6 +93,24 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
 
         self.validate_shutdown(http_server, listener, listener.url())
 
+    def test_tls_backend(self):
+        ngrok.set_auth_token(os.environ["NGROK_AUTHTOKEN"])
+        listener = ngrok.forward("https://dashboard.ngrok.com")
+
+        response = retry_request().get(listener.url())
+        self.assertEqual(421, response.status_code)
+        self.assertTrue(response.headers["ngrok-trace-id"])
+        ngrok.disconnect(listener.url())
+
+    def test_tls_backend_no_verify(self):
+        ngrok.set_auth_token(os.environ["NGROK_AUTHTOKEN"])
+        listener = ngrok.forward("https://dashboard.ngrok.com", verify_upstream_tls=False)
+
+        response = retry_request().get(listener.url())
+        self.assertEqual(421, response.status_code)
+        self.assertTrue(response.headers["ngrok-trace-id"])
+        ngrok.disconnect(listener.url())
+
     def test_forward_number(self):
         http_server = test.make_http()
         listener = ngrok.forward(
