@@ -76,6 +76,13 @@ macro_rules! plumb_bool {
         }
     };
 }
+macro_rules! plumb_bool_2arg {
+    ($builder:tt, $self:tt, $config:tt, $name:tt) => {
+        if let Some(v) = $config.get_item(stringify!($name)) {
+            $builder::$name($self.borrow_mut(), get_bool(v)?);
+        }
+    };
+}
 
 /// Vector configuration
 macro_rules! plumb_vec {
@@ -115,6 +122,7 @@ macro_rules! config_common {
         plumb_vec!($builder, $self, $config, deny_cidr);
         plumb!($builder, $self, $config, proxy_proto);
         plumb!($builder, $self, $config, forwards_to);
+        plumb_bool_2arg!($builder, $self, $config, verify_upstream_tls);
 
         // returns a Result, so we can't use the macro
         if let Some(v) = $config.get_item("policy") {
@@ -416,6 +424,7 @@ async fn labeled_listener(
         type B = LabeledListenerBuilder;
         plumb!(B, bld, cfg, metadata);
         plumb!(B, bld, cfg, app_protocol);
+        plumb_bool_2arg!(B, bld, cfg, verify_upstream_tls);
         plumb_vec!(B, bld, cfg, label, labels, ":");
         Ok::<_, PyErr>(bld.replace(session.labeled_listener()))
     })?;

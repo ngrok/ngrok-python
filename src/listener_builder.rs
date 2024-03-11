@@ -59,6 +59,12 @@ macro_rules! make_listener_builder {
                 self_
             }
 
+            /// Whether to disable certificate verification for this listener.
+            pub fn verify_upstream_tls(self_: PyRefMut<Self>, verify_upstream_tls: bool) -> PyRefMut<Self> {
+                self_.set(|b| {b.verify_upstream_tls(verify_upstream_tls);});
+                self_
+            }
+
             /// Begin listening for new connections on this listener.
             pub fn listen<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
                 let session = self.session.lock().clone();
