@@ -104,7 +104,9 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
 
     def test_tls_backend_no_verify(self):
         ngrok.set_auth_token(os.environ["NGROK_AUTHTOKEN"])
-        listener = ngrok.forward("https://dashboard.ngrok.com", verify_upstream_tls=False)
+        listener = ngrok.forward(
+            "https://dashboard.ngrok.com", verify_upstream_tls=False
+        )
 
         response = retry_request().get(listener.url())
         self.assertEqual(421, response.status_code)
