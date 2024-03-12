@@ -305,6 +305,12 @@ Linux/Darwin “unix:///path/to/unix.sock”.</p>
 These addresses can be reserved in the <a class="reference external" href="https://dashboard.ngrok.com/cloud-edge/tcp-addresses">ngrok dashboard</a> to use across sessions. For example: remote_addr(“2.tcp.ngrok.io:21746”)</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="ngrok.TcpListenerBuilder.verify_upstream_tls">
+<span class="sig-name descname"><span class="pre">verify_upstream_tls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verify_upstream_tls</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.TcpListenerBuilder.verify_upstream_tls" title="Permalink to this definition">#</a></dt>
+<dd><p>Whether to disable certificate verification for this listener.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -376,6 +382,7 @@ These addresses can be reserved in the <a class="reference external" href="https
 <li><a class="reference internal" href="#ngrok.TcpListenerBuilder.policy"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.policy()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.TcpListenerBuilder.proxy_proto"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.proxy_proto()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.TcpListenerBuilder.remote_addr"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.remote_addr()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.TcpListenerBuilder.verify_upstream_tls"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.verify_upstream_tls()</span></code></a></li>
 </ul>
 </li>
 </ul>
