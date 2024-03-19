@@ -70,6 +70,7 @@ async def create_listener(httpd: Union[TCPServer, UnixStreamServer]) -> None:
         # .request_header("X-Req-Yup", "true")
         # .response_header("X-Res-Yup", "true")
         # .scheme("HTTPS")
+        # .verify_upstream_tls(False)
         # .websocket_tcp_conversion()
         # .webhook_verification("twilio", "asdf")
         .metadata("example listener metadata from python").listen()
