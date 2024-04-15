@@ -4,13 +4,6 @@ use std::{
 };
 
 use ngrok::{
-    config::{
-        HttpTunnelBuilder,
-        LabeledTunnelBuilder,
-        ProxyProto,
-        TcpTunnelBuilder,
-        TlsTunnelBuilder,
-    },
     prelude::*,
     Session,
 };

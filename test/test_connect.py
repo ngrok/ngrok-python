@@ -99,7 +99,7 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
 
         response = retry_request().get(listener.url())
         self.assertEqual(421, response.status_code)
-        self.assertTrue(response.headers["ngrok-trace-id"])
+        self.assertTrue("different Host" in response.text)
         ngrok.disconnect(listener.url())
 
     def test_tls_backend_no_verify(self):
@@ -110,7 +110,7 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
 
         response = retry_request().get(listener.url())
         self.assertEqual(421, response.status_code)
-        self.assertTrue(response.headers["ngrok-trace-id"])
+        self.assertTrue("different Host" in response.text)
         ngrok.disconnect(listener.url())
 
     def test_forward_number(self):
