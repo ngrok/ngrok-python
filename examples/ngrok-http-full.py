@@ -46,6 +46,8 @@ async def create_listener(httpd: Union[TCPServer, UnixStreamServer]) -> None:
         .handle_update_command(on_update)
         .handle_heartbeat(on_heartbeat)
         .handle_disconnection(on_disconnection)
+        # .ca_cert(load_file("ca.crt"))
+        # .server_addr("example.com:443")
         .connect()
     )
     # create listener
