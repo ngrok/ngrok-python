@@ -50,7 +50,7 @@ jobs:
           command: clippy
           args: '--all-targets --all-features --workspace -- -D warnings'
   test:
-    name: Test
+    name: Test Linux
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -59,6 +59,16 @@ jobs:
       - name: Run Tests
         run: |
           NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
+          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
+  test-win:
+    name: Test Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
+      - name: Run Tests
+        run: |
           NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
   decide:
     name: Decide on Publishing
