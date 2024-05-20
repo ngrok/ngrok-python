@@ -243,6 +243,37 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
         self.assertIsInstance(error, ValueError)
         self.assertTrue("parse policy" in f"{error}")
 
+    def test_root_cas(self):
+        http_server = test.make_http()
+        error = None
+        # tls error connecting to marketing site
+        try:
+            listener = ngrok.connect(
+                http_server.listen_to,
+                authtoken_from_env=True,
+                force_new_session=True,
+                root_cas="trusted",
+                server_addr="ngrok.com:443",
+            )
+        except ValueError as err:
+            error = err
+        self.assertIsInstance(error, ValueError)
+        self.assertTrue("tls handshake" in f"{error}", error)
+
+        # non-tls error connecting to marketing site with "host" root_cas
+        try:
+            listener = ngrok.connect(
+                http_server.listen_to,
+                authtoken_from_env=True,
+                force_new_session=True,
+                root_cas="host",
+                server_addr="ngrok.com:443",
+            )
+        except ValueError as err:
+            error = err
+        self.assertIsInstance(error, ValueError)
+        self.assertFalse("tls handshake" in f"{error}", error)
+
 
 if __name__ == "__main__":
     unittest.main()
