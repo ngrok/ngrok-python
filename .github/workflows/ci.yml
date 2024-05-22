@@ -104,7 +104,7 @@ jobs:
         settings:
           - host: macos-latest
             target: x86_64-apple-darwin
-            if: ${{ github.ref == 'refs/heads/main' }}
+            if: true
           - host: windows-latest
             target: x86_64-pc-windows-msvc
             if: true
@@ -122,7 +122,7 @@ jobs:
             if: true
             target: aarch64-apple-darwin
           - host: macos-latest
-            if: ${{ github.ref == 'refs/heads/main' }}
+            if: true
             target: universal2-apple-darwin
           - host: ubuntu-latest
             if: true
