@@ -57,7 +57,11 @@ jobs:
             ls -lah
             whoami
             env
+            echo "apk add:"
+            apk add python3-dev
+            echo "apk update:"
             apk update
+            echo "create venv:"
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf

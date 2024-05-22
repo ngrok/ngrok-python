@@ -193,6 +193,10 @@ listener = ngrok.forward(
     authtoken_from_env=True,
     app_protocol="http2",
     session_metadata="Online in One Line",
+    # advanced session connection configuration
+    server_addr="example.com:443",
+    root_cas="trusted",
+    session_ca_cert=load_file("ca.pem"),
     # listener configuration
     metadata="example listener metadata from python",
     domain="<domain>",

@@ -272,7 +272,24 @@ impl SessionBuilder {
     /// .. _server_addr parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#server_addr
     pub fn server_addr(self_: PyRefMut<Self>, addr: String) -> PyRefMut<Self> {
         self_.set(|b| {
-            b.server_addr(addr).expect("fixme");
+            b.server_addr(&addr)
+                .unwrap_or_else(|_| panic!("failed to parse addr: {addr}"));
+        });
+        self_
+    }
+
+    /// Sets the file path to a default certificate in PEM format to validate ngrok Session TLS connections.
+    /// Setting to "trusted" is the default, using the ngrok CA certificate.
+    /// Setting to "host" will verify using the certificates on the host operating system.
+    /// A client config set via tls_config after calling root_cas will override this value.
+    ///
+    /// Corresponds to the `root_cas parameter in the ngrok docs`_
+    ///
+    /// .. _root_cas parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#root_cas
+    pub fn root_cas(self_: PyRefMut<Self>, root_cas: String) -> PyRefMut<Self> {
+        self_.set(|b| {
+            b.root_cas(&root_cas)
+                .unwrap_or_else(|_| panic!("failed to invoke root_cas: {root_cas}"));
         });
         self_
     }

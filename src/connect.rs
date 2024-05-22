@@ -252,14 +252,24 @@ fn configure_session(options: &Py<PyDict>) -> Result<SessionBuilder, PyErr> {
         plumb!(B, s_builder, cfg, authtoken);
         plumb_bool!(B, s_builder, cfg, authtoken_from_env);
         plumb!(B, s_builder, cfg, metadata, session_metadata);
+        plumb_vec!(B, s_builder, cfg, ca_cert, session_ca_cert, vecu8);
+        plumb!(B, s_builder, cfg, root_cas, root_cas);
+        plumb!(B, s_builder, cfg, server_addr, server_addr);
         Ok(s_builder.replace(SessionBuilder::new()))
     })
 }
 
 async fn do_connect(options: Py<PyDict>) -> PyResult<PyObject> {
+    let force_new_session = Python::with_gil(|py| -> PyResult<bool> {
+        if let Some(v) = options.as_ref(py).get_item("force_new_session") {
+            return get_bool(v);
+        }
+        Ok(false)
+    })?;
+
     // Using a singleton session for connect use cases
     let mut opt = SESSION.lock().await;
-    if opt.is_none() {
+    if opt.is_none() || force_new_session {
         opt.replace(configure_session(&options)?.async_connect().await?);
     }
     let session = opt.as_ref().unwrap();
