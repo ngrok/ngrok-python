@@ -242,6 +242,7 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
             error = err
         self.assertIsInstance(error, ValueError)
         self.assertTrue("parse policy" in f"{error}")
+        shutdown(None, http_server)
 
     def test_root_cas(self):
         http_server = test.make_http()
