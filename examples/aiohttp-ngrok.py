@@ -5,7 +5,7 @@ import logging, ngrok
 
 
 async def hello(request):
-    return web.Response(text="Hello, world")
+    return web.Response(text="Online in One Line")
 
 
 logging.basicConfig(level=logging.INFO)
