@@ -323,7 +323,7 @@ You can find more examples in <a class="reference external" href="https://github
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ngrok</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="s2">&quot;https://127.0.0.1:3000&quot;</span><span class="p">,</span> <span class="n">authtoken_from_env</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If the service is using certs not trusted by the OS, such as self-signed certificates, add an environment variable like this before running: <code class="docutils literal notranslate"><span class="pre">SSL_CERT_FILE=/path/to/ca.crt</span></code>.</p>
+<p>If the service is using certs not trusted by the OS, such as self-signed certificates, add an environment variable like this before running: <code class="docutils literal notranslate"><span class="pre">SSL_CERT_FILE=/path/to/ca.crt</span></code>. There is also a <code class="docutils literal notranslate"><span class="pre">verify_upstream_tls=False</span></code> option to disable certification verification.</p>
 </section>
 <section id="unix-sockets">
 <h2>Unix Sockets<a class="headerlink" href="#unix-sockets" title="Permalink to this heading">#</a></h2>
@@ -353,6 +353,10 @@ You can find more examples in <a class="reference external" href="https://github
     <span class="n">authtoken_from_env</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">app_protocol</span><span class="o">=</span><span class="s2">&quot;http2&quot;</span><span class="p">,</span>
     <span class="n">session_metadata</span><span class="o">=</span><span class="s2">&quot;Online in One Line&quot;</span><span class="p">,</span>
+    <span class="c1"># advanced session connection configuration</span>
+    <span class="n">server_addr</span><span class="o">=</span><span class="s2">&quot;example.com:443&quot;</span><span class="p">,</span>
+    <span class="n">root_cas</span><span class="o">=</span><span class="s2">&quot;trusted&quot;</span><span class="p">,</span>
+    <span class="n">session_ca_cert</span><span class="o">=</span><span class="n">load_file</span><span class="p">(</span><span class="s2">&quot;ca.pem&quot;</span><span class="p">),</span>
     <span class="c1"># listener configuration</span>
     <span class="n">metadata</span><span class="o">=</span><span class="s2">&quot;example listener metadata from python&quot;</span><span class="p">,</span>
     <span class="n">domain</span><span class="o">=</span><span class="s2">&quot;&lt;domain&gt;&quot;</span><span class="p">,</span>
@@ -388,6 +392,7 @@ You can find more examples in <a class="reference external" href="https://github
     <span class="n">response_header_remove</span><span class="o">=</span><span class="s2">&quot;X-Res-Nope&quot;</span><span class="p">,</span>
     <span class="n">request_header_add</span><span class="o">=</span><span class="s2">&quot;X-Req-Yup:true&quot;</span><span class="p">,</span>
     <span class="n">response_header_add</span><span class="o">=</span><span class="s2">&quot;X-Res-Yup:true&quot;</span><span class="p">,</span>
+    <span class="n">verify_upstream_tls</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">verify_webhook_provider</span><span class="o">=</span><span class="s2">&quot;twilio&quot;</span><span class="p">,</span>
     <span class="n">verify_webhook_secret</span><span class="o">=</span><span class="s2">&quot;asdf&quot;</span><span class="p">,</span>
     <span class="n">websocket_tcp_converter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>

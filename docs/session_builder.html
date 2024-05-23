@@ -344,6 +344,16 @@ suggest encoding the value in a structured format like JSON.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="ngrok.SessionBuilder.root_cas">
+<span class="sig-name descname"><span class="pre">root_cas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_cas</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.root_cas" title="Permalink to this definition">#</a></dt>
+<dd><p>Sets the file path to a default certificate in PEM format to validate ngrok Session TLS connections.
+Setting to “trusted” is the default, using the ngrok CA certificate.
+Setting to “host” will verify using the certificates on the host operating system.
+A client config set via tls_config after calling root_cas will override this value.</p>
+<p>Corresponds to the <a class="reference external" href="https://ngrok.com/docs/ngrok-agent/config#root_cas">root_cas parameter in the ngrok docs</a></p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ngrok.SessionBuilder.server_addr">
 <span class="sig-name descname"><span class="pre">server_addr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.SessionBuilder.server_addr" title="Permalink to this definition">#</a></dt>
 <dd><p>Configures the network address to dial to connect to the ngrok service.
@@ -425,6 +435,7 @@ Use this option only if you are connecting to a custom agent ingress.</p>
 <li><a class="reference internal" href="#ngrok.SessionBuilder.heartbeat_interval"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.heartbeat_interval()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.SessionBuilder.heartbeat_tolerance"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.heartbeat_tolerance()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.SessionBuilder.metadata"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.metadata()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.SessionBuilder.root_cas"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.root_cas()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.SessionBuilder.server_addr"><code class="docutils literal notranslate"><span class="pre">SessionBuilder.server_addr()</span></code></a></li>
 </ul>
 </li>
