@@ -1,7 +1,7 @@
 aiohttp==3.9.5
 black==23.3.0
 furo==2022.12.7
-maturin==0.14.16
+maturin==1.5.1
 mypy==1.5.1
 myst_parser==1.0.0
 pytest-xdist==3.2.0
