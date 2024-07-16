@@ -38,12 +38,20 @@ pip install ngrok
     ```python
     # import ngrok python sdk
     import ngrok
+    import time
     
     # Establish connectivity
     listener = ngrok.forward(9000, authtoken_from_env=True)
     
     # Output ngrok url to console
     print(f"Ingress established at {listener.url()}")
+
+    # Keep the listener alive
+    try:
+    while True:
+        time.sleep(1)
+    except KeyboardInterrupt:
+        print("Closing listener")
     ```
 
 That's it! Your application should now be available through the url output in your terminal. 
