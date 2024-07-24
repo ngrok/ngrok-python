@@ -123,11 +123,9 @@ macro_rules! config_common {
         plumb!($builder, $self, $config, proxy_proto);
         plumb!($builder, $self, $config, forwards_to);
         plumb_bool_2arg!($builder, $self, $config, verify_upstream_tls);
-
-        // returns a Result, so we can't use the macro
-        if let Some(v) = $config.get_item("policy") {
-            $builder::policy($self.borrow_mut(), get_string(v)?)?;
-        }
+        plumb!($builder, $self, $config, traffic_policy);
+        // policy is currently an alias of traffic_policy, it will eventually be removed.
+        plumb!($builder, $self, $config, traffic_policy, policy);
     };
 }
 

@@ -163,6 +163,36 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("added-header-value", response.headers["added-header"])
         await shutdown(listener, http_server)
 
+    async def test_https_listener_with_traffic_policy(self):
+        traffic_policy = """
+        {
+          "inbound": [],
+          "outbound": [
+            {
+              "expressions": [],
+              "name": "",
+              "actions": [
+                {
+                  "type": "add-headers",
+                  "config": {
+                    "headers": {
+                      "added-header": "added-header-value"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        """
+
+        http_server, session = await make_http_and_session()
+        listener = await session.http_endpoint().traffic_policy(traffic_policy).listen()
+        listener.forward(http_server.listen_to)
+        response = retry_request().get(listener.url())
+        self.assertEqual("added-header-value", response.headers["added-header"])
+        await shutdown(listener, http_server)
+
     async def test_https_listener_with_invalid_policy_json(self):
         error = None
         try:
@@ -171,7 +201,17 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         except ValueError as err:
             error = err
         self.assertIsInstance(error, ValueError)
-        self.assertTrue("parse policy" in f"{error}")
+        self.assertTrue("provided is invalid" in f"{error}")
+
+    async def test_https_listener_with_invalid_traffic_policy_json(self):
+        error = None
+        try:
+            _, session = await make_http_and_session()
+            await session.http_endpoint().traffic_policy('{ "inbound": "not valid" }').listen()
+        except ValueError as err:
+            error = err
+        self.assertIsInstance(error, ValueError)
+        self.assertTrue("provided is invalid" in f"{error}")
 
     async def test_https_listener_with_invalid_policy_action(self):
         policy = """
@@ -199,6 +239,39 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         try:
             http_server, session = await make_http_and_session()
             listener = await session.http_endpoint().policy(policy).listen()
+            listener.forward(http_server.listen_to)
+            _ = retry_request().get(listener.url())
+        except ValueError as err:
+            error = err
+        self.assertIsInstance(error, ValueError)
+        self.assertTrue("Invalid policy action type 'not-real-action'." in f"{error}")
+
+    async def test_https_listener_with_invalid_traffic_policy_action(self):
+        traffic_policy = """
+        {
+          "inbound": [],
+          "outbound": [
+            {
+              "expressions": [],
+              "name": "",
+              "actions": [
+                {
+                  "type": "not-real-action",
+                  "config": {
+                    "headers": {
+                      "added-header": "added-header-value"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        """
+
+        try:
+            http_server, session = await make_http_and_session()
+            listener = await session.http_endpoint().traffic_policy(traffic_policy).listen()
             listener.forward(http_server.listen_to)
             _ = retry_request().get(listener.url())
         except ValueError as err:
