@@ -35,3 +35,6 @@ pyo3-build-config = "0.17.3"
 
 [profile.release]
 lto = true
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["mio"]
