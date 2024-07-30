@@ -230,6 +230,39 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("added-header-value", response.headers["added-header"])
         self.validate_shutdown(http_server, listener, listener.url())
 
+    async def test_connect_traffic_policy(self):
+        traffic_policy = """
+        {
+          "inbound": [],
+          "outbound": [
+            {
+              "expressions": [],
+              "name": "",
+              "actions": [
+                {
+                  "type": "add-headers",
+                  "config": {
+                    "headers": {
+                      "added-header": "added-header-value"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+        """
+
+        http_server = test.make_http()
+        listener = await ngrok.connect(
+            http_server.listen_to,
+            authtoken_from_env=True,
+            traffic_policy=traffic_policy,
+        )
+        response = retry_request().get(listener.url())
+        self.assertEqual("added-header-value", response.headers["added-header"])
+        self.validate_shutdown(http_server, listener, listener.url())
+
     async def test_invalid_connect_policy(self):
         http_server = test.make_http()
         try:
@@ -241,7 +274,21 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
         except ValueError as err:
             error = err
         self.assertIsInstance(error, ValueError)
-        self.assertTrue("parse policy" in f"{error}")
+        self.assertTrue("provided is invalid" in f"{error}")
+        shutdown(None, http_server)
+
+    async def test_invalid_connect_traffic_policy(self):
+        http_server = test.make_http()
+        try:
+            listener = await ngrok.connect(
+                http_server.listen_to,
+                authtoken_from_env=True,
+                traffic_policy="{{",
+            )
+        except ValueError as err:
+            error = err
+        self.assertIsInstance(error, ValueError)
+        self.assertTrue("provided is invalid" in f"{error}")
         shutdown(None, http_server)
 
     def test_root_cas(self):

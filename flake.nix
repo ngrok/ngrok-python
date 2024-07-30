@@ -32,11 +32,14 @@
           "rust-src"
           "rustc"
           "rustfmt"
+          "rust-analyzer"
         ];
         python-toolchain = with pkgs; [
           python3
           python3Packages.pandas
           python3Packages.pyarrow
+
+          python3Packages.python-lsp-server
         ];
         fix-n-fmt = pkgs.writeShellScriptBin "fix-n-fmt" ''
           set -euf -o pipefail

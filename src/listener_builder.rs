@@ -205,15 +205,18 @@ macro_rules! make_listener_builder {
                 self_
             }
 
+            /// DEPRECATED: use traffic_policy instead.
+            /// :param str policy_config: Traffic policy configuration to be attached to the listener.
+            pub fn policy(self_: PyRefMut<Self>, policy_config: String) -> PyRefMut<Self> {
+                self_.set(|b| {b.traffic_policy(policy_config);});
+                self_
+            }
+
             /// Traffic Policy configuration.
             /// :param str policy_config: Traffic policy configuration to be attached to the listener.
-            pub fn policy(self_: PyRefMut<Self>, policy_config: String) -> PyResult<PyRefMut<Self>> {
-                let mut builder = self_.listener_builder.lock();
-                builder
-                    .policy(policy_config.as_str())
-                    .map_err(|e| py_err(format!("Cannot parse policy: {e}")))?;
-                drop(builder);
-                Ok(self_)
+            pub fn traffic_policy(self_: PyRefMut<Self>, policy_config: String) -> PyRefMut<Self> {
+                self_.set(|b| {b.traffic_policy(policy_config);});
+                self_
             }
         }
     };
