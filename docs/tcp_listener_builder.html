@@ -288,7 +288,7 @@ Linux/Darwin “unix:///path/to/unix.sock”.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ngrok.TcpListenerBuilder.policy">
 <span class="sig-name descname"><span class="pre">policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy_config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.TcpListenerBuilder.policy" title="Permalink to this definition">#</a></dt>
-<dd><p>Traffic Policy configuration.
+<dd><p>DEPRECATED: use traffic_policy instead.
 :param str policy_config: Traffic policy configuration to be attached to the listener.</p>
 </dd></dl>
 
@@ -303,6 +303,13 @@ Linux/Darwin “unix:///path/to/unix.sock”.</p>
 <span class="sig-name descname"><span class="pre">remote_addr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remote_addr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.TcpListenerBuilder.remote_addr" title="Permalink to this definition">#</a></dt>
 <dd><p>The TCP address to request for this edge.
 These addresses can be reserved in the <a class="reference external" href="https://dashboard.ngrok.com/cloud-edge/tcp-addresses">ngrok dashboard</a> to use across sessions. For example: remote_addr(“2.tcp.ngrok.io:21746”)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ngrok.TcpListenerBuilder.traffic_policy">
+<span class="sig-name descname"><span class="pre">traffic_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy_config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.TcpListenerBuilder.traffic_policy" title="Permalink to this definition">#</a></dt>
+<dd><p>Traffic Policy configuration.
+:param str policy_config: Traffic policy configuration to be attached to the listener.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -382,6 +389,7 @@ These addresses can be reserved in the <a class="reference external" href="https
 <li><a class="reference internal" href="#ngrok.TcpListenerBuilder.policy"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.policy()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.TcpListenerBuilder.proxy_proto"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.proxy_proto()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.TcpListenerBuilder.remote_addr"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.remote_addr()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.TcpListenerBuilder.traffic_policy"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.traffic_policy()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.TcpListenerBuilder.verify_upstream_tls"><code class="docutils literal notranslate"><span class="pre">TcpListenerBuilder.verify_upstream_tls()</span></code></a></li>
 </ul>
 </li>
