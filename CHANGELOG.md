@@ -1,3 +1,8 @@
+## 1.4.0:
+
+- Rename `policy` to `traffic_policy` in Listener builders and `ngrok.forward`
+- Fix quickstart example in README
+
 ## 1.3.0:
 
 - Add `root_cas` to session builder and `ngrok.forward`. Setting this to `host` will use the host's trusted certificates to connect for the ngrok session.

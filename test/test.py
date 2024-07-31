@@ -207,7 +207,9 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         error = None
         try:
             _, session = await make_http_and_session()
-            await session.http_endpoint().traffic_policy('{ "inbound": "not valid" }').listen()
+            await session.http_endpoint().traffic_policy(
+                '{ "inbound": "not valid" }'
+            ).listen()
         except ValueError as err:
             error = err
         self.assertIsInstance(error, ValueError)
@@ -271,7 +273,9 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
         try:
             http_server, session = await make_http_and_session()
-            listener = await session.http_endpoint().traffic_policy(traffic_policy).listen()
+            listener = (
+                await session.http_endpoint().traffic_policy(traffic_policy).listen()
+            )
             listener.forward(http_server.listen_to)
             _ = retry_request().get(listener.url())
         except ValueError as err:

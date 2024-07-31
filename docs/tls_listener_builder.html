@@ -303,7 +303,7 @@ See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/module
 <dl class="py method">
 <dt class="sig sig-object py" id="ngrok.TlsListenerBuilder.policy">
 <span class="sig-name descname"><span class="pre">policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy_config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.TlsListenerBuilder.policy" title="Permalink to this definition">#</a></dt>
-<dd><p>Traffic Policy configuration.
+<dd><p>DEPRECATED: use traffic_policy instead.
 :param str policy_config: Traffic policy configuration to be attached to the listener.</p>
 </dd></dl>
 
@@ -318,6 +318,13 @@ See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/module
 <span class="sig-name descname"><span class="pre">termination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cert_pem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_pem</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.TlsListenerBuilder.termination" title="Permalink to this definition">#</a></dt>
 <dd><p>The key to use for TLS termination at the ngrok edge in PEM format.
 See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/modules/tls-termination/">TLS Termination</a> in the ngrok docs for additional details.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ngrok.TlsListenerBuilder.traffic_policy">
+<span class="sig-name descname"><span class="pre">traffic_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy_config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ngrok.TlsListenerBuilder.traffic_policy" title="Permalink to this definition">#</a></dt>
+<dd><p>Traffic Policy configuration.
+:param str policy_config: Traffic policy configuration to be attached to the listener.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -399,6 +406,7 @@ See <a class="reference external" href="https://ngrok.com/docs/cloud-edge/module
 <li><a class="reference internal" href="#ngrok.TlsListenerBuilder.policy"><code class="docutils literal notranslate"><span class="pre">TlsListenerBuilder.policy()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.TlsListenerBuilder.proxy_proto"><code class="docutils literal notranslate"><span class="pre">TlsListenerBuilder.proxy_proto()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.TlsListenerBuilder.termination"><code class="docutils literal notranslate"><span class="pre">TlsListenerBuilder.termination()</span></code></a></li>
+<li><a class="reference internal" href="#ngrok.TlsListenerBuilder.traffic_policy"><code class="docutils literal notranslate"><span class="pre">TlsListenerBuilder.traffic_policy()</span></code></a></li>
 <li><a class="reference internal" href="#ngrok.TlsListenerBuilder.verify_upstream_tls"><code class="docutils literal notranslate"><span class="pre">TlsListenerBuilder.verify_upstream_tls()</span></code></a></li>
 </ul>
 </li>
