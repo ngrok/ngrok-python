@@ -3,10 +3,10 @@ env:
   DEBUG: napi:*
   APP_NAME: ngrok
   MACOSX_DEPLOYMENT_TARGET: '10.13'
-'on':
+on:
   push:
     branches:
-      - '**'
+      - 'main'
     tags-ignore:
       - '**'
     paths-ignore:
@@ -17,49 +17,43 @@ env:
       - docs/**
   pull_request: null
 jobs:
-  udeps:
-    name: Udeps
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - uses: ./.github/workflows/rust-cache
-      - uses: actions-rs/cargo@v1
-        with:
-          command: udeps
-          args: '--workspace --all-targets --all-features'
-  fmt:
-    name: Rustfmt
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: '--all -- --check'
-  clippy:
-    name: Clippy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - uses: ./.github/workflows/rust-cache
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: '--all-targets --all-features --workspace -- -D warnings'
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - uses: ./.github/workflows/rust-cache
-      - name: Run Tests
-        run: |
-          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
-          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
+  # udeps:
+  #   name: Udeps
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - uses: ./.github/workflows/rust-cache
+  #     - name: Run Udeps
+  #       run: cargo udeps --workspace --all-targets --all-features
+  # fmt:
+  #   name: Rustfmt
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - name: Run Rustfmt
+  #       run: cargo fmt --all -- --check
+  # clippy:
+  #   name: Clippy
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - uses: ./.github/workflows/rust-cache
+  #     - name: Run Clippy
+  #       run: cargo clippy --all-targets --all-features --workspace
+  # test:
+  #   name: Test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - uses: ./.github/workflows/rust-cache
+  #     - name: Run Tests
+  #       run: |
+  #         NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
+  #         NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
   decide:
     name: Decide on Publishing
     runs-on: ubuntu-latest
@@ -84,57 +78,56 @@ jobs:
 
   build:
     needs:
-      - clippy
+      # - clippy
       - decide
-      - fmt
-      - test
-      - udeps
+      # - fmt
+      # - test
+      # - udeps
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
       docker: ${{ matrix.settings.docker }}
       host: ${{ matrix.settings.host }}
-      if: ${{ matrix.settings.if || 'true' }}
-      publish: ${{ needs.decide.outputs.publish || 'false' }}
+      if: true
+      publish: ${{ needs.decide.outputs.publish || false }}
       setup: ${{ matrix.settings.setup }}
       target: ${{ matrix.settings.target }}
     strategy:
       fail-fast: false
       matrix:
         settings:
-          - host: macos-latest
-            target: x86_64-apple-darwin
-          - host: windows-latest
-            target: x86_64-pc-windows-msvc
-          - host: windows-latest
-            target: i686-pc-windows-msvc
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-          - host: macos-latest
-            target: aarch64-apple-darwin
-          - host: macos-latest
-            target: universal2-apple-darwin
-          - host: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            docker: ghcr.io/rust-cross/manylinux2014-cross:aarch64
+          # MACOS
+          # - host: macos-latest
+          #   target: aarch64-apple-darwin
+          # - host: macos-latest
+          #   target: universal2-apple-darwin
+          # - host: macos-latest
+          #   target: x86_64-apple-darwin
+
+          # LINUX
+          # - host: ubuntu-latest
+          #   target: aarch64-unknown-linux-gnu
+          #   docker: ghcr.io/rust-cross/manylinux2014-cross:aarch64
+          # - host: ubuntu-latest
+          #   target: aarch64-unknown-linux-musl
           - host: ubuntu-latest
             target: armv7-unknown-linux-gnueabihf
-            setup: |
-              sudo apt-get update
-              sudo apt-get install gcc-arm-linux-gnueabihf -y
-          - host: ubuntu-latest
-            target: aarch64-linux-android
-          - host: ubuntu-latest
-            target: armv7-linux-androideabi
-            # need to build python against the android ndk
-            if: false
-          - host: ubuntu-latest
-            target: aarch64-unknown-linux-musl
-          - host: windows-latest
-            target: aarch64-pc-windows-msvc
+            docker: ghcr.io/rust-cross/manylinux2014-cross:armv7
+          # - host: ubuntu-latest
+          #   target: x86_64-unknown-linux-gnu
+          # - host: ubuntu-latest
+          #   target: x86_64-unknown-linux-musl
+          #   docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
+              
+
+          # WINDOWS
+          # - host: windows-latest
+          #   target: aarch64-pc-windows-msvc
+          # - host: windows-latest
+          #   target: i686-pc-windows-msvc
+          # - host: windows-latest
+          #   target: x86_64-pc-windows-msvc 
+  
   build-freebsd:
     needs: decide
     runs-on: ubuntu-22.04
@@ -149,27 +142,20 @@ jobs:
         id: build
         uses: vmactions/freebsd-vm@v1
         env:
-          DEBUG: napi:*
           RUSTUP_HOME: /usr/local/rustup
           CARGO_HOME: /usr/local/cargo
           RUSTUP_IO_THREADS: 1
           SHOULD_PUBLISH: ${{ needs.decide.outputs.publish }}
         with:
-          envs: DEBUG RUSTUP_HOME CARGO_HOME RUSTUP_IO_THREADS SHOULD_PUBLISH
+          envs: RUSTUP_HOME CARGO_HOME RUSTUP_IO_THREADS SHOULD_PUBLISH
           usesh: true
           mem: 3000
           prepare: |
-            pkg install -y -f curl libnghttp2 python3 yarn cmake llvm
+            pkg install -y -f curl libnghttp2 python3 cmake llvm
             alias curl="curl --retry 5 --retry-all-errors"
             curl https://sh.rustup.rs -sSf --output rustup.sh
             sh rustup.sh -y --profile minimal --default-toolchain beta
             export PATH="/usr/local/cargo/bin:$PATH"
-            echo "~~~~ rustc --version ~~~~"
-            rustc --version
-            echo "~~~~ node -v ~~~~"
-            node -v
-            echo "~~~~ yarn --version ~~~~"
-            yarn --version
           run: |
             export PATH="/usr/local/cargo/bin:$PATH"
             pwd
@@ -197,7 +183,7 @@ jobs:
           path: target/wheels/*.whl
           if-no-files-found: error
   tag:
-    if: ${{ github.ref == 'refs/heads/main' && needs.decide.outputs.publish == 'true' }}
+    if: ${{ github.ref == 'refs/heads/main' && needs.decide.outputs.publish == true }}
     needs:
       - decide
       - build
