@@ -1,16 +1,8 @@
 use std::str::FromStr;
 
 use bytes::Bytes;
-use ngrok::config::{
-    OauthOptions,
-    OidcOptions,
-    Scheme,
-};
-use pyo3::{
-    pymethods,
-    types::PyByteArray,
-    PyRefMut,
-};
+use ngrok::config::{OauthOptions, OidcOptions, Scheme};
+use pyo3::{pymethods, types::PyByteArray, PyRefMut};
 
 use crate::listener_builder::HttpListenerBuilder;
 
@@ -260,6 +252,14 @@ impl HttpListenerBuilder {
 
         self_.set(|b| {
             b.oidc(oidc);
+        });
+        self_
+    }
+
+    /// Enable endpoint pooling for this listener.
+    pub fn pooling_enabled(self_: PyRefMut<Self>, pooling_enabled: bool) -> PyRefMut<Self> {
+        self_.set(|b| {
+            b.pooling_enabled(pooling_enabled);
         });
         self_
     }

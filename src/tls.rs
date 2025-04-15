@@ -1,9 +1,5 @@
 use bytes::Bytes;
-use pyo3::{
-    pymethods,
-    types::PyByteArray,
-    PyRefMut,
-};
+use pyo3::{pymethods, types::PyByteArray, PyRefMut};
 
 use crate::listener_builder::TlsListenerBuilder;
 
@@ -34,6 +30,15 @@ impl TlsListenerBuilder {
         });
         self_
     }
+
+    /// Enable endpoint pooling for this listener.
+    pub fn pooling_enabled(self_: PyRefMut<Self>, endpoint_pooling: bool) -> PyRefMut<Self> {
+        self_.set(|b| {
+            b.pooling_enabled(endpoint_pooling);
+        });
+        self_
+    }
+
     /// The key to use for TLS termination at the ngrok edge in PEM format.
     /// See `TLS Termination`_ in the ngrok docs for additional details.
     ///

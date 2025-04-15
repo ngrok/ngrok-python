@@ -1,7 +1,4 @@
-use pyo3::{
-    pymethods,
-    PyRefMut,
-};
+use pyo3::{pymethods, PyRefMut};
 
 use crate::listener_builder::TcpListenerBuilder;
 
@@ -15,6 +12,14 @@ impl TcpListenerBuilder {
     pub fn remote_addr(self_: PyRefMut<Self>, remote_addr: String) -> PyRefMut<Self> {
         self_.set(|b| {
             b.remote_addr(remote_addr);
+        });
+        self_
+    }
+
+    /// Enable endpoint pooling for this listener.
+    pub fn pooling_enabled(self_: PyRefMut<Self>, pooling_enabled: bool) -> PyRefMut<Self> {
+        self_.set(|b| {
+            b.pooling_enabled(pooling_enabled);
         });
         self_
     }
