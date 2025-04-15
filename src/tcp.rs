@@ -1,4 +1,7 @@
-use pyo3::{pymethods, PyRefMut};
+use pyo3::{
+    pymethods,
+    PyRefMut,
+};
 
 use crate::listener_builder::TcpListenerBuilder;
 

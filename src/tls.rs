@@ -1,5 +1,9 @@
 use bytes::Bytes;
-use pyo3::{pymethods, types::PyByteArray, PyRefMut};
+use pyo3::{
+    pymethods,
+    types::PyByteArray,
+    PyRefMut,
+};
 
 use crate::listener_builder::TlsListenerBuilder;
 
