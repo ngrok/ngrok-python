@@ -24,7 +24,7 @@ on:
 jobs:
   reusable-build:
     if: ${{ inputs.if }}
-    name: stable - ${{ inputs.target }} - python@3.13
+    name: stable - ${{ inputs.target }} - python@3.12
     runs-on: ${{ inputs.host }}
     steps:
       - name: Checkout
@@ -43,7 +43,7 @@ jobs:
         run: |
           cargo install --force --locked bindgen-cli
       - name: Install zig
-        uses: goto-bus-stop/setup-zig@v2
+        uses: mlugg/setup-zig@v1
         if: ${{ inputs.target == 'armv7-unknown-linux-gnueabihf' }}
         with:
           version: 0.10.0
@@ -58,7 +58,7 @@ jobs:
         if: ${{ inputs.target == 'i686-pc-windows-msvc' }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.12"
           architecture: "x86"
       - name: Build and Publish x86_64-unknown-linux-musl
         uses: addnab/docker-run-action@v3
@@ -75,6 +75,8 @@ jobs:
             apk add musl-dev gcc make cmake clang llvm build-base python3
             echo "apk update:"
             apk update
+            # adds the cargo bin to the path
+            export PATH="/usr/bin/cargo:$PATH"
             echo "create venv:"
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
@@ -86,13 +88,6 @@ jobs:
               echo "~~~~ maturin building"
               . .env/bin/activate && maturin build
             fi
-      - name: Build and Publish aarch64-unknown-linux-gnu
-        uses: addnab/docker-run-action@v3
-        if: ${{ inputs.target == 'aarch64-unknown-linux-gnu' }}
-        with:
-          image: ${{ inputs.docker }}
-          options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
-          run: |
             # shows the current directory
             pwd
             # shows all files with their permissions and sizes
@@ -118,35 +113,20 @@ jobs:
               echo "~~~~ maturin building"
               . .env/bin/activate && maturin build --target ${{ inputs.target }}
             fi
-      - name: Build aarch64-linux-android
-        if: ${{ inputs.target == 'aarch64-linux-android' }}
+      - name: Build Python Extension Module (non-docker)
+        if: ${{ inputs.publish != true && !inputs.docker  }}
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ inputs.target }}
           # builds in release mode with the specified python version as the interpreter and the Cargo.toml file as the manifest
-          args: --release -i python3.13 -m Cargo.toml
-          docker-options: |
-            --mount type=bind,source=/usr/local/lib/android/sdk/ndk/25.2.9519653,target=/usr/local/lib/android/sdk/ndk/25.2.9519653
-            -e CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang
-            -e CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-androideabi24-clang
-            -e CC=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang
-            -e CXX=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++
-            -e AR=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-            -e ANDROID_NDK=/usr/local/lib/android/sdk/ndk/25.2.9519653
-      - name: Build Python Extension Module (non-docker && non-android)
-        if: ${{ inputs.publish != true && !inputs.docker && !contains(inputs.target,'android') }}
-        uses: PyO3/maturin-action@v1
-        with:
-          target: ${{ inputs.target }}
-          # builds in release mode with the specified python version as the interpreter and the Cargo.toml file as the manifest
-          args: --release -i python3.13 -m Cargo.toml
-      - name: Publish to PyPI (non-docker && non-android)
-        if: ${{ inputs.publish == true && !inputs.docker && !contains(inputs.target,'android') }}
+          args: --release -i python3.12 -m Cargo.toml
+      - name: Publish to PyPI (non-docker)
+        if: ${{ inputs.publish == true && !inputs.docker }}
         uses: PyO3/maturin-action@v1
         with:
           command: publish
           target: ${{ inputs.target }}
-          args: --no-sdist -i python3.13 -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+          args: --no-sdist -i python3.12 -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
