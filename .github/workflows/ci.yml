@@ -94,7 +94,7 @@ jobs:
     with:
       docker: ${{ matrix.settings.docker }}
       host: ${{ matrix.settings.host }}
-      if: ${{ matrix.settings.if || true }}
+      if: true
       publish: ${{ needs.decide.outputs.publish || false }}
       setup: ${{ matrix.settings.setup }}
       target: ${{ matrix.settings.target }}
@@ -112,7 +112,7 @@ jobs:
             target: x86_64-unknown-linux-gnu
           - host: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
+            docker: alpine:latest
           - host: macos-latest
             target: aarch64-apple-darwin
           - host: macos-latest
@@ -127,10 +127,6 @@ jobs:
               sudo apt-get install gcc-arm-linux-gnueabihf -y
           - host: ubuntu-latest
             target: aarch64-linux-android
-          - host: ubuntu-latest
-            target: armv7-linux-androideabi
-            # need to build python against the android ndk
-            if: false
           - host: ubuntu-latest
             target: aarch64-unknown-linux-musl
           - host: windows-latest
@@ -159,17 +155,11 @@ jobs:
           usesh: true
           mem: 3000
           prepare: |
-            pkg install -y -f curl libnghttp2 python3 yarn cmake llvm
+            pkg install -y -f curl libnghttp2 python3 cmake llvm
             alias curl="curl --retry 5 --retry-all-errors"
             curl https://sh.rustup.rs -sSf --output rustup.sh
             sh rustup.sh -y --profile minimal --default-toolchain beta
             export PATH="/usr/local/cargo/bin:$PATH"
-            echo "~~~~ rustc --version ~~~~"
-            rustc --version
-            echo "~~~~ node -v ~~~~"
-            node -v
-            echo "~~~~ yarn --version ~~~~"
-            yarn --version
           run: |
             export PATH="/usr/local/cargo/bin:$PATH"
             pwd
@@ -197,7 +187,7 @@ jobs:
           path: target/wheels/*.whl
           if-no-files-found: error
   tag:
-    if: ${{ github.ref == 'refs/heads/main' && needs.decide.outputs.publish == 'true' }}
+    if: ${{ github.ref == 'refs/heads/main' && needs.decide.outputs.publish == true }}
     needs:
       - decide
       - build

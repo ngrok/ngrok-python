@@ -39,6 +39,9 @@ jobs:
             .cargo-cache
             target/
           key: ${{ inputs.target }}-cargo-${{ inputs.host }}
+      - name: Install Bindgen
+        run: |
+          cargo install --force --locked bindgen-cli
       - name: Install zig
         uses: goto-bus-stop/setup-zig@v2
         if: ${{ inputs.target == 'armv7-unknown-linux-gnueabihf' }}
@@ -48,7 +51,16 @@ jobs:
         run: ${{ inputs.setup }}
         if: ${{ inputs.setup }}
         shell: bash
-      - name: x86_64-unknown-linux-musl
+      - name: Install nasm for i686-pc-windows-msvc
+        uses: ilammy/setup-nasm@v1
+        if: inputs.target == 'i686-pc-windows-msvc'
+      - name: Setup x86 Python for i686-pc-windows-msvc
+        if: ${{ inputs.target == 'i686-pc-windows-msvc' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          architecture: "x86"
+      - name: Build and Publish x86_64-unknown-linux-musl
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'x86_64-unknown-linux-musl' }}
         with:
@@ -60,7 +72,7 @@ jobs:
             whoami
             env
             echo "apk add:"
-            apk add python3-dev
+            apk add musl-dev gcc make cmake clang llvm build-base python3
             echo "apk update:"
             apk update
             echo "create venv:"
@@ -74,22 +86,25 @@ jobs:
               echo "~~~~ maturin building"
               . .env/bin/activate && maturin build
             fi
-      - name: aarch64-unknown-linux-gnu
+      - name: Build and Publish aarch64-unknown-linux-gnu
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'aarch64-unknown-linux-gnu' }}
         with:
           image: ${{ inputs.docker }}
           options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
+            # shows the current directory
             pwd
+            # shows all files with their permissions and sizes
             ls -lah
+            # shows the current user
             whoami
+            # prints the environment variables
             env
+            # installs the minimal Rust toolchain profile
             curl --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+            # adds the cargo bin to the path
             export PATH="$HOME/.cargo/bin:$PATH"
-            # ring 0.17 assembly build needs __ARM_ARCH set
-            export CFLAGS_aarch64_unknown_linux_gnu="-D__ARM_ARCH=8"
-            rustup component add llvm-tools-preview || true
             rustup target add aarch64-unknown-linux-gnu
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
@@ -108,6 +123,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ inputs.target }}
+          # builds in release mode with the specified python version as the interpreter and the Cargo.toml file as the manifest
           args: --release -i python3.13 -m Cargo.toml
           docker-options: |
             --mount type=bind,source=/usr/local/lib/android/sdk/ndk/25.2.9519653,target=/usr/local/lib/android/sdk/ndk/25.2.9519653
@@ -117,34 +133,15 @@ jobs:
             -e CXX=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++
             -e AR=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
             -e ANDROID_NDK=/usr/local/lib/android/sdk/ndk/25.2.9519653
-      - name: Build armv7-linux-androideabi
-        if: ${{ inputs.target == 'armv7-linux-androideabi' }}
+      - name: Build Python Extension Module (non-docker && non-android)
+        if: ${{ inputs.publish != true && !inputs.docker && !contains(inputs.target,'android') }}
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ inputs.target }}
+          # builds in release mode with the specified python version as the interpreter and the Cargo.toml file as the manifest
           args: --release -i python3.13 -m Cargo.toml
-          docker-options: |
-            --mount type=bind,source=/usr/local/lib/android/sdk/ndk/25.2.9519653,target=/usr/local/lib/android/sdk/ndk/25.2.9519653
-            -e CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang
-            -e CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang
-            -e CC=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang
-            -e CXX=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang++
-            -e AR=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-            -e ANDROID_NDK=/usr/local/lib/android/sdk/ndk/25.2.9519653
-      - name: Setup x86 Python
-        if: ${{ inputs.target == 'i686-pc-windows-msvc' }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-          architecture: "x86"
-      - name: Build (non-docker &&non-android)
-        if: ${{ inputs.publish != 'true' && !inputs.docker && !contains(inputs.target,'android') }}
-        uses: PyO3/maturin-action@v1
-        with:
-          target: ${{ inputs.target }}
-          args: --release -i python3.13 -m Cargo.toml
-      - name: Publish (non-docker && non-android)
-        if: ${{ inputs.publish == 'true' && !inputs.docker && !contains(inputs.target,'android') }}
+      - name: Publish to PyPI (non-docker && non-android)
+        if: ${{ inputs.publish == true && !inputs.docker && !contains(inputs.target,'android') }}
         uses: PyO3/maturin-action@v1
         with:
           command: publish
@@ -154,5 +151,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bindings-${{ inputs.target }}
-          path: target/wheels/*.whl
+          path: target/wheels/*.whl # path to the python wheel package
           if-no-files-found: error
