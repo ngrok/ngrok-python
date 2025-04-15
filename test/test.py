@@ -413,7 +413,6 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         except requests.exceptions.ReadTimeout as err:
             pass
 
-        
         self.assertIn(b"PROXY TCP", ProxyHandler.read_value)
 
         await shutdown(listener, tcp_server)
