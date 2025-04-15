@@ -191,7 +191,7 @@ jobs:
             # make the rsync back faster
             rm -rf .env/ target/debug/ target/release/
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bindings-freebsd
           path: target/wheels/*.whl
