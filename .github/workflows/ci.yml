@@ -159,7 +159,7 @@ jobs:
           usesh: true
           mem: 3000
           prepare: |
-            pkg install -y -f curl libnghttp2 python3 yarn cmake
+            pkg install -y -f curl libnghttp2 python3 yarn cmake llvm
             alias curl="curl --retry 5 --retry-all-errors"
             curl https://sh.rustup.rs -sSf --output rustup.sh
             sh rustup.sh -y --profile minimal --default-toolchain beta
