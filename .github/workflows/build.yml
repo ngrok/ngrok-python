@@ -24,12 +24,13 @@ on:
 jobs:
   reusable-build:
     if: ${{ inputs.if }}
-    name: stable - ${{ inputs.target }} - node@18
+    name: stable - ${{ inputs.target }} - python@3.13
     runs-on: ${{ inputs.host }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Cache cargo
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry/index/
@@ -38,7 +39,8 @@ jobs:
             .cargo-cache
             target/
           key: ${{ inputs.target }}-cargo-${{ inputs.host }}
-      - uses: goto-bus-stop/setup-zig@v2
+      - name: Install zig
+        uses: goto-bus-stop/setup-zig@v2
         if: ${{ inputs.target == 'armv7-unknown-linux-gnueabihf' }}
         with:
           version: 0.10.0
@@ -106,7 +108,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ inputs.target }}
-          args: --release -i python3.9 -m Cargo.toml
+          args: --release -i python3.13 -m Cargo.toml
           docker-options: |
             --mount type=bind,source=/usr/local/lib/android/sdk/ndk/25.2.9519653,target=/usr/local/lib/android/sdk/ndk/25.2.9519653
             -e CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang
@@ -120,7 +122,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ inputs.target }}
-          args: --release -i python3.9 -m Cargo.toml
+          args: --release -i python3.13 -m Cargo.toml
           docker-options: |
             --mount type=bind,source=/usr/local/lib/android/sdk/ndk/25.2.9519653,target=/usr/local/lib/android/sdk/ndk/25.2.9519653
             -e CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=/usr/local/lib/android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang
@@ -131,25 +133,25 @@ jobs:
             -e ANDROID_NDK=/usr/local/lib/android/sdk/ndk/25.2.9519653
       - name: Setup x86 Python
         if: ${{ inputs.target == 'i686-pc-windows-msvc' }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.13"
           architecture: "x86"
-      - name: Build
+      - name: Build (non-docker &&non-android)
         if: ${{ inputs.publish != 'true' && !inputs.docker && !contains(inputs.target,'android') }}
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ inputs.target }}
-          args: --release -i python3.9 -m Cargo.toml
-      - name: Publish
+          args: --release -i python3.13 -m Cargo.toml
+      - name: Publish (non-docker && non-android)
         if: ${{ inputs.publish == 'true' && !inputs.docker && !contains(inputs.target,'android') }}
         uses: PyO3/maturin-action@v1
         with:
           command: publish
           target: ${{ inputs.target }}
-          args: --no-sdist -i python3.9 -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+          args: --no-sdist -i python3.13 -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bindings-${{ inputs.target }}
           path: target/wheels/*.whl

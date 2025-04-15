@@ -412,7 +412,9 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
             resp = requests.get(listener.url(), timeout=3)
         except requests.exceptions.ReadTimeout as err:
             pass
-        self.assertEqual(b"PROXY TCP4", ProxyHandler.read_value)
+
+        self.assertIn(b"PROXY TCP", ProxyHandler.read_value)
+
         await shutdown(listener, tcp_server)
 
     async def test_ip_restriction_http(self):

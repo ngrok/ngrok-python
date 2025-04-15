@@ -264,6 +264,14 @@ impl HttpListenerBuilder {
         self_
     }
 
+    /// Enable endpoint pooling for this listener.
+    pub fn pooling_enabled(self_: PyRefMut<Self>, pooling_enabled: bool) -> PyRefMut<Self> {
+        self_.set(|b| {
+            b.pooling_enabled(pooling_enabled);
+        });
+        self_
+    }
+
     /// WebhookVerification configuration.
     /// If not called, WebhookVerification is disabled.
     /// See `Webhook Verification`_ in the ngrok docs for additional details.
