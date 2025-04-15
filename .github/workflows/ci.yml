@@ -6,7 +6,7 @@ env:
 'on':
   push:
     branches:
-      - '**'
+      - 'main'
     tags-ignore:
       - '**'
     paths-ignore:
@@ -94,8 +94,8 @@ jobs:
     with:
       docker: ${{ matrix.settings.docker }}
       host: ${{ matrix.settings.host }}
-      if: ${{ matrix.settings.if || 'true' }}
-      publish: ${{ needs.decide.outputs.publish || 'false' }}
+      if: ${{ matrix.settings.if || true }}
+      publish: ${{ needs.decide.outputs.publish || false }}
       setup: ${{ matrix.settings.setup }}
       target: ${{ matrix.settings.target }}
     strategy:
