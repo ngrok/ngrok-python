@@ -1,67 +1,39 @@
 use core::result::Result as CoreResult;
-use std::{
-    collections::HashMap,
-    error::Error as StdError,
-    io,
-    sync::Arc,
-};
+use std::{collections::HashMap, error::Error as StdError, io, sync::Arc};
 
 // the lib.name and the pymodule below need to be 'ngrok' for that to be the python library
 // name, so this has to explicitly set this as a crate with the '::' prefix
-use ::ngrok::{
-    prelude::*,
-    tunnel::TcpTunnel,
-    Session,
-};
+use ::ngrok::{prelude::*, tunnel::TcpTunnel, Session};
 use async_trait::async_trait;
 use futures::prelude::*;
 use lazy_static::lazy_static;
 use ngrok::{
     forwarder::Forwarder,
     session::ConnectError,
-    tunnel::{
-        HttpTunnel,
-        LabeledTunnel,
-        TlsTunnel,
-    },
+    tunnel::{HttpTunnel, LabeledTunnel, TlsTunnel},
 };
+use once_cell::sync::Lazy;
 use pyo3::{
     intern,
-    once_cell::GILOnceCell,
     prelude::*,
-    pyclass,
-    pymethods,
-    types::{
-        PyDict,
-        PyString,
-        PyTuple,
-    },
+    pyclass, pymethods,
+    types::{PyDict, PyString, PyTuple},
+    Bound,
 };
 use regex::Regex;
-use tokio::{
-    sync::Mutex,
-    task::JoinHandle,
-};
-use tracing::{
-    debug,
-    info,
-};
+use tokio::{sync::Mutex, task::JoinHandle};
+use tracing::{debug, info};
 use url::Url;
 
 #[cfg(target_os = "windows")]
 use crate::wrapper::wrap_object;
 use crate::{
-    py_err,
-    py_ngrok_err,
-    wrapper::{
-        self,
-        bound_default_tcp_socket,
-        bound_default_unix_socket,
-    },
+    py_err, py_ngrok_err,
+    wrapper::{self, bound_default_tcp_socket, bound_default_unix_socket},
 };
 
 /// Python dictionary of id's to sockets.
-static SOCK_CELL: GILOnceCell<Py<PyDict>> = GILOnceCell::new();
+static SOCK_CELL: Lazy<Py<PyDict>> = Lazy::new(|| Python::with_gil(|py| PyDict::new(py).into()));
 
 // no forward host section to allow for relative unix paths
 pub(crate) const UNIX_PREFIX: &str = "unix:";
@@ -303,15 +275,15 @@ impl Listener {
     ///
     /// Forward incoming listener connections. This can be either a TCP address or a file socket path.
     /// For file socket paths on Linux/Darwin, addr can be a unix domain socket path, e.g. "/tmp/ngrok.sock".
-    pub fn forward<'a>(&self, py: Python<'a>, addr: String) -> PyResult<&'a PyAny> {
+    pub fn forward<'a>(&self, py: Python<'a>, addr: String) -> PyResult<Bound<'a, PyAny>> {
         let id = self.tun_meta.id.clone();
-        pyo3_asyncio::tokio::future_into_py(py, async move { forward(&id, addr).await })
+        pyo3_async_runtimes::tokio::future_into_py(py, async move { forward(&id, addr).await })
     }
 
     /// Wait for the forwarding task to exit.
-    pub fn join<'a>(&mut self, py: Python<'a>) -> PyResult<&'a PyAny> {
+    pub fn join<'a>(&mut self, py: Python<'a>) -> PyResult<Bound<'a, PyAny>> {
         let id = self.tun_meta.id.clone();
-        pyo3_asyncio::tokio::future_into_py(py, async move {
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let forwarder_option = &get_storage_by_id(&id).await?.forwarder;
             if let Some(forwarder_mutex) = forwarder_option {
                 forwarder_mutex
@@ -333,10 +305,10 @@ impl Listener {
     /// This is an RPC call that must be `.await`ed.
     /// It is equivalent to calling `Session::close_listener` with this
     /// listener's ID.
-    pub fn close<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+    pub fn close<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyAny>> {
         let session = self.session.clone();
         let id = self.tun_meta.id.clone();
-        pyo3_asyncio::tokio::future_into_py(py, async move {
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
             debug!("{} closing, id: {id:?}", stringify!($wrapper));
 
             // we may not be able to lock our reference to the listener due to the forward_* calls which
@@ -361,35 +333,40 @@ impl Listener {
     // for aiohttp case, proxy calls to socket
     #[getter]
     pub fn get_family(&self, py: Python) -> PyResult<Py<PyAny>> {
-        self.get_sock_attr(py, intern!(py, "family"))
+        let attr = intern!(py, "family").as_gil_ref();
+        self.get_sock_attr(py, attr)
     }
 
     pub fn getsockname(&self, py: Python) -> PyResult<Py<PyAny>> {
-        self.get_sock_attr(py, intern!(py, "getsockname"))?
-            .call0(py)
+        let attr = intern!(py, "getsockname").as_gil_ref();
+        self.get_sock_attr(py, attr)?.call0(py)
     }
 
     #[getter]
     pub fn get_type(&self, py: Python) -> PyResult<Py<PyAny>> {
-        self.get_sock_attr(py, intern!(py, "type"))
+        let attr = intern!(py, "type").as_gil_ref();
+        self.get_sock_attr(py, attr)
     }
 
     pub fn setblocking(&self, py: Python, blocking: bool) -> PyResult<Py<PyAny>> {
         let args = PyTuple::new(py, [blocking]);
-        self.get_sock_attr(py, intern!(py, "setblocking"))?
-            .call1(py, args)
+        let attr = intern!(py, "setblocking").as_gil_ref();
+        self.get_sock_attr(py, attr)?.call1(py, args)
     }
 
     pub fn fileno(&self, py: Python) -> PyResult<Py<PyAny>> {
-        self.get_sock_attr(py, intern!(py, "fileno"))?.call0(py)
+        let attr = intern!(py, "fileno").as_gil_ref();
+        self.get_sock_attr(py, attr)?.call0(py)
     }
 
     pub fn accept(&self, py: Python) -> PyResult<Py<PyAny>> {
-        self.get_sock_attr(py, intern!(py, "accept"))?.call0(py)
+        let attr = intern!(py, "accept").as_gil_ref();
+        self.get_sock_attr(py, attr)?.call0(py)
     }
 
     pub fn gettimeout(&self, py: Python) -> PyResult<Py<PyAny>> {
-        self.get_sock_attr(py, intern!(py, "gettimeout"))?.call0(py)
+        let attr = intern!(py, "gettimeout").as_gil_ref();
+        self.get_sock_attr(py, attr)?.call0(py)
     }
 
     pub fn listen(
@@ -435,13 +412,11 @@ impl Listener {
     }
 
     fn get_sock(&self, py: Python) -> PyResult<Py<PyAny>> {
-        let map: &PyDict = SOCK_CELL
-            .get_or_init(py, || PyDict::new(py).into())
-            .extract(py)?;
+        let map: &PyDict = SOCK_CELL.as_ref(py);
         let maybe_socket = map.get_item(&self.tun_meta.id);
         Ok(match maybe_socket {
-            Some(s) => s.into_py(py),
-            None => {
+            Ok(Some(s)) => s.into_py(py),
+            Ok(None) => {
                 // try unix first, fall back to tcp
                 let res = match bound_default_unix_socket(py) {
                     Ok(res) => res,
@@ -450,9 +425,10 @@ impl Listener {
                         bound_default_tcp_socket(py)?
                     }
                 };
-                map.set_item(self.tun_meta.id.clone(), res.clone())?;
+                map.set_item(self.tun_meta.id.clone(), res.clone_ref(py).into_py(py))?;
                 res
             }
+            Err(e) => return Err(e),
         })
     }
 
@@ -558,17 +534,16 @@ pub(crate) async fn remove_global_listener(id: &String) -> PyResult<()> {
 
     // remove any references to sockets
     Python::with_gil(|py| -> PyResult<()> {
-        if let Some(map) = SOCK_CELL.get(py) {
-            let dict: &PyDict = map.extract(py)?;
-            // close socket if it exists
-            let existing = dict.get_item(id);
-            if let Some(existing) = existing {
+        let dict: &PyDict = SOCK_CELL.extract(py)?;
+        // close socket if it exists
+        match dict.get_item(id) {
+            Ok(Some(existing)) => {
                 debug!("closing socket: {}", id);
                 existing.call_method0("close")?;
-
-                // delete reference
                 dict.del_item(id)?;
             }
+            Ok(None) => {}
+            Err(e) => return Err(e),
         }
         Ok(())
     })
@@ -624,8 +599,8 @@ pub fn get_listeners(py: Python) -> PyResult<Py<PyAny>> {
 }
 
 #[pyfunction]
-pub fn async_listeners(py: Python) -> PyResult<&PyAny> {
-    pyo3_asyncio::tokio::future_into_py(py, async move { list_listeners(None).await })
+pub fn async_listeners(py: Python) -> PyResult<Bound<'_, PyAny>> {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move { list_listeners(None).await })
 }
 
 // Helper class to implement the iterator protocol for listener sockets.

@@ -102,34 +102,42 @@ jobs:
       fail-fast: false
       matrix:
         settings:
-          - host: macos-latest
-            target: x86_64-apple-darwin
-          - host: windows-latest
-            target: x86_64-pc-windows-msvc
-          - host: windows-latest
-            target: i686-pc-windows-msvc
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-            docker: alpine:latest
+          # MACOS
           - host: macos-latest
             target: aarch64-apple-darwin
           - host: macos-latest
             target: universal2-apple-darwin
+          - host: macos-latest
+            target: x86_64-apple-darwin
+
+          # LINUX (ANDROID)
+          - host: ubuntu-latest
+            target: aarch64-linux-android
+
+          # LINUX
           - host: ubuntu-latest
             target: aarch64-unknown-linux-gnu
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-musl
           - host: ubuntu-latest
             target: armv7-unknown-linux-gnueabihf
             setup: |
               sudo apt-get update
               sudo apt-get install gcc-arm-linux-gnueabihf -y
           - host: ubuntu-latest
-            target: aarch64-linux-android
+            target: x86_64-unknown-linux-gnu
           - host: ubuntu-latest
-            target: aarch64-unknown-linux-musl
+            target: x86_64-unknown-linux-musl
+            docker: alpine:latest
+
+          # WINDOWS
           - host: windows-latest
             target: aarch64-pc-windows-msvc
+          - host: windows-latest
+            target: i686-pc-windows-msvc
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc 
+          
   build-freebsd:
     needs: decide
     runs-on: ubuntu-22.04
