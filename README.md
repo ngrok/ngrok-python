@@ -346,7 +346,7 @@ Pre-built binaries are provided on PyPI for the following platforms:
 
 | OS         | i686 | x64 | aarch64 | arm |
 | ---------- | -----|-----|---------|-----|
-| Windows    |   ✓  |  ✓  |    *    |     |
+| Windows    |   ✓  |  ✓  |    ✓    |     |
 | MacOS      |      |  ✓  |    ✓    |     |
 | Linux      |      |  ✓  |    ✓    |  ✓  |
 | Linux musl |      |  ✓  |    ✓    |     |
@@ -354,7 +354,6 @@ Pre-built binaries are provided on PyPI for the following platforms:
 
 > **Note**
 > `ngrok-python`, and [ngrok-rust](https://github.com/ngrok/ngrok-rust/) which it depends on, are open source, so it may be possible to build them for other platforms.
-> - Windows-aarch64 will be supported after the next release of [Ring](https://github.com/briansmith/ring/issues/1167).
 > - FreeBSD-x64 is built by the release process, but PyPI won't accept BSD flavors.
 
 # Dependencies

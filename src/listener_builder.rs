@@ -11,6 +11,7 @@ use parking_lot::Mutex;
 use pyo3::{
     pyclass,
     pymethods,
+    Bound,
     Py,
     PyAny,
     PyRefMut,
@@ -59,10 +60,10 @@ macro_rules! make_listener_builder {
             }
 
             /// Begin listening for new connections on this listener.
-            pub fn listen<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+            pub fn listen<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyAny>> {
                 let session = self.session.lock().clone();
                 let tun = self.listener_builder.lock().clone();
-                pyo3_asyncio::tokio::future_into_py(
+                pyo3_async_runtimes::tokio::future_into_py(
                     py,
                     async move {
                         $wrapper::do_listen(session, tun).await
@@ -78,12 +79,12 @@ macro_rules! make_listener_builder {
             /// :param to_url: The URL to forward traffic on to
             /// :return: A task to await for the :class:`Listener` linked with the server.
             /// :rtype: Task
-            pub fn listen_and_forward<'a>(&self, to_url: String, py: Python<'a>) -> PyResult<&'a PyAny> {
+            pub fn listen_and_forward<'a>(&self, to_url: String, py: Python<'a>) -> PyResult<Bound<'a, PyAny>> {
                 let url = Url::parse(&to_url).map_err(|e| py_err(format!("Url forward argument parse failure, {e}")))?;
                 let session = self.session.lock().clone();
                 let builder = self.listener_builder.lock().clone();
 
-                pyo3_asyncio::tokio::future_into_py(
+                pyo3_async_runtimes::tokio::future_into_py(
                     py,
                     async move {
                         let result = builder
@@ -110,7 +111,7 @@ macro_rules! make_listener_builder {
                 &self,
                 py: Python<'a>,
                 server: Py<PyAny>,
-            ) -> PyResult<&'a PyAny> {
+            ) -> PyResult<Bound<'a, PyAny>> {
                 let address = address_from_server(py, server)?;
                 return self.listen_and_forward(address, py)
             }

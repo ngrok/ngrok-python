@@ -25,6 +25,7 @@ use pyo3::{
     pyfunction,
     pymethods,
     types::PyByteArray,
+    Bound,
     PyAny,
     PyErr,
     PyObject,
@@ -106,8 +107,8 @@ impl SessionBuilder {
 
     /// Update the connector callback in the upstream rust sdk.
     fn update_connector(&self) {
-        // clone for move to connector function
-        let disconnect_handler = self.disconnect_handler.clone();
+        let disconnect_handler =
+            Python::with_gil(|py| self.disconnect_handler.as_ref().map(|h| h.clone_ref(py)));
 
         self.set(|b| {
             b.connector(
@@ -115,11 +116,13 @@ impl SessionBuilder {
                       port: u16,
                       tls_config: Arc<ClientConfig>,
                       err: Option<AcceptError>| {
-                    // clone for async move out of environment
-                    let disconn_fn = disconnect_handler.clone();
+                    let disconn_fn =
+                        Python::with_gil(|py| disconnect_handler.as_ref().map(|h| h.clone_ref(py)));
                     async move {
                         // call disconnect python handler
-                        if let Some(handler) = disconn_fn.clone() {
+                        if let Some(handler) =
+                            Python::with_gil(|py| disconn_fn.as_ref().map(|h| h.clone_ref(py)))
+                        {
                             if let Some(err) = err.clone() {
                                 Python::with_gil(|py| -> PyResult<()> {
                                     handler
@@ -337,7 +340,7 @@ impl SessionBuilder {
     pub fn handle_stop_command(self_: PyRefMut<'_, Self>, handler: PyObject) -> PyRefMut<'_, Self> {
         self_.set(|b| {
             b.handle_stop_command(move |_req| {
-                let handler = handler.clone();
+                let handler = Python::with_gil(|py| handler.clone_ref(py));
                 async move {
                     Python::with_gil(|py| -> PyResult<()> {
                         handler.call(py, (), None).map(|_o| ())
@@ -368,7 +371,7 @@ impl SessionBuilder {
     ) -> PyRefMut<'_, Self> {
         self_.set(|b| {
             b.handle_restart_command(move |_req| {
-                let handler = handler.clone();
+                let handler = Python::with_gil(|py| handler.clone_ref(py));
                 async move {
                     Python::with_gil(|py| -> PyResult<()> {
                         handler.call(py, (), None).map(|_o| ())
@@ -399,7 +402,7 @@ impl SessionBuilder {
     ) -> PyRefMut<'_, Self> {
         self_.set(|b| {
             b.handle_update_command(move |req: Update| {
-                let handler = handler.clone();
+                let handler = Python::with_gil(|py| handler.clone_ref(py));
                 async move {
                     Python::with_gil(|py| -> PyResult<()> {
                         handler
@@ -421,7 +424,7 @@ impl SessionBuilder {
     pub fn handle_heartbeat(self_: PyRefMut<'_, Self>, handler: PyObject) -> PyRefMut<'_, Self> {
         self_.set(|b| {
             b.handle_heartbeat(move |latency: Option<Duration>| {
-                let handler = handler.clone();
+                let handler = Python::with_gil(|py| handler.clone_ref(py));
                 let millis = latency.and_then(|d| u32::try_from(d.as_millis()).ok());
                 async move {
                     Python::with_gil(|py| -> PyResult<()> {
@@ -440,14 +443,13 @@ impl SessionBuilder {
     }
 
     /// Attempt to establish an ngrok session using the current configuration.
-    pub fn connect<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+    pub fn connect<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyAny>> {
         self.handle_default_auth_token();
         let builder = self.raw_builder.lock().clone();
         let auth_token_set = self.auth_token_set;
-        pyo3_asyncio::tokio::future_into_py(
-            py,
-            async move { do_connect(builder, auth_token_set).await },
-        )
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            do_connect(builder, auth_token_set).await
+        })
     }
 }
 
@@ -509,18 +511,17 @@ impl Session {
     }
 
     /// Retrieve a list of this session's non-closed Listeners, in no particular order.
-    pub fn get_listeners<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+    pub fn get_listeners<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyAny>> {
         let session_id = self.raw_session.lock().id();
-        pyo3_asyncio::tokio::future_into_py(
-            py,
-            async move { list_listeners(Some(session_id)).await },
-        )
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            list_listeners(Some(session_id)).await
+        })
     }
 
     /// Close a listener with the given ID.
-    pub fn close_listener<'a>(&self, py: Python<'a>, id: String) -> PyResult<&'a PyAny> {
+    pub fn close_listener<'a>(&self, py: Python<'a>, id: String) -> PyResult<Bound<'a, PyAny>> {
         let session = self.raw_session.lock().clone();
-        pyo3_asyncio::tokio::future_into_py(py, async move {
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let res = session
                 .close_tunnel(id.clone())
                 .await
@@ -535,9 +536,9 @@ impl Session {
     }
 
     /// Close the ngrok session.
-    pub fn close<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+    pub fn close<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyAny>> {
         let mut session = self.raw_session.lock().clone();
-        pyo3_asyncio::tokio::future_into_py(py, async move {
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
             session
                 .close()
                 .await

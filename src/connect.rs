@@ -14,6 +14,7 @@ use pyo3::{
         PyList,
         PyString,
     },
+    Bound,
     IntoPy,
     Py,
     PyAny,
@@ -57,7 +58,7 @@ macro_rules! plumb {
         plumb!($builder, $self, $config, $name, $name)
     };
     ($builder:tt, $self:tt, $config:tt, $name:tt, $config_name:tt) => {
-        if let Some(v) = $config.get_item(stringify!($config_name)) {
+        if let Some(v) = $config.get_item(stringify!($config_name))? {
             $builder::$name($self.borrow_mut(), get_string(v)?);
         }
     };
@@ -69,16 +70,17 @@ macro_rules! plumb_bool {
         plumb_bool!($builder, $self, $config, $name, $name)
     };
     ($builder:tt, $self:tt, $config:tt, $name:tt, $config_name:tt) => {
-        if let Some(v) = $config.get_item(stringify!($config_name)) {
+        if let Some(v) = $config.get_item(stringify!($config_name))? {
             if get_bool(v)? {
                 $builder::$name($self.borrow_mut());
             }
         }
     };
 }
+
 macro_rules! plumb_bool_2arg {
     ($builder:tt, $self:tt, $config:tt, $name:tt) => {
-        if let Some(v) = $config.get_item(stringify!($name)) {
+        if let Some(v) = $config.get_item(stringify!($name))? {
             $builder::$name($self.borrow_mut(), get_bool(v)?);
         }
     };
@@ -90,21 +92,21 @@ macro_rules! plumb_vec {
         plumb_vec!($builder, $self, $config, $name, $name)
     };
     ($builder:tt, $self:tt, $config:tt, $name:tt, $config_name:tt) => {
-        if let Some(v) = $config.get_item(stringify!($config_name)) {
+        if let Some(v) = $config.get_item(stringify!($config_name))? {
             for val in get_list(v)? {
                 $builder::$name($self.borrow_mut(), get_string(val)?);
             }
         }
     };
     ($builder:tt, $self:tt, $config:tt, $name:tt, $config_name:tt, vecu8) => {
-        if let Some(v) = $config.get_item(stringify!($config_name)) {
+        if let Some(v) = $config.get_item(stringify!($config_name))? {
             for val in get_list(v)? {
                 $builder::$name($self.borrow_mut(), get_byte_array(val)?);
             }
         }
     };
     ($builder:tt, $self:tt, $config:tt, $name:tt, $config_name:tt, $split:tt) => {
-        if let Some(v) = $config.get_item(stringify!($config_name)) {
+        if let Some(v) = $config.get_item(stringify!($config_name))? {
             for val in get_list(v)? {
                 let s = get_string(val)?;
                 let (a, b) = s.split_once($split).expect("split of value failed: ${val}");
@@ -209,7 +211,7 @@ pub fn forward(
     }
 
     // package up args to kwargs
-    if addr.is_some() || kwargs.get_item("addr").is_none() {
+    if addr.is_some() || kwargs.get_item("addr")?.is_none() {
         kwargs.set_item("addr", addr_str)?;
     }
     if proto.is_some() {
@@ -218,7 +220,7 @@ pub fn forward(
 
     // Remove all None's from kwargs to avoid casting problems on keys we will ignore
     for k in kwargs.keys() {
-        if let Some(v) = kwargs.get_item(k) {
+        if let Some(v) = kwargs.get_item(k)? {
             if v.is_none() {
                 kwargs.del_item(k)?;
             } else if get_string(k)?.contains('.') {
@@ -238,8 +240,11 @@ pub fn forward(
 }
 
 #[pyfunction]
-pub fn async_connect(py: Python, config: Py<PyDict>) -> PyResult<&PyAny> {
-    pyo3_asyncio::tokio::future_into_py(py, async move { do_connect(config).await })
+pub fn async_connect(py: Python, config: Py<PyDict>) -> PyResult<Bound<'_, PyAny>> {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        let result = do_connect(config).await;
+        Python::with_gil(|py| result.map(|obj| obj.into_py(py)))
+    })
 }
 
 fn configure_session(options: &Py<PyDict>) -> Result<SessionBuilder, PyErr> {
@@ -259,7 +264,7 @@ fn configure_session(options: &Py<PyDict>) -> Result<SessionBuilder, PyErr> {
 
 async fn do_connect(options: Py<PyDict>) -> PyResult<PyObject> {
     let force_new_session = Python::with_gil(|py| -> PyResult<bool> {
-        if let Some(v) = options.as_ref(py).get_item("force_new_session") {
+        if let Some(v) = options.as_ref(py).get_item("force_new_session")? {
             return get_bool(v);
         }
         Ok(false)
@@ -275,12 +280,17 @@ async fn do_connect(options: Py<PyDict>) -> PyResult<PyObject> {
     // decode address
     let addr = Python::with_gil(|py| -> PyResult<String> {
         // decode address string
-        get_string(options.as_ref(py).get_item("addr").expect("addr set"))
+        get_string(
+            options
+                .as_ref(py)
+                .get_item("addr")?
+                .ok_or_else(|| py_err("addr not set"))?,
+        )
     })?;
 
     // decode proto
     let proto = Python::with_gil(|py| -> PyResult<String> {
-        Ok(match options.as_ref(py).get_item("proto") {
+        Ok(match options.as_ref(py).get_item("proto")? {
             Some(p) => get_string(p)?,
             None => "http".to_string(),
         })
@@ -325,47 +335,45 @@ async fn http_endpoint(session: &Session, addr: String, options: Py<PyDict>) -> 
         plumb_vec!(B, bld, cfg, allow_user_agent, allow_user_agent);
         plumb_vec!(B, bld, cfg, deny_user_agent, deny_user_agent);
         // circuit breaker
-        if let Some(cb) = cfg.get_item("circuit_breaker") {
+        if let Some(cb) = cfg.get_item("circuit_breaker")? {
             let cb64 = cb.downcast::<PyFloat>()?.extract::<f64>()?;
             HttpListenerBuilder::circuit_breaker(bld.borrow_mut(), cb64);
         }
         // oauth
-        if let Some(provider) = cfg.get_item("oauth_provider") {
+        if let Some(provider) = cfg.get_item("oauth_provider")? {
             HttpListenerBuilder::oauth(
                 bld.borrow_mut(),
                 get_string(provider)?,
-                get_str_list(cfg.get_item("oauth_allow_emails"))?,
-                get_str_list(cfg.get_item("oauth_allow_domains"))?,
-                get_str_list(cfg.get_item("oauth_scopes"))?,
-                cfg.get_item("oauth_client_id")
-                    .map(get_string)
+                get_str_list(cfg.get_item("oauth_allow_emails")?)?,
+                get_str_list(cfg.get_item("oauth_allow_domains")?)?,
+                get_str_list(cfg.get_item("oauth_scopes")?)?,
+                cfg.get_item("oauth_client_id")?
+                    .map(|v| get_string(v))
                     .transpose()?,
-                cfg.get_item("oauth_client_secret")
-                    .map(get_string)
+                cfg.get_item("oauth_client_secret")?
+                    .map(|v| get_string(v))
                     .transpose()?,
             );
         }
         // oidc
-        if let Some(issuer_url) = cfg.get_item("oidc_issuer_url") {
-            let client_id = cfg.get_item("oidc_client_id").ok_or_else(|| {
-                py_err("Missing client id for oidc. oidc_client_id must be set if oidc_issuer_url is set")
-            })?;
-            let client_secret = cfg.get_item("oidc_client_secret").ok_or_else(|| {
-                py_err("Missing client secret for oidc. oidc_client_secret must be set if oidc_issuer_url is set")
-            })?;
+        if let Some(issuer_url) = cfg.get_item("oidc_issuer_url")? {
+            let client_id = cfg.get_item("oidc_client_id")?
+                .ok_or_else(|| py_err("Missing client id for oidc. oidc_client_id must be set if oidc_issuer_url is set"))?;
+            let client_secret = cfg.get_item("oidc_client_secret")?
+                .ok_or_else(|| py_err("Missing client secret for oidc. oidc_client_secret must be set if oidc_issuer_url is set"))?;
             HttpListenerBuilder::oidc(
                 bld.borrow_mut(),
                 get_string(issuer_url)?,
                 get_string(client_id)?,
                 get_string(client_secret)?,
-                get_str_list(cfg.get_item("oidc_allow_emails"))?,
-                get_str_list(cfg.get_item("oidc_allow_domains"))?,
-                get_str_list(cfg.get_item("oidc_scopes"))?,
+                get_str_list(cfg.get_item("oidc_allow_emails")?)?,
+                get_str_list(cfg.get_item("oidc_allow_domains")?)?,
+                get_str_list(cfg.get_item("oidc_scopes")?)?,
             );
         }
         // webhook verification
-        if let Some(provider) = cfg.get_item("verify_webhook_provider") {
-            if let Some(secret) = cfg.get_item("verify_webhook_secret") {
+        if let Some(provider) = cfg.get_item("verify_webhook_provider")? {
+            if let Some(secret) = cfg.get_item("verify_webhook_secret")? {
                 HttpListenerBuilder::webhook_verification(
                     bld.borrow_mut(),
                     get_string(provider)?,
@@ -404,8 +412,8 @@ async fn tls_endpoint(session: &Session, addr: String, options: Py<PyDict>) -> P
         plumb!(B, bld, cfg, domain);
         plumb_vec!(B, bld, cfg, mutual_tlsca, mutual_tls_cas, vecu8);
         // tls termination
-        if let Some(crt) = cfg.get_item("crt") {
-            if let Some(key) = cfg.get_item("key") {
+        if let Some(crt) = cfg.get_item("crt")? {
+            if let Some(key) = cfg.get_item("key")? {
                 TlsListenerBuilder::termination(
                     bld.borrow_mut(),
                     get_byte_array(crt)?,
@@ -468,16 +476,13 @@ pub fn disconnect(py: Python, url: Option<Py<PyString>>) -> PyResult<Py<PyAny>> 
 }
 
 #[pyfunction]
-pub fn async_disconnect(py: Python, url: Option<String>) -> PyResult<&PyAny> {
+pub fn async_disconnect(py: Python, url: Option<String>) -> PyResult<Bound<'_, PyAny>> {
     debug!("Disconnecting. url: {url:?}");
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         listener::close_url(url.clone()).await?;
-
-        // if closing every listener, remove any stored session
         if url.is_none() {
             SESSION.lock().await.take();
         }
-
         Ok(())
     })
 }
