@@ -16,38 +16,45 @@ on:
       - docs/**
   pull_request: null
 jobs:
-  setup:
-    name: Setup
+  udeps:
+    name: Udeps
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: jrobsonchase/direnv-action@v0.7
       - uses: ./.github/workflows/rust-cache
-      - uses: dtolnay/rust-toolchain@stable
-      
-  udeps:
-    name: Udeps
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - run: cargo udeps --workspace --all-targets --all-features
+      - uses: actions-rs/cargo@v1
+        with:
+          command: udeps
+          args: '--workspace --all-targets --all-features'
   fmt:
     name: Rustfmt
-    needs: setup
     runs-on: ubuntu-latest
     steps:
-      - run: cargo fmt --all -- --check
+      - uses: actions/checkout@v4
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: '--all -- --check'
   clippy:
     name: Clippy
-    needs: setup
     runs-on: ubuntu-latest
     steps:
-      - run: clippy --all-targets --all-features --workspace -- -D warnings
+      - uses: actions/checkout@v4
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: '--all-targets --all-features --workspace -- -D warnings'
   test:
     name: Test
-    needs: setup
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
       - name: Run Tests
         run: |
           NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
@@ -76,7 +83,6 @@ jobs:
 
   build:
     needs:
-      - setup
       - clippy
       - decide
       - fmt
