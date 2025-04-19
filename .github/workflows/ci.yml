@@ -27,18 +27,21 @@ jobs:
       
   udeps:
     name: Udeps
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: ./.github/workflows/ci.yml@setup
       - run: cargo udeps --workspace --all-targets --all-features
   fmt:
     name: Rustfmt
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: ./.github/workflows/ci.yml@setup
       - run: cargo fmt --all -- --check
   clippy:
     name: Clippy
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: ./.github/workflows/rust-cache
@@ -46,6 +49,7 @@ jobs:
       - run: clippy --all-targets --all-features --workspace -- -D warnings
   test:
     name: Test
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: ./.github/workflows/rust-cache
@@ -78,6 +82,7 @@ jobs:
 
   build:
     needs:
+      - setup
       - clippy
       - decide
       - fmt
