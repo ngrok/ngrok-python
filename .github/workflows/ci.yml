@@ -30,30 +30,24 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/ci.yml@setup
       - run: cargo udeps --workspace --all-targets --all-features
   fmt:
     name: Rustfmt
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/ci.yml@setup
       - run: cargo fmt --all -- --check
   clippy:
     name: Clippy
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/rust-cache
-      - uses: ./.github/workflows/ci.yml@setup
       - run: clippy --all-targets --all-features --workspace -- -D warnings
   test:
     name: Test
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/rust-cache
-      - uses: ./.github/workflows/ci.yml@setup
       - name: Run Tests
         run: |
           NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
