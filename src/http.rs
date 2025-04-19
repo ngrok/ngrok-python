@@ -1,8 +1,16 @@
 use std::str::FromStr;
 
 use bytes::Bytes;
-use ngrok::config::{OauthOptions, OidcOptions, Scheme};
-use pyo3::{pymethods, types::PyByteArray, PyRefMut};
+use ngrok::config::{
+    OauthOptions,
+    OidcOptions,
+    Scheme,
+};
+use pyo3::{
+    pymethods,
+    types::PyByteArray,
+    PyRefMut,
+};
 
 use crate::listener_builder::HttpListenerBuilder;
 

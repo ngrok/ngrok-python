@@ -1,35 +1,64 @@
 use core::result::Result as CoreResult;
-use std::{collections::HashMap, error::Error as StdError, io, sync::Arc};
+use std::{
+    collections::HashMap,
+    error::Error as StdError,
+    io,
+    sync::Arc,
+};
 
 // the lib.name and the pymodule below need to be 'ngrok' for that to be the python library
 // name, so this has to explicitly set this as a crate with the '::' prefix
-use ::ngrok::{prelude::*, tunnel::TcpTunnel, Session};
+use ::ngrok::{
+    prelude::*,
+    tunnel::TcpTunnel,
+    Session,
+};
 use async_trait::async_trait;
 use futures::prelude::*;
 use lazy_static::lazy_static;
 use ngrok::{
     forwarder::Forwarder,
     session::ConnectError,
-    tunnel::{HttpTunnel, LabeledTunnel, TlsTunnel},
+    tunnel::{
+        HttpTunnel,
+        LabeledTunnel,
+        TlsTunnel,
+    },
 };
 use once_cell::sync::Lazy;
 use pyo3::{
     intern,
     prelude::*,
-    pyclass, pymethods,
-    types::{PyDict, PyString, PyTuple},
+    pyclass,
+    pymethods,
+    types::{
+        PyDict,
+        PyString,
+        PyTuple,
+    },
     Bound,
 };
 use regex::Regex;
-use tokio::{sync::Mutex, task::JoinHandle};
-use tracing::{debug, info};
+use tokio::{
+    sync::Mutex,
+    task::JoinHandle,
+};
+use tracing::{
+    debug,
+    info,
+};
 use url::Url;
 
 #[cfg(target_os = "windows")]
 use crate::wrapper::wrap_object;
 use crate::{
-    py_err, py_ngrok_err,
-    wrapper::{self, bound_default_tcp_socket, bound_default_unix_socket},
+    py_err,
+    py_ngrok_err,
+    wrapper::{
+        self,
+        bound_default_tcp_socket,
+        bound_default_unix_socket,
+    },
 };
 
 /// Python dictionary of id's to sockets.

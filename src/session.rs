@@ -1,4 +1,9 @@
-use std::{borrow::BorrowMut, env, sync::Arc, time::Duration};
+use std::{
+    borrow::BorrowMut,
+    env,
+    sync::Arc,
+    time::Duration,
+};
 
 // the lib.name and the pymodule below need to be 'ngrok' for that to be the python library
 // name, so this has to explicitly set this as a crate with the '::' prefix
@@ -6,21 +11,44 @@ use ::ngrok::session::Session as NgrokSession;
 use bytes::Bytes;
 use lazy_static::lazy_static;
 use ngrok::{
-    session::{default_connect, ConnectError, SessionBuilder as NgrokSessionBuilder, Update},
+    session::{
+        default_connect,
+        ConnectError,
+        SessionBuilder as NgrokSessionBuilder,
+        Update,
+    },
     tunnel::AcceptError,
 };
 use parking_lot::Mutex as SyncMutex;
 use pyo3::{
-    pyclass, pyfunction, pymethods, types::PyByteArray, Bound, PyAny, PyErr, PyObject, PyRefMut,
-    PyResult, Python,
+    pyclass,
+    pyfunction,
+    pymethods,
+    types::PyByteArray,
+    Bound,
+    PyAny,
+    PyErr,
+    PyObject,
+    PyRefMut,
+    PyResult,
+    Python,
 };
 use rustls::ClientConfig;
-use tracing::{debug, info};
+use tracing::{
+    debug,
+    info,
+};
 
 use crate::{
-    listener::{list_listeners, remove_global_listener},
+    listener::{
+        list_listeners,
+        remove_global_listener,
+    },
     listener_builder::{
-        HttpListenerBuilder, LabeledListenerBuilder, TcpListenerBuilder, TlsListenerBuilder,
+        HttpListenerBuilder,
+        LabeledListenerBuilder,
+        TcpListenerBuilder,
+        TlsListenerBuilder,
     },
     py_ngrok_err,
 };

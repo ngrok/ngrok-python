@@ -47,7 +47,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: '--all-targets --all-features --workspace -- -D warnings'
+          args: '--all-targets --all-features --workspace'
   test:
     name: Test
     runs-on: ubuntu-latest

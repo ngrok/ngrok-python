@@ -1,14 +1,36 @@
-use std::{str::FromStr, sync::Arc};
+use std::{
+    str::FromStr,
+    sync::Arc,
+};
 
-use ngrok::{prelude::*, Session};
+use ngrok::{
+    prelude::*,
+    Session,
+};
 use parking_lot::Mutex;
-use pyo3::{pyclass, pymethods, Bound, Py, PyAny, PyRefMut, PyResult, Python};
+use pyo3::{
+    pyclass,
+    pymethods,
+    Bound,
+    Py,
+    PyAny,
+    PyRefMut,
+    PyResult,
+    Python,
+};
 use tracing::debug;
 use url::Url;
 
 use crate::{
-    listener::{HttpListener, LabeledListener, Listener, TcpListener, TlsListener},
-    py_err, py_ngrok_err,
+    listener::{
+        HttpListener,
+        LabeledListener,
+        Listener,
+        TcpListener,
+        TlsListener,
+    },
+    py_err,
+    py_ngrok_err,
     wrapper::address_from_server,
 };
 

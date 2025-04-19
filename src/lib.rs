@@ -1,20 +1,49 @@
 use ::ngrok::prelude::Error;
 use listener::Listener;
 use listener_builder::{
-    HttpListenerBuilder, LabeledListenerBuilder, TcpListenerBuilder, TlsListenerBuilder,
+    HttpListenerBuilder,
+    LabeledListenerBuilder,
+    TcpListenerBuilder,
+    TlsListenerBuilder,
 };
 use pyo3::{
-    exceptions::PyValueError, pymodule, types::PyModule, wrap_pyfunction, PyErr, PyResult, Python,
+    exceptions::PyValueError,
+    pymodule,
+    types::PyModule,
+    wrap_pyfunction,
+    PyErr,
+    PyResult,
+    Python,
 };
-use session::{Session, SessionBuilder};
+use session::{
+    Session,
+    SessionBuilder,
+};
 use tracing::debug;
 
 use crate::{
-    connect::{async_connect, async_disconnect, connect as connect_fn, disconnect, forward, kill},
-    listener::{async_listeners, get_listeners},
+    connect::{
+        async_connect,
+        async_disconnect,
+        connect as connect_fn,
+        disconnect,
+        forward,
+        kill,
+    },
+    listener::{
+        async_listeners,
+        get_listeners,
+    },
     logging::log_level,
     session::set_auth_token,
-    wrapper::{default, fd, getsockname, listen, pipe_name, werkzeug_develop},
+    wrapper::{
+        default,
+        fd,
+        getsockname,
+        listen,
+        pipe_name,
+        werkzeug_develop,
+    },
 };
 
 pub mod connect;

@@ -1,19 +1,49 @@
 use lazy_static::lazy_static;
-use log::{debug, info};
+use log::{
+    debug,
+    info,
+};
 use pyo3::{
     pyfunction,
-    types::{PyBool, PyByteArray, PyDict, PyFloat, PyInt, PyList, PyString},
-    Bound, IntoPy, Py, PyAny, PyCell, PyDowncastError, PyErr, PyObject, PyResult, Python,
+    types::{
+        PyBool,
+        PyByteArray,
+        PyDict,
+        PyFloat,
+        PyInt,
+        PyList,
+        PyString,
+    },
+    Bound,
+    IntoPy,
+    Py,
+    PyAny,
+    PyCell,
+    PyDowncastError,
+    PyErr,
+    PyObject,
+    PyResult,
+    Python,
 };
 use tokio::sync::Mutex;
 
 use crate::{
-    listener::{self, Listener, TCP_PREFIX},
+    listener::{
+        self,
+        Listener,
+        TCP_PREFIX,
+    },
     listener_builder::{
-        HttpListenerBuilder, LabeledListenerBuilder, TcpListenerBuilder, TlsListenerBuilder,
+        HttpListenerBuilder,
+        LabeledListenerBuilder,
+        TcpListenerBuilder,
+        TlsListenerBuilder,
     },
     py_err,
-    session::{Session, SessionBuilder},
+    session::{
+        Session,
+        SessionBuilder,
+    },
     wrapper,
 };
 
