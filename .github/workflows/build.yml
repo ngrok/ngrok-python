@@ -1,9 +1,6 @@
 on:
   workflow_call:
     inputs:
-      docker:
-        required: false
-        type: string
       host:
         required: true
         type: string
@@ -46,7 +43,7 @@ jobs:
         uses: mlugg/setup-zig@v1
         if: ${{ inputs.target == 'armv7-unknown-linux-gnueabihf' }}
         with:
-          version: 0.10.0
+          version: 0.13.0
       - name: Setup toolchain
         run: ${{ inputs.setup }}
         if: ${{ inputs.setup }}
@@ -60,68 +57,15 @@ jobs:
         with:
           python-version: "3.12"
           architecture: "x86"
-      - name: Build and Publish x86_64-unknown-linux-musl
-        uses: addnab/docker-run-action@v3
-        if: ${{ inputs.target == 'x86_64-unknown-linux-musl' }}
-        with:
-          image: ${{ inputs.docker }}
-          options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
-          run: |
-            pwd
-            ls -lah
-            whoami
-            env
-            echo "apk add:"
-            apk add musl-dev gcc make cmake clang llvm build-base python3
-            echo "apk update:"
-            apk update
-            # adds the cargo bin to the path
-            export PATH="/usr/bin/cargo:$PATH"
-            echo "create venv:"
-            python3 -m venv .env
-            . .env/bin/activate && pip install -r requirements.txt
-            . .env/bin/activate && pip install patchelf
-            if [ "${SHOULD_PUBLISH}" == 'true' ]; then
-              echo "~~~~ maturin publishing"
-              . .env/bin/activate && maturin publish --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
-            else
-              echo "~~~~ maturin building"
-              . .env/bin/activate && maturin build
-            fi
-            # shows the current directory
-            pwd
-            # shows all files with their permissions and sizes
-            ls -lah
-            # shows the current user
-            whoami
-            # prints the environment variables
-            env
-            # installs the minimal Rust toolchain profile
-            curl --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
-            # adds the cargo bin to the path
-            export PATH="$HOME/.cargo/bin:$PATH"
-            rustup target add aarch64-unknown-linux-gnu
-            python3 -m venv .env
-            . .env/bin/activate && pip install -r requirements.txt
-            . .env/bin/activate && pip install patchelf
-            # this is in raw 'sh', use single '='
-            if [ "${SHOULD_PUBLISH}" = 'true' ]; then
-              echo "~~~~ maturin publishing"
-              # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
-              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
-            else
-              echo "~~~~ maturin building"
-              . .env/bin/activate && maturin build --target ${{ inputs.target }}
-            fi
-      - name: Build Python Extension Module (non-docker)
-        if: ${{ inputs.publish != true && !inputs.docker  }}
+      - name: Build Python Extension Module
+        if: ${{ inputs.publish != true }}
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ inputs.target }}
           # builds in release mode with the specified python version as the interpreter and the Cargo.toml file as the manifest
           args: --release -i python3.12 -m Cargo.toml
-      - name: Publish to PyPI (non-docker)
-        if: ${{ inputs.publish == true && !inputs.docker }}
+      - name: Publish to PyPI
+        if: ${{ inputs.publish == true }}
         uses: PyO3/maturin-action@v1
         with:
           command: publish

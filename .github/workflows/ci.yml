@@ -1,9 +1,8 @@
 name: CI
 env:
-  DEBUG: napi:*
   APP_NAME: ngrok
   MACOSX_DEPLOYMENT_TARGET: '10.13'
-'on':
+on:
   push:
     branches:
       - 'main'
@@ -17,45 +16,40 @@ env:
       - docs/**
   pull_request: null
 jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
+      - uses: dtolnay/rust-toolchain@stable
+      
   udeps:
     name: Udeps
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - uses: ./.github/workflows/rust-cache
-      - uses: actions-rs/cargo@v1
-        with:
-          command: udeps
-          args: '--workspace --all-targets --all-features'
+      - uses: ./.github/workflows/ci.yml@setup
+      - run: cargo udeps --workspace --all-targets --all-features
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: '--all -- --check'
+      - uses: ./.github/workflows/ci.yml@setup
+      - run: cargo fmt --all -- --check
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
       - uses: ./.github/workflows/rust-cache
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: '--all-targets --all-features --workspace -- -D warnings'
+      - uses: ./.github/workflows/ci.yml@setup
+      - run: clippy --all-targets --all-features --workspace -- -D warnings
   test:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
       - uses: ./.github/workflows/rust-cache
+      - uses: ./.github/workflows/ci.yml@setup
       - name: Run Tests
         run: |
           NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
@@ -92,7 +86,6 @@ jobs:
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
-      docker: ${{ matrix.settings.docker }}
       host: ${{ matrix.settings.host }}
       if: true
       publish: ${{ needs.decide.outputs.publish || false }}
@@ -128,7 +121,6 @@ jobs:
             target: x86_64-unknown-linux-gnu
           - host: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            docker: alpine:latest
 
           # WINDOWS
           - host: windows-latest
@@ -152,13 +144,12 @@ jobs:
         id: build
         uses: vmactions/freebsd-vm@v1
         env:
-          DEBUG: napi:*
           RUSTUP_HOME: /usr/local/rustup
           CARGO_HOME: /usr/local/cargo
           RUSTUP_IO_THREADS: 1
           SHOULD_PUBLISH: ${{ needs.decide.outputs.publish }}
         with:
-          envs: DEBUG RUSTUP_HOME CARGO_HOME RUSTUP_IO_THREADS SHOULD_PUBLISH
+          envs: RUSTUP_HOME CARGO_HOME RUSTUP_IO_THREADS SHOULD_PUBLISH
           usesh: true
           mem: 3000
           prepare: |
