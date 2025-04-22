@@ -72,9 +72,10 @@ jobs:
             whoami
             env
             echo "apk add:"
-            apk add python3-dev
+            apk add musl-dev gcc make cmake clang llvm build-base python3-dev
             echo "apk update:"
             apk update
+            rustup target add x86_64-unknown-linux-musl
             echo "create venv:"
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
