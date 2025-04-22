@@ -41,3 +41,4 @@ build-backend = "maturin"
 
 [tool.maturin]
 python-source = "python"
+features = ["pyo3/generate-import-lib"]
