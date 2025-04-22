@@ -46,7 +46,7 @@ jobs:
         uses: mlugg/setup-zig@v1
         if: ${{ inputs.target == 'armv7-unknown-linux-gnueabihf' }}
         with:
-          version: 0.13.0
+          version: 0.10.0
       - name: Setup toolchain
         run: ${{ inputs.setup }}
         if: ${{ inputs.setup }}
