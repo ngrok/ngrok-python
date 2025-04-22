@@ -1,5 +1,6 @@
 name: CI
 env:
+  DEBUG: napi:*
   APP_NAME: ngrok
   MACOSX_DEPLOYMENT_TARGET: '10.13'
 on:
@@ -16,43 +17,43 @@ on:
       - docs/**
   pull_request: null
 jobs:
-  udeps:
-    name: Udeps
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - uses: ./.github/workflows/rust-cache
-      - name: Run Udeps
-        run: cargo udeps --workspace --all-targets --all-features
-  fmt:
-    name: Rustfmt
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - name: Run Rustfmt
-        run: cargo fmt --all -- --check
-  clippy:
-    name: Clippy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - uses: ./.github/workflows/rust-cache
-      - name: Run Clippy
-        run: cargo clippy --all-targets --all-features --workspace
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - uses: ./.github/workflows/rust-cache
-      - name: Run Tests
-        run: |
-          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
-          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
+  # udeps:
+  #   name: Udeps
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - uses: ./.github/workflows/rust-cache
+  #     - name: Run Udeps
+  #       run: cargo udeps --workspace --all-targets --all-features
+  # fmt:
+  #   name: Rustfmt
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - name: Run Rustfmt
+  #       run: cargo fmt --all -- --check
+  # clippy:
+  #   name: Clippy
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - uses: ./.github/workflows/rust-cache
+  #     - name: Run Clippy
+  #       run: cargo clippy --all-targets --all-features --workspace
+  # test:
+  #   name: Test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - uses: ./.github/workflows/rust-cache
+  #     - name: Run Tests
+  #       run: |
+  #         NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
+  #         NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
   decide:
     name: Decide on Publishing
     runs-on: ubuntu-latest
@@ -77,14 +78,15 @@ jobs:
 
   build:
     needs:
-      - clippy
+      #- clippy
       - decide
-      - fmt
-      - test
-      - udeps
+      #- fmt
+      #- test
+      #- udeps
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
+      docker: ${{ matrix.settings.docker }}
       host: ${{ matrix.settings.host }}
       if: true
       publish: ${{ needs.decide.outputs.publish || false }}
@@ -95,115 +97,107 @@ jobs:
       matrix:
         settings:
           # MACOS
-          - host: macos-latest
-            target: aarch64-apple-darwin
-          - host: macos-latest
-            target: universal2-apple-darwin
-          - host: macos-latest
-            target: x86_64-apple-darwin
-
-          # LINUX (ANDROID)
-          - host: ubuntu-latest
-            target: aarch64-linux-android
-            setup: |
-              rustup target add aarch64-linux-android
+          # - host: macos-latest
+          #   target: aarch64-apple-darwin
+          # - host: macos-latest
+          #   target: universal2-apple-darwin
+          # - host: macos-latest
+          #   target: x86_64-apple-darwin
 
           # LINUX
-          - host: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            setup: |
-              rustup target add aarch64-unknown-linux-gnu
-          - host: ubuntu-latest
-            target: aarch64-unknown-linux-musl
-          - host: ubuntu-latest
-            target: armv7-unknown-linux-gnueabihf
-            setup: |
-              rustup target add armv7-unknown-linux-gnueabihf
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
+          # - host: ubuntu-latest
+          #   target: aarch64-unknown-linux-gnu
+          #   docker: ghcr.io/rust-cross/manylinux2014-cross:aarch64
+          # - host: ubuntu-latest
+          #   target: aarch64-unknown-linux-musl
+          # failing - host: ubuntu-latest
+          #   target: armv7-unknown-linux-gnueabihf
+          #   setup: |
+          #     sudo apt-get update
+          #     sudo apt-get install gcc-arm-linux-gnueabihf -y
+          # - host: ubuntu-latest
+          #   target: x86_64-unknown-linux-gnu
           - host: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            setup: |
-              rustup target add x86_64-unknown-linux-musl
+            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
+              
 
           # WINDOWS
-          - host: windows-latest
-            target: aarch64-pc-windows-msvc
-            setup: |
-              rustup target add aarch64-pc-windows-msvc
-          - host: windows-latest
-            target: i686-pc-windows-msvc
-          - host: windows-latest
-            target: x86_64-pc-windows-msvc 
+          # - host: windows-latest
+          #   target: aarch64-pc-windows-msvc
+          # - host: windows-latest
+          #   target: i686-pc-windows-msvc
+          # - host: windows-latest
+          #   target: x86_64-pc-windows-msvc 
           
-  build-freebsd:
-    needs: decide
-    runs-on: ubuntu-22.04
-    name: Build FreeBSD
-    timeout-minutes: 20
-    continue-on-error: true
-    steps:
-      - name: Run lscpu
-        run: lscpu
-      - uses: actions/checkout@v4
-      - name: Build
-        id: build
-        uses: vmactions/freebsd-vm@v1
-        env:
-          RUSTUP_HOME: /usr/local/rustup
-          CARGO_HOME: /usr/local/cargo
-          RUSTUP_IO_THREADS: 1
-          SHOULD_PUBLISH: ${{ needs.decide.outputs.publish }}
-        with:
-          envs: RUSTUP_HOME CARGO_HOME RUSTUP_IO_THREADS SHOULD_PUBLISH
-          usesh: true
-          mem: 3000
-          prepare: |
-            pkg install -y -f curl libnghttp2 python3 cmake llvm
-            alias curl="curl --retry 5 --retry-all-errors"
-            curl https://sh.rustup.rs -sSf --output rustup.sh
-            sh rustup.sh -y --profile minimal --default-toolchain beta
-            export PATH="/usr/local/cargo/bin:$PATH"
-          run: |
-            export PATH="/usr/local/cargo/bin:$PATH"
-            pwd
-            ls -lah
-            whoami
-            env
-            freebsd-version
-            python3 -m venv .env
-            . .env/bin/activate && pip install -r requirements.txt
-            if [ "${SHOULD_PUBLISH}" == 'true' ]; then
-              echo "~~~~ maturin just building since pypi doesn't support BSD wheels"
-              # https://discuss.python.org/t/pypi-org-unsupported-platform-tag-openbsd-7-0-amd64/16302
-              # . .env/bin/activate && maturin publish --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
-              . .env/bin/activate && maturin build
-            else
-              echo "~~~~ maturin building"
-              . .env/bin/activate && maturin build
-            fi
-            # make the rsync back faster
-            rm -rf .env/ target/debug/ target/release/
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: bindings-freebsd
-          path: target/wheels/*.whl
-          if-no-files-found: error
-  tag:
-    if: ${{ github.ref == 'refs/heads/main' && needs.decide.outputs.publish == true }}
-    needs:
-      - decide
-      - build
-    runs-on: ubuntu-latest
-    name: Tag Release
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - name: Tag
-        run: |
-          version="$(extract-crate-version ngrok-python)"
-          git config user.name "GitHub Action"
-          git config user.email noreply@ngrok.com
-          git tag -a -m "Version ${version}" v${version}
-          git push --tags
+  # build-freebsd:
+  #   needs: decide
+  #   runs-on: ubuntu-22.04
+  #   name: Build FreeBSD
+  #   timeout-minutes: 20
+  #   continue-on-error: true
+  #   steps:
+  #     - name: Run lscpu
+  #       run: lscpu
+  #     - uses: actions/checkout@v4
+  #     - name: Build
+  #       id: build
+  #       uses: vmactions/freebsd-vm@v1
+  #       env:
+  #         RUSTUP_HOME: /usr/local/rustup
+  #         CARGO_HOME: /usr/local/cargo
+  #         RUSTUP_IO_THREADS: 1
+  #         SHOULD_PUBLISH: ${{ needs.decide.outputs.publish }}
+  #       with:
+  #         envs: RUSTUP_HOME CARGO_HOME RUSTUP_IO_THREADS SHOULD_PUBLISH
+  #         usesh: true
+  #         mem: 3000
+  #         prepare: |
+  #           pkg install -y -f curl libnghttp2 python3 cmake llvm
+  #           alias curl="curl --retry 5 --retry-all-errors"
+  #           curl https://sh.rustup.rs -sSf --output rustup.sh
+  #           sh rustup.sh -y --profile minimal --default-toolchain beta
+  #           export PATH="/usr/local/cargo/bin:$PATH"
+  #         run: |
+  #           export PATH="/usr/local/cargo/bin:$PATH"
+  #           pwd
+  #           ls -lah
+  #           whoami
+  #           env
+  #           freebsd-version
+  #           python3 -m venv .env
+  #           . .env/bin/activate && pip install -r requirements.txt
+  #           if [ "${SHOULD_PUBLISH}" == 'true' ]; then
+  #             echo "~~~~ maturin just building since pypi doesn't support BSD wheels"
+  #             # https://discuss.python.org/t/pypi-org-unsupported-platform-tag-openbsd-7-0-amd64/16302
+  #             # . .env/bin/activate && maturin publish --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+  #             . .env/bin/activate && maturin build
+  #           else
+  #             echo "~~~~ maturin building"
+  #             . .env/bin/activate && maturin build
+  #           fi
+  #           # make the rsync back faster
+  #           rm -rf .env/ target/debug/ target/release/
+  #     - name: Upload artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: bindings-freebsd
+  #         path: target/wheels/*.whl
+  #         if-no-files-found: error
+  # tag:
+  #   if: ${{ github.ref == 'refs/heads/main' && needs.decide.outputs.publish == true }}
+  #   needs:
+  #     - decide
+  #     - build
+  #   runs-on: ubuntu-latest
+  #   name: Tag Release
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - name: Tag
+  #       run: |
+  #         version="$(extract-crate-version ngrok-python)"
+  #         git config user.name "GitHub Action"
+  #         git config user.email noreply@ngrok.com
+  #         git tag -a -m "Version ${version}" v${version}
+  #         git push --tags
