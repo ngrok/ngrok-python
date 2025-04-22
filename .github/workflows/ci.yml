@@ -126,6 +126,8 @@ jobs:
           # WINDOWS
           - host: windows-latest
             target: aarch64-pc-windows-msvc
+            setup: |
+              export XWIN_VERSION=16
           - host: windows-latest
             target: i686-pc-windows-msvc
           - host: windows-latest
