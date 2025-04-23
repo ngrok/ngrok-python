@@ -60,17 +60,6 @@ jobs:
         with:
           python-version: "3.12"
           architecture: "x86"
-      - name: Setup ARM64 Windows cross-compilation
-        if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
-        run: |
-          # Install ARM64 Windows SDK
-          choco install windows-sdk-10-version-2004-windbg-arm64
-          
-          # Set up environment variables
-          echo "LLVM_ROOT=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\Llvm" >> $env:GITHUB_ENV
-          echo "CARGO_TARGET_AARCH64_PC_WINDOWS_MSVC_LINKER=clang-cl" >> $env:GITHUB_ENV
-          echo "CC_aarch64_pc_windows_msvc=clang-cl" >> $env:GITHUB_ENV
-          echo "CXX_aarch64_pc_windows_msvc=clang-cl" >> $env:GITHUB_ENV
       - name: Build Python Extension Module (ARM64 Windows)
         if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
         uses: PyO3/maturin-action@v1
