@@ -60,34 +60,6 @@ jobs:
         with:
           python-version: "3.12"
           architecture: "x86"
-      - name: Setup arm64 Python for aarch64-pc-windows-msvc
-        if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
-        run: |
-          # Download Python installer
-          curl -O https://www.python.org/ftp/python/3.12.10/python-3.12.10-arm64.exe
-          
-          # Install Python with necessary components
-          ./python-3.12.10-arm64.exe /quiet InstallAllUsers=1 PrependPath=1 Include_launcher=1 Include_test=0 Include_pip=1 Include_dev=1
-          
-          # Verify Python installation
-          python --version
-          pip --version
-      - name: Setup Windows Build Environment
-        if: ${{ contains(inputs.target, 'windows') }}
-        run: |
-          # Set environment variables for Python and Windows SDK
-          $env:LIB = "C:\hostedtoolcache\windows\Python\3.12.10\x64\libs;$env:LIB"
-          $env:WindowsSdkDir = "C:\Program Files (x86)\Windows Kits\10"
-          $env:WindowsSdkVersion = "10.0.22621.0"
-          $env:WindowsSdkBinPath = "$env:WindowsSdkDir\bin\$env:WindowsSdkVersion"
-          $env:VCToolsVersion = "14.42.34438"
-          $env:VCToolsInstallDir = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\$env:VCToolsVersion"
-          $env:PATH = "$env:VCToolsInstallDir\bin\Hostx64\x64;$env:WindowsSdkBinPath\x64;$env:PATH"
-          
-          # Verify environment setup
-          echo "Python LIB path: $env:LIB"
-          echo "Windows SDK Version: $env:WindowsSdkVersion"
-          echo "Visual C++ Tools Version: $env:VCToolsVersion"
       - name: Build and (Publish) x86_64-unknown-linux-musl
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'x86_64-unknown-linux-musl' }}
@@ -150,14 +122,14 @@ jobs:
             fi
       - name: Build Python Extension Module (non-docker)
         if: ${{ inputs.publish != true && !inputs.docker && !contains(inputs.target,'android') }}
-        uses: PyO3/maturin-action@v1
+        uses: PyO3/maturin-action@v1.6.0
         with:
           target: ${{ inputs.target }}
           # builds in release mode with the specified python version as the interpreter and the Cargo.toml file as the manifest
           args: --release -i python3.12 --target ${{ inputs.target }} -m Cargo.toml
       - name: Publish to PyPI (non-docker)
         if: ${{ inputs.publish == true && !inputs.docker && !contains(inputs.target,'android') }}
-        uses: PyO3/maturin-action@v1
+        uses: PyO3/maturin-action@v1.6.0
         with:
           command: publish
           target: ${{ inputs.target }}

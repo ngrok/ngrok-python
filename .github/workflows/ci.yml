@@ -17,43 +17,43 @@ on:
       - docs/**
   pull_request: null
 jobs:
-  # udeps:
-  #   name: Udeps
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: jrobsonchase/direnv-action@v0.7
-  #     - uses: ./.github/workflows/rust-cache
-  #     - name: Run Udeps
-  #       run: cargo udeps --workspace --all-targets --all-features
-  # fmt:
-  #   name: Rustfmt
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: jrobsonchase/direnv-action@v0.7
-  #     - name: Run Rustfmt
-  #       run: cargo fmt --all -- --check
-  # clippy:
-  #   name: Clippy
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: jrobsonchase/direnv-action@v0.7
-  #     - uses: ./.github/workflows/rust-cache
-  #     - name: Run Clippy
-  #       run: cargo clippy --all-targets --all-features --workspace
-  # test:
-  #   name: Test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: jrobsonchase/direnv-action@v0.7
-  #     - uses: ./.github/workflows/rust-cache
-  #     - name: Run Tests
-  #       run: |
-  #         NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
-  #         NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
+  udeps:
+    name: Udeps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
+      - name: Run Udeps
+        run: cargo udeps --workspace --all-targets --all-features
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jrobsonchase/direnv-action@v0.7
+      - name: Run Rustfmt
+        run: cargo fmt --all -- --check
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
+      - name: Run Clippy
+        run: cargo clippy --all-targets --all-features --workspace
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
+      - name: Run Tests
+        run: |
+          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
+          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
   decide:
     name: Decide on Publishing
     runs-on: ubuntu-latest
