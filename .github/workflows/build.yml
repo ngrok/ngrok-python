@@ -49,6 +49,7 @@ jobs:
         if: ${{ inputs.setup }}
         shell: bash
       - name: Install Bindgen
+        if: ${{ inputs.target != 'aarch64-pc-windows-msvc' }}
         run: |
           cargo install --force --locked bindgen-cli
       - name: Install nasm for i686-pc-windows-msvc
@@ -66,6 +67,23 @@ jobs:
         with:
           python-version: "3.12"
           architecture: "arm64"
+      - name: Build and (Publish) aarch64-pc-windows-msvc
+        if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
+        run: |
+          curl -O https://static.rust-lang.org/rustup/dist/aarch64-pc-windows-msvc/rustup-init.exe
+          ./rustup-init.exe --default-host aarch64-pc-windows-msvc
+          rustup target add aarch64-pc-windows-msvc
+          echo "create venv:"
+          python3 -m venv .env
+          . .env/bin/activate && pip install -r requirements.txt
+          . .env/bin/activate && pip install patchelf
+          if [ "${SHOULD_PUBLISH}" == 'true' ]; then
+            echo "~~~~ maturin publishing"
+            . .env/bin/activate && maturin publish --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+          else
+            echo "~~~~ maturin building"
+            . .env/bin/activate && maturin build
+          fi
       - name: Build and (Publish) x86_64-unknown-linux-musl
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'x86_64-unknown-linux-musl' }}
