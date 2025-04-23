@@ -64,10 +64,10 @@ jobs:
         if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
         run: |
           # Download Python installer
-          curl -O https://www.python.org/ftp/python/3.12/python-3.12-arm64.exe
+          curl -O https://www.python.org/ftp/python/3.12.1/python-3.12.1-arm64.exe
           
           # Install Python with necessary components
-          ./python-3.12-arm64.exe /quiet InstallAllUsers=1 PrependPath=1 Include_launcher=1 Include_test=0 Include_pip=1 Include_dev=1
+          ./python-3.12.1-arm64.exe /quiet InstallAllUsers=1 PrependPath=1 Include_launcher=1 Include_test=0 Include_pip=1 Include_dev=1
           
           # Verify Python installation
           python --version
