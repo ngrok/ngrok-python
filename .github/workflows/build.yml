@@ -65,7 +65,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: aarch64-pc-windows-msvc
-          args: --release -i python3.12 --target aarch64-pc-windows-msvc -m Cargo.toml --no-sdist
+          args: --release -i python3.12 --target aarch64-pc-windows-msvc -m Cargo.toml
         env:
           RUSTFLAGS: "-C linker=clang-cl -C link-arg=/target:arm64"
           env:
