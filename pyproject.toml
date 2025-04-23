@@ -41,3 +41,7 @@ build-backend = "maturin"
 
 [tool.maturin]
 python-source = "python"
+
+[target.aarch64-pc-windows-msvc]
+linker = "clang-cl"
+ar = "llvm-ar"
