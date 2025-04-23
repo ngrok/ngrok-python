@@ -17,7 +17,7 @@ log = "0.4"
 mio = { version = "1.0.3" }
 ngrok = { version = "0.15.0", features = ["hyper"] }
 once_cell = {version = "1.21"}
-pyo3 = { version = "0.22", features = ["abi3", "abi3-py37", "extension-module", "multiple-pymethods", "experimental-async", "gil-refs", "generate-import-lib"]}
+pyo3 = { version = "0.22", features = ["abi3", "abi3-py37", "extension-module", "multiple-pymethods", "experimental-async", "gil-refs"]}
 pyo3-async-runtimes = { version = "0.22", features = ["attributes", "tokio-runtime"] }
 pyo3-log = { version = "0.11" }
 parking_lot = "0.12.1"

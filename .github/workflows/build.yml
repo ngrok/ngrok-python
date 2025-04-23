@@ -60,26 +60,6 @@ jobs:
         with:
           python-version: "3.12"
           architecture: "x86"
-      - name: Build Python Extension Module (ARM64 Windows)
-        if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
-        uses: PyO3/maturin-action@v1
-        with:
-          target: aarch64-pc-windows-msvc
-          args: --release -i python3.12 --target aarch64-pc-windows-msvc -m Cargo.toml
-        env:
-          RUSTFLAGS: "-C linker=clang-cl -C link-arg=/target:arm64"
-          env:
-          # LLVM toolchain
-          LLVM_ROOT: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\Llvm
-          
-          # Compiler settings
-          CC_aarch64_pc_windows_msvc: clang-cl
-          CXX_aarch64_pc_windows_msvc: clang-cl
-          CARGO_TARGET_AARCH64_PC_WINDOWS_MSVC_LINKER: clang-cl
-          
-          # Python settings
-          PYTHON_INCLUDE_DIR: C:\hostedtoolcache\windows\Python\3.12.10\arm64\include
-          PYTHON_LIB_DIR: C:\hostedtoolcache\windows\Python\3.12.10\arm64\libs
       - name: Build and (Publish) x86_64-unknown-linux-musl
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'x86_64-unknown-linux-musl' }}
