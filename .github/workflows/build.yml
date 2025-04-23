@@ -74,7 +74,15 @@ jobs:
           # Download and install Rust for ARM64 Windows
           Invoke-WebRequest -Uri "https://static.rust-lang.org/rustup/dist/aarch64-pc-windows-msvc/rustup-init.exe" -OutFile "rustup-init.exe"
           .\rustup-init.exe --default-host aarch64-pc-windows-msvc -y
+          
+          # Add Rust to PATH
           $env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
+          
+          # Verify Rust installation
+          rustc --version
+          cargo --version
+          
+          # Add ARM64 Windows target
           rustup target add aarch64-pc-windows-msvc
           
           # Create and activate virtual environment
