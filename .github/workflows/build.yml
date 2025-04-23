@@ -60,6 +60,12 @@ jobs:
         with:
           python-version: "3.12"
           architecture: "x86"
+      - name: Setup arm64 Python for aarch64-pc-windows-msvc
+        if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: "arm64"
       - name: Build and (Publish) x86_64-unknown-linux-musl
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'x86_64-unknown-linux-musl' }}
