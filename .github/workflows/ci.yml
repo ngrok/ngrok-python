@@ -126,6 +126,8 @@ jobs:
           # WINDOWS
           - host: windows-11-arm
             target: aarch64-pc-windows-msvc
+            setup: |
+              choco install rustup.install
           - host: windows-latest
             target: i686-pc-windows-msvc
           - host: windows-latest
