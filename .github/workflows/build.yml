@@ -69,21 +69,30 @@ jobs:
           architecture: "arm64"
       - name: Build and (Publish) aarch64-pc-windows-msvc
         if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
+        shell: pwsh
         run: |
-          curl -O https://static.rust-lang.org/rustup/dist/aarch64-pc-windows-msvc/rustup-init.exe
-          ./rustup-init.exe --default-host aarch64-pc-windows-msvc
+          # Download and install Rust for ARM64 Windows
+          Invoke-WebRequest -Uri "https://static.rust-lang.org/rustup/dist/aarch64-pc-windows-msvc/rustup-init.exe" -OutFile "rustup-init.exe"
+          .\rustup-init.exe --default-host aarch64-pc-windows-msvc -y
+          $env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
           rustup target add aarch64-pc-windows-msvc
-          echo "create venv:"
-          python3 -m venv .env
-          . .env/bin/activate && pip install -r requirements.txt
-          . .env/bin/activate && pip install patchelf
-          if [ "${SHOULD_PUBLISH}" == 'true' ]; then
-            echo "~~~~ maturin publishing"
-            . .env/bin/activate && maturin publish --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
-          else
-            echo "~~~~ maturin building"
-            . .env/bin/activate && maturin build
-          fi
+          
+          # Create and activate virtual environment
+          python -m venv .env
+          .\.env\Scripts\Activate.ps1
+          
+          # Install requirements
+          pip install -r requirements.txt
+          pip install patchelf
+          
+          # Build or publish
+          if ($env:SHOULD_PUBLISH -eq 'true') {
+            Write-Output "~~~~ maturin publishing"
+            maturin publish --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+          } else {
+            Write-Output "~~~~ maturin building"
+            maturin build
+          }
       - name: Build and (Publish) x86_64-unknown-linux-musl
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'x86_64-unknown-linux-musl' }}
