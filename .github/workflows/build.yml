@@ -83,7 +83,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: arm64
-          toolset: 14.3
+          toolset: 14.37
           sdk: 10.0.22621.0
       - name: Debug ARM64 Environment
         if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
