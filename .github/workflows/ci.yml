@@ -134,11 +134,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
       - name: Install cross-compilation toolchain
-        run: sudo apt-get update && sudo apt-get install -y gcc-arm-linux-gnueabihf
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
       - name: Configure build environment
         run: |
-          export CC=arm-linux-gnueabi-gcc
-          export CXX=arm-linux-gnueabi-g++
+          export CC=arm-linux-gnueabihf-gcc
+          export CXX=arm-linux-gnueabihf-g++
+          export CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc
       - name: Build and (Publish) armv7-unknown-linux-gnueabihf
         run: |
           pwd
