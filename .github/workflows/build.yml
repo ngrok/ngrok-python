@@ -56,6 +56,8 @@ jobs:
         with:
           python-version: "3.12"
           architecture: "x86"
+      - name: Setup Quemu for armv7-unknown-linux-gnueabihf
+        uses: docker/setup-qemu-action@v3
       - name: Build and (Publish) x86_64-unknown-linux-musl
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'x86_64-unknown-linux-musl' }}
