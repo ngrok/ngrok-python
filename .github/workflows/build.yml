@@ -120,13 +120,19 @@ jobs:
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'armv7-unknown-linux-gnueabihf' }}
         with:
-          image: ${{ inputs.docker}}
+          image: ${{ inputs.docker }}
           options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
             pwd
             ls -lah
             whoami
             env
+            
+            # Set up bindgen environment
+            export BINDGEN_EXTRA_CLANG_ARGS="--target=armv7-unknown-linux-gnueabihf"
+            export BINDGEN_SYSROOT="/usr/arm-linux-gnueabihf"
+            
+            # Install Rust and configure ARM target
             curl --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
             export PATH="$HOME/.cargo/bin:$PATH"
             rustup component add llvm-tools-preview || true
