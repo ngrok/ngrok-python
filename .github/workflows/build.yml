@@ -43,10 +43,6 @@ jobs:
         run: ${{ inputs.setup }}
         if: ${{ inputs.setup }}
         shell: bash
-      - name: Install Bindgen
-        if: ${{ inputs.target != 'aarch64-pc-windows-msvc' }}
-        run: |
-          cargo install --force --locked bindgen-cli
       - name: Install nasm for i686-pc-windows-msvc
         uses: ilammy/setup-nasm@v1
         if: inputs.target == 'i686-pc-windows-msvc'
@@ -124,6 +120,8 @@ jobs:
           target: ${{ inputs.target }}
           # builds in release mode with the specified python version as the interpreter and the Cargo.toml file as the manifest
           args: --release -i python3.12 --target ${{ inputs.target }} -m Cargo.toml
+          before-script-linux: |
+            cargo install --force --locked bindgen-cli
         env:
           # see https://github.com/PyO3/maturin/issues/2110
           XWIN_VERSION: '16'

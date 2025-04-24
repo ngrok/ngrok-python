@@ -112,10 +112,6 @@ jobs:
           #   target: aarch64-unknown-linux-musl
           - host: ubuntu-latest
             target: armv7-unknown-linux-gnueabihf
-            setup: |
-              sudo apt-get update
-              sudo apt-get install gcc-arm-linux-gnueabihf -y
-              rustup target add armv7-unknown-linux-gnueabihf
           # - host: ubuntu-latest
           #   target: x86_64-unknown-linux-gnu
           # - host: ubuntu-latest
