@@ -137,9 +137,9 @@ jobs:
       #   with:
       #     image: arm32v7/ubuntu
       - run: |
-            apt update && apt install -y curl pip cmake clang python3.12-venv
+            sudo apt update && apt install -y curl pip cmake clang python3.12-venv
             curl --tlsv1.2 -sSf https://static.rust-lang.org/rustup/dist/armv7-unknown-linux-gnueabihf/rustup-init -o rustup-init
-            chmod +x rustup-init
+            sudo chmod +x rustup-init
             ./rustup-init -y --profile minimal --default-toolchain stable
             rm rustup-init
             export PATH="$HOME/.cargo/bin:$PATH"
