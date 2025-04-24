@@ -131,6 +131,7 @@ jobs:
             export PATH="$HOME/.cargo/bin:$PATH"
             rustup component add llvm-tools-preview || true
             rustup target add armv7-unknown-linux-gnueabihf
+            cargo install --force --locked bindgen-cli
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf
