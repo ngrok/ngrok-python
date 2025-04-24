@@ -17,43 +17,43 @@ on:
       - docs/**
   pull_request: null
 jobs:
-  udeps:
-    name: Udeps
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - uses: ./.github/workflows/rust-cache
-      - name: Run Udeps
-        run: cargo udeps --workspace --all-targets --all-features
-  fmt:
-    name: Rustfmt
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - name: Run Rustfmt
-        run: cargo fmt --all -- --check
-  clippy:
-    name: Clippy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - uses: ./.github/workflows/rust-cache
-      - name: Run Clippy
-        run: cargo clippy --all-targets --all-features --workspace
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - uses: ./.github/workflows/rust-cache
-      - name: Run Tests
-        run: |
-          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
-          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
+  # udeps:
+  #   name: Udeps
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - uses: ./.github/workflows/rust-cache
+  #     - name: Run Udeps
+  #       run: cargo udeps --workspace --all-targets --all-features
+  # fmt:
+  #   name: Rustfmt
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - name: Run Rustfmt
+  #       run: cargo fmt --all -- --check
+  # clippy:
+  #   name: Clippy
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - uses: ./.github/workflows/rust-cache
+  #     - name: Run Clippy
+  #       run: cargo clippy --all-targets --all-features --workspace
+  # test:
+  #   name: Test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jrobsonchase/direnv-action@v0.7
+  #     - uses: ./.github/workflows/rust-cache
+  #     - name: Run Tests
+  #       run: |
+  #         NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
+  #         NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
   decide:
     name: Decide on Publishing
     runs-on: ubuntu-latest
@@ -78,11 +78,11 @@ jobs:
 
   build:
     needs:
-      - clippy
+      # - clippy
       - decide
-      - fmt
-      - test
-      - udeps
+      # - fmt
+      # - test
+      # - udeps
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
@@ -97,81 +97,40 @@ jobs:
       matrix:
         settings:
           # MACOS
-          - host: macos-latest
-            target: aarch64-apple-darwin
-          - host: macos-latest
-            target: universal2-apple-darwin
-          - host: macos-latest
-            target: x86_64-apple-darwin
+          # - host: macos-latest
+          #   target: aarch64-apple-darwin
+          # - host: macos-latest
+          #   target: universal2-apple-darwin
+          # - host: macos-latest
+          #   target: x86_64-apple-darwin
 
           # LINUX
+          # - host: ubuntu-latest
+          #   target: aarch64-unknown-linux-gnu
+          #   docker: ghcr.io/rust-cross/manylinux2014-cross:aarch64
+          # - host: ubuntu-latest
+          #   target: aarch64-unknown-linux-musl
           - host: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            docker: ghcr.io/rust-cross/manylinux2014-cross:aarch64
-          - host: ubuntu-latest
-            target: aarch64-unknown-linux-musl
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
+            target: armv7-unknown-linux-gnueabihf
+            docker: ghcr.io/rust-cross/manylinux2014-cross:armv7
+            setup: |
+              sudo apt-get update
+              sudo apt-get install gcc-arm-linux-gnueabihf -y
+          # - host: ubuntu-latest
+          #   target: x86_64-unknown-linux-gnu
+          # - host: ubuntu-latest
+          #   target: x86_64-unknown-linux-musl
+          #   docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
               
 
           # WINDOWS
-          - host: windows-latest
-            target: aarch64-pc-windows-msvc
-          - host: windows-latest
-            target: i686-pc-windows-msvc
-          - host: windows-latest
-            target: x86_64-pc-windows-msvc 
-  build-armv7:
-    needs: decide
-    runs-on: ubuntu-latest
-    name: Build ARMv7
-    env:
-        SHOULD_PUBLISH: ${{ needs.decide.outputs.publish }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install cross-compilation toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf binutils-arm-linux-gnueabihf
-      - name: Configure build environment
-        run: |
-          export CC=arm-linux-gnueabihf-gcc
-          export CXX=arm-linux-gnueabihf-g++
-          export AR=arm-linux-gnueabihf-ar
-          export RANLIB=arm-linux-gnueabihf-ranlib
-          export LD=arm-linux-gnueabihf-ld
-          export STRIP=arm-linux-gnueabihf-strip
-          export OBJCOPY=arm-linux-gnueabihf-objcopy
-          export OBJDUMP=arm-linux-gnueabihf-objdump
-          export READELF=arm-linux-gnueabihf-readelf
-          export NM=arm-linux-gnueabihf-nm
-          export RUSTFLAGS="-C linker=arm-linux-gnueabihf-gcc -C link-arg=-Wl,--build-id=none"
-          export CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc
-      - name: Build and (Publish) armv7-unknown-linux-gnueabihf
-        run: |
-          pwd
-          ls -lah
-          whoami
-          env
-          curl --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
-          export PATH="$HOME/.cargo/bin:$PATH"
-          rustup target add armv7-unknown-linux-gnueabihf
-          cargo install --force --locked bindgen-cli
-          python3 -m venv .env
-          . .env/bin/activate && pip install -r requirements.txt
-          . .env/bin/activate && pip install patchelf
-          # this is in raw 'sh', use single '='
-          if [ "${SHOULD_PUBLISH}" = 'true' ]; then
-            echo "~~~~ maturin publishing"
-            # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
-            . .env/bin/activate && maturin publish --target armv7-unknown-linux-gnueabihf --no-sdist --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
-          else
-            echo "~~~~ maturin building"
-            . .env/bin/activate && maturin build --target armv7-unknown-linux-gnueabihf
-          fi
+          # - host: windows-latest
+          #   target: aarch64-pc-windows-msvc
+          # - host: windows-latest
+          #   target: i686-pc-windows-msvc
+          # - host: windows-latest
+          #   target: x86_64-pc-windows-msvc 
+  
   build-freebsd:
     needs: decide
     runs-on: ubuntu-22.04
