@@ -43,6 +43,10 @@ jobs:
         run: ${{ inputs.setup }}
         if: ${{ inputs.setup }}
         shell: bash
+      - name: Install Bindgen
+        if: ${{ inputs.target != 'aarch64-pc-windows-msvc' }}
+        run: |
+          cargo install --force --locked bindgen-cli
       - name: Install nasm for i686-pc-windows-msvc
         uses: ilammy/setup-nasm@v1
         if: inputs.target == 'i686-pc-windows-msvc'
