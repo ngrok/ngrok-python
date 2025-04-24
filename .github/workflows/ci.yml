@@ -134,7 +134,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
       - name: Install cross-compilation toolchain
-        run: sudo apt-get update && sudo apt-get install -y gcc-arm-linux-gnueabi
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-linux-gnueabihf
       - name: Configure build environment
         run: |
           export CC=arm-linux-gnueabi-gcc
