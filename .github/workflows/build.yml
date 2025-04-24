@@ -44,7 +44,7 @@ jobs:
         if: ${{ inputs.setup }}
         shell: bash
       - name: Install Bindgen
-        if: ${{ inputs.target != 'aarch64-pc-windows-msvc' }}
+        if: ${{ inputs.target != 'aarch64-pc-windows-msvc' && inputs.target != 'armv7-unknown-linux-gnueabihf' }}
         run: |
           cargo install --force --locked bindgen-cli
       - name: Install nasm for i686-pc-windows-msvc
@@ -127,7 +127,7 @@ jobs:
         env:
           # see https://github.com/PyO3/maturin/issues/2110
           XWIN_VERSION: '16'
-          AWS_LC_SYS_EXTERNAL_BINDGEN: "1"
+          AWS_LC_SYS_EXTERNAL_BINDGEN: "0"
       - name: Publish to PyPI (non-docker)
         if: ${{ inputs.publish == true && !inputs.docker && !contains(inputs.target,'android') }}
         uses: PyO3/maturin-action@v1
