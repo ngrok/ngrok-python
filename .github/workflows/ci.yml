@@ -110,8 +110,8 @@ jobs:
           #   docker: ghcr.io/rust-cross/manylinux2014-cross:aarch64
           # - host: ubuntu-latest
           #   target: aarch64-unknown-linux-musl
-          # - host: ubuntu-latest
-          #   target: armv7-unknown-linux-gnueabihf
+          - host: ubuntu-latest
+            target: armv7-unknown-linux-gnueabihf
           #   setup: |
           #     sudo apt-get update
           #     sudo apt-get install gcc-arm-linux-gnueabihf -y
@@ -124,8 +124,8 @@ jobs:
               
 
           # WINDOWS
-          - host: windows-latest
-            target: aarch64-pc-windows-msvc
+          # - host: windows-latest
+          #   target: aarch64-pc-windows-msvc
           # - host: windows-latest
           #   target: i686-pc-windows-msvc
           # - host: windows-latest
