@@ -132,17 +132,23 @@ jobs:
         SHOULD_PUBLISH: ${{ needs.decide.outputs.publish }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
       - name: Install cross-compilation toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+          sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf binutils-arm-linux-gnueabihf
       - name: Configure build environment
         run: |
           export CC=arm-linux-gnueabihf-gcc
           export CXX=arm-linux-gnueabihf-g++
           export AR=arm-linux-gnueabihf-ar
-          export RUSTFLAGS="-C linker=arm-linux-gnueabihf-gcc"
+          export RANLIB=arm-linux-gnueabihf-ranlib
+          export LD=arm-linux-gnueabihf-ld
+          export STRIP=arm-linux-gnueabihf-strip
+          export OBJCOPY=arm-linux-gnueabihf-objcopy
+          export OBJDUMP=arm-linux-gnueabihf-objdump
+          export READELF=arm-linux-gnueabihf-readelf
+          export NM=arm-linux-gnueabihf-nm
+          export RUSTFLAGS="-C linker=arm-linux-gnueabihf-gcc -C link-arg=-Wl,--build-id=none"
           export CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc
       - name: Build and (Publish) armv7-unknown-linux-gnueabihf
         run: |
