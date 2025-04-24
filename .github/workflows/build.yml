@@ -61,12 +61,23 @@ jobs:
         with:
           python-version: "3.12"
           architecture: "x86"
-      - name: Setup arm64 Python for aarch64-pc-windows-msvc
+      - name: Setup Python for cross-compilation
         if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          architecture: "arm64"
+          architecture: "x64"
+          check-latest: true
+      - name: Download ARM64 Python
+        if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
+        shell: pwsh
+        run: |
+          $pythonUrl = "https://www.python.org/ftp/python/3.12.0/python-3.12.0-embed-arm64.zip"
+          $outputPath = "python-arm64.zip"
+          Invoke-WebRequest -Uri $pythonUrl -OutFile $outputPath
+          Expand-Archive -Path $outputPath -DestinationPath "python-arm64" -Force
+          $env:PYTHON_ARM64_ROOT = "$PWD\python-arm64"
+          echo "PYTHON_ARM64_ROOT=$env:PYTHON_ARM64_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Install Visual Studio Build Tools
         if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
         uses: ilammy/msvc-dev-cmd@v1
