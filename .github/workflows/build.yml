@@ -67,23 +67,20 @@ jobs:
         with:
           python-version: "3.12"
           architecture: "arm64"
+      - name: Setup Rust for ARM64 Windows
+        if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: aarch64-pc-windows-msvc
+          components: rust-src, llvm-tools-preview
       - name: Build and (Publish) aarch64-pc-windows-msvc
         if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
         shell: pwsh
         run: |
-          # Download and install Rust for ARM64 Windows
-          Invoke-WebRequest -Uri "https://static.rust-lang.org/rustup/dist/aarch64-pc-windows-msvc/rustup-init.exe" -OutFile "rustup-init.exe"
-          .\rustup-init.exe --default-host aarch64-pc-windows-msvc -y
-          
-          # Add Rust to PATH
-          $env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
-          
           # Verify Rust installation
           rustc --version
           cargo --version
-          
-          # Add ARM64 Windows target
-          rustup target add aarch64-pc-windows-msvc
           
           # Create and activate virtual environment
           python -m venv .env
