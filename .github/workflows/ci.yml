@@ -126,7 +126,7 @@ jobs:
             target: x86_64-pc-windows-msvc 
   build-armv7:
     needs: decide
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     name: Build ARMv7
     env:
         SHOULD_PUBLISH: ${{ needs.decide.outputs.publish }}
@@ -141,6 +141,8 @@ jobs:
         run: |
           export CC=arm-linux-gnueabihf-gcc
           export CXX=arm-linux-gnueabihf-g++
+          export AR=arm-linux-gnueabihf-ar
+          export RUSTFLAGS="-C linker=arm-linux-gnueabihf-gcc"
           export CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc
       - name: Build and (Publish) armv7-unknown-linux-gnueabihf
         run: |
