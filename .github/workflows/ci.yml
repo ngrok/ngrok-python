@@ -138,9 +138,7 @@ jobs:
       - uses: docker/setup-qemu-action@v3
         with:
           platforms: arm
-      - run: |
-          docker run --rm --privileged tonistiigi/binfmt:desktop-master --install arm
-
+      - uses: docker/setup-buildx-action@v3
       - name: Build and (Publish) armv7-unknown-linux-gnueabihf
         uses: addnab/docker-run-action@v3
         with:
