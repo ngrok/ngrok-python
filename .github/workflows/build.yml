@@ -69,11 +69,12 @@ jobs:
           architecture: "arm64"
       - name: Setup Rust for ARM64 Windows
         if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
-        uses: dtolnay/rust-toolchain@v1
+        uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: aarch64-pc-windows-msvc
           components: rust-src, llvm-tools-preview
+          override: true
       - name: Build and (Publish) aarch64-pc-windows-msvc
         if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
         shell: pwsh
