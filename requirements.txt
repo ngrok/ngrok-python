@@ -1,7 +1,7 @@
 aiohttp==3.9.5 # async HTTP client/server framework
 black==23.3.0 # code formatter
 furo==2024.8.6 # customisable Sphinx theme
-maturin==1.7.4 # build and publish Python packages
+maturin==1.6.0 # build and publish Python packages
 mypy==1.15.0 # static type checker
 myst-parser==4.0.1 # Sphinx extension for Markdown
 pytest-xdist==3.6.1 # run tests in parallel

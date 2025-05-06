@@ -17,43 +17,43 @@ on:
       - docs/**
   pull_request: null
 jobs:
-  # udeps:
-  #   name: Udeps
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: jrobsonchase/direnv-action@v0.7
-  #     - uses: ./.github/workflows/rust-cache
-  #     - name: Run Udeps
-  #       run: cargo udeps --workspace --all-targets --all-features
-  # fmt:
-  #   name: Rustfmt
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: jrobsonchase/direnv-action@v0.7
-  #     - name: Run Rustfmt
-  #       run: cargo fmt --all -- --check
-  # clippy:
-  #   name: Clippy
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: jrobsonchase/direnv-action@v0.7
-  #     - uses: ./.github/workflows/rust-cache
-  #     - name: Run Clippy
-  #       run: cargo clippy --all-targets --all-features --workspace
-  # test:
-  #   name: Test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: jrobsonchase/direnv-action@v0.7
-  #     - uses: ./.github/workflows/rust-cache
-  #     - name: Run Tests
-  #       run: |
-  #         NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
-  #         NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
+  udeps:
+    name: Udeps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
+      - name: Run Udeps
+        run: cargo udeps --workspace --all-targets --all-features
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jrobsonchase/direnv-action@v0.7
+      - name: Run Rustfmt
+        run: cargo fmt --all -- --check
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
+      - name: Run Clippy
+        run: cargo clippy --all-targets --all-features --workspace
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: ./.github/workflows/rust-cache
+      - name: Run Tests
+        run: |
+          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
+          NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
   decide:
     name: Decide on Publishing
     runs-on: ubuntu-latest
@@ -78,11 +78,11 @@ jobs:
 
   build:
     needs:
-      # - clippy
+      - clippy
       - decide
-      # - fmt
-      # - test
-      # - udeps
+      - fmt
+      - test
+      - udeps
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
@@ -97,36 +97,36 @@ jobs:
       matrix:
         settings:
           # MACOS
-          # - host: macos-latest
-          #   target: aarch64-apple-darwin
-          # - host: macos-latest
-          #   target: universal2-apple-darwin
-          # - host: macos-latest
-          #   target: x86_64-apple-darwin
+          - host: macos-latest
+            target: aarch64-apple-darwin
+          - host: macos-latest
+            target: universal2-apple-darwin
+          - host: macos-latest
+            target: x86_64-apple-darwin
 
           # LINUX
-          # - host: ubuntu-latest
-          #   target: aarch64-unknown-linux-gnu
-          #   docker: ghcr.io/rust-cross/manylinux2014-cross:aarch64
-          # - host: ubuntu-latest
-          #   target: aarch64-unknown-linux-musl
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            docker: ghcr.io/rust-cross/manylinux2014-cross:aarch64
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-musl
           - host: ubuntu-latest
             target: armv7-unknown-linux-gnueabihf
             docker: ghcr.io/rust-cross/manylinux2014-cross:armv7
-          # - host: ubuntu-latest
-          #   target: x86_64-unknown-linux-gnu
-          # - host: ubuntu-latest
-          #   target: x86_64-unknown-linux-musl
-          #   docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
               
 
           # WINDOWS
-          # - host: windows-latest
-          #   target: aarch64-pc-windows-msvc
-          # - host: windows-latest
-          #   target: i686-pc-windows-msvc
-          # - host: windows-latest
-          #   target: x86_64-pc-windows-msvc 
+          - host: windows-latest
+            target: aarch64-pc-windows-msvc
+          - host: windows-latest
+            target: i686-pc-windows-msvc
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc 
   
   build-freebsd:
     needs: decide
