@@ -34,6 +34,13 @@
           "rustfmt"
           "rust-analyzer"
         ];
+        llvm-toolchain = with pkgs; [
+          cmake
+
+          clang
+          libclang
+          llvm
+        ];
         python-toolchain = with pkgs; [
           python3
           python3Packages.pandas
@@ -113,9 +120,11 @@
           OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
           OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
           RUSTC_WRAPPER="${pkgs.sccache}/bin/sccache";
+          LIBCLANG_PATH="${pkgs.llvmPackages.libclang.lib}/lib";
           buildInputs = with pkgs; [
             toolchain
             python-toolchain
+            llvm-toolchain
             fix-n-fmt
             setup-hooks
             cargo-udeps
