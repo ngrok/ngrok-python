@@ -64,7 +64,7 @@ jobs:
             whoami
             env
             echo "apk add:"
-            apk add musl-dev gcc make cmake clang llvm build-base python3-dev
+            apk add musl-dev gcc make cmake clang clang-libclang llvm build-base python3-dev
             export CARGO_BUILD_TARGET="x86_64-unknown-linux-musl"
             ln -s /usr/lib/gcc/x86_64-alpine-linux-musl/14.2.0/crtbeginS.o /usr/lib
             ln -s /usr/lib/gcc/x86_64-alpine-linux-musl/14.2.0/crtendS.o /usr/lib
