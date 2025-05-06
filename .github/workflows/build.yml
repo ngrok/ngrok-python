@@ -64,13 +64,12 @@ jobs:
             whoami
             env
             echo "apk add:"
+            apk upgrade
             apk add musl-dev gcc make cmake clang clang-libclang llvm build-base python3-dev
             export CARGO_BUILD_TARGET="x86_64-unknown-linux-musl"
             ln -s /usr/lib/gcc/x86_64-alpine-linux-musl/14.2.0/crtbeginS.o /usr/lib
             ln -s /usr/lib/gcc/x86_64-alpine-linux-musl/14.2.0/crtendS.o /usr/lib
             ln -s /usr/lib/gcc/x86_64-alpine-linux-musl/14.2.0/libgcc.a /usr/lib
-            echo "apk update:"
-            apk update
             rustup target add x86_64-unknown-linux-musl
             echo "create venv:"
             python3 -m venv .env
@@ -94,8 +93,16 @@ jobs:
             ls -lah
             whoami
             env
+
+            # Ensure multilib support is available
+            sudo apt -y update
+            sudo apt -y full-upgrade
+            sudo apt -y install gcc-multilib
+
+            # Install Rust
             curl --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
             export PATH="$HOME/.cargo/bin:$PATH"
+
             # ring 0.17 assembly build needs __ARM_ARCH set
             export CFLAGS_aarch64_unknown_linux_gnu="-D__ARM_ARCH=8"
             rustup component add llvm-tools-preview || true
@@ -124,6 +131,11 @@ jobs:
             whoami
             env
             
+            # Ensure multilib support is available
+            sudo apt -y update
+            sudo apt -y full-upgrade
+            sudo apt -y install gcc-multilib
+
             # Set up bindgen environment
             export BINDGEN_EXTRA_CLANG_ARGS="--target=armv7-unknown-linux-gnueabihf"
             export BINDGEN_SYSROOT="/usr/arm-linux-gnueabihf"
