@@ -27,6 +27,8 @@ rustls-pemfile = "2.0.0"
 tokio = { version = "1.40", features = ["sync"] }
 tracing = { version = "0.1.37", features = ["log", "log-always"] }
 url = "2.4.0"
+aws-lc-sys = "=0.28.0"
+aws-lc-rs = "=1.13.0"
 
 [build-dependencies]
 prost-build = "0.13.5"
