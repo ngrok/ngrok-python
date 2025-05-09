@@ -59,11 +59,6 @@ jobs:
           image: ${{ inputs.docker }}
           options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
-            pwd
-            ls -lah
-            whoami
-            env
-
             echo "apk add:"
             apk upgrade
             apk add musl-dev gcc make cmake clang-libclang rustup python3-dev bash
@@ -86,11 +81,6 @@ jobs:
           image: ${{ inputs.docker }}
           options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
-            pwd
-            ls -lah
-            whoami
-            env
-
             # Ensure multilib support is available
             sudo apt -y update
             sudo apt -y full-upgrade
@@ -123,11 +113,6 @@ jobs:
           image: ${{ inputs.docker }}
           options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
-            pwd
-            ls -lah
-            whoami
-            env
-            
             # Ensure multilib support is available
             sudo apt -y update
             sudo apt -y full-upgrade

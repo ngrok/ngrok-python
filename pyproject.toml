@@ -3,7 +3,6 @@ name = "ngrok"
 version = "1.5.0"
 readme = "README.md"
 requires-python = ">=3.12"
-platforms = ["linux", "osx", "win32"]
 # https://pypi.org/classifiers/
 classifiers = ["Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
@@ -20,7 +19,6 @@ classifiers = ["Development Status :: 5 - Production/Stable",
   "Topic :: System :: Networking",
   "Topic :: System :: Networking :: Firewalls"]
 keywords = ["ngrok", "python", "pypi", "pyo3", "ingress", "networking"]
-categories = ["ngrok", "api-bindings", "development-tools::networking", "networking"]
 license = {text = "MIT OR Apache-2.0"}
 
 [project.urls]

@@ -70,7 +70,7 @@ jobs:
           echo "git log:"
           git log -1 --pretty=%B
 
-          if [ '${{ github.ref }}' == 'refs/heads/main' ] && [ '${{ github.repository }}' == 'ngrok/ngrok-python' ] && git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$"; then
+          if [ '${{ github.ref }}' == 'refs/heads/main' ] && [ '${{ github.repository }}' == 'ngrok/ngrok-python' ] && git log -1 --pretty=%B | grep "^Release [0-9]\+\.[0-9]\+\.[0-9]\+$"; then
             echo "SHOULD_PUBLISH=true" >> $GITHUB_OUTPUT
           else
             echo "SHOULD_PUBLISH=false" >> $GITHUB_OUTPUT
@@ -161,11 +161,6 @@ jobs:
             export PATH="/usr/local/cargo/bin:$PATH"
           run: |
             export PATH="/usr/local/cargo/bin:$PATH"
-            pwd
-            ls -lah
-            whoami
-            env
-            freebsd-version
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             if [ "${SHOULD_PUBLISH}" == 'true' ]; then
