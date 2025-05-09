@@ -161,11 +161,6 @@ jobs:
             export PATH="/usr/local/cargo/bin:$PATH"
           run: |
             export PATH="/usr/local/cargo/bin:$PATH"
-            pwd
-            ls -lah
-            whoami
-            env
-            freebsd-version
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             if [ "${SHOULD_PUBLISH}" == 'true' ]; then
