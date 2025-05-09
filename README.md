@@ -372,7 +372,7 @@ Changes to `ngrok-python` are tracked under [CHANGELOG.md](https://github.com/ng
 - Open an [issue](https://github.com/ngrok/ngrok-python/issues) or [pull request](https://github.com/ngrok/ngrok-python/pulls)
 - Join our [Slack community](https://ngrok.com/slack)
 - Follow us on [X / Twitter (@ngrokHQ)](https://twitter.com/ngrokhq)
-- Subscribe to our [Youtube channel (@ngrokHQ)](https://www.youtube.com/@ngrokhq)
+- Subscribe to our [YouTube channel (@ngrokHQ)](https://www.youtube.com/@ngrokhq)
 
 # License
 
