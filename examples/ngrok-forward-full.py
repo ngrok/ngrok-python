@@ -61,5 +61,6 @@ listener = ngrok.forward(
     # verify_webhook_provider="twilio",
     # verify_webhook_secret="asdf",
     # websocket_tcp_converter=True,
+    # traffic_policy='{"on_http_request": [{"actions": [{"type": "custom-response","config": {"status_code": 200, "body": "Hello, World!"}}]}]}',
 )
 server.serve_forever()
