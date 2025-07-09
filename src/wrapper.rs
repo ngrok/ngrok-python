@@ -2,16 +2,19 @@ use pyo3::{
     intern,
     pyfunction,
     types::{
+        PyAnyMethods,
         PyModule,
         PyString,
         PyTuple,
     },
+    Bound,
     IntoPy,
     Py,
     PyAny,
     PyErr,
     PyResult,
     Python,
+    ToPyObject,
 };
 
 use crate::{
@@ -61,7 +64,7 @@ def run(input=None):
 /// :return: The created listener.
 /// :rtype: Listener
 #[pyfunction]
-#[pyo3(text_signature = "(session=None)")]
+#[pyo3(signature = (session=None))]
 pub fn default(py: Python, session: Option<Py<PyAny>>) -> PyResult<Py<PyAny>> {
     default_listener_with_return(py, session, "listener")
 }
@@ -75,7 +78,7 @@ pub fn default(py: Python, session: Option<Py<PyAny>>) -> PyResult<Py<PyAny>> {
 /// :return: The file descriptor of the created listener's forwarding socket.
 /// :rtype: int
 #[pyfunction]
-#[pyo3(text_signature = "(session=None)")]
+#[pyo3(signature = (session=None))]
 pub fn fd(py: Python, session: Option<Py<PyAny>>) -> PyResult<Py<PyAny>> {
     default_listener_with_return(py, session, "listener.fd")
 }
@@ -89,7 +92,7 @@ pub fn fd(py: Python, session: Option<Py<PyAny>>) -> PyResult<Py<PyAny>> {
 /// :return: The name of the created listener's forwarding socket.
 /// :rtype: str
 #[pyfunction]
-#[pyo3(text_signature = "(session=None)")]
+#[pyo3(signature = (session=None))]
 pub fn getsockname(py: Python, session: Option<Py<PyAny>>) -> PyResult<Py<PyAny>> {
     default_listener_with_return(py, session, "listener.getsockname()")
 }
@@ -127,7 +130,7 @@ fn default_listener_with_return(
 /// :return: The listener linked with the server, or a Task to await for said listener.
 /// :rtype: Listener or Task
 #[pyfunction]
-#[pyo3(text_signature = "(server=None, listener=None)")]
+#[pyo3(signature = (server=None, listener=None))]
 pub fn listen(
     py: Python,
     server: Option<Py<PyAny>>,
@@ -156,22 +159,22 @@ pub fn listen(
 
 pub(crate) fn address_from_server(py: Python, server: Py<PyAny>) -> Result<String, PyErr> {
     let server_address_attr = server.getattr(py, "server_address")?;
-    let address_type = server_address_attr.as_ref(py).get_type();
+    let address_type = server_address_attr.bind(py).get_type();
     if server_address_attr
-        .as_ref(py)
-        .is_instance(py.get_type::<PyTuple>())?
+        .bind(py)
+        .is_instance(&py.get_type_bound::<PyTuple>())?
     {
-        let address: &PyTuple = server_address_attr.downcast(py)?;
+        let address: &Bound<PyTuple> = server_address_attr.downcast_bound(py)?;
         Ok(format!(
             "{TCP_PREFIX}{}:{}",
             address.get_item(0)?,
             address.get_item(1)?
         ))
     } else if server_address_attr
-        .as_ref(py)
-        .is_instance(py.get_type::<PyString>())?
+        .bind(py)
+        .is_instance(&py.get_type_bound::<PyString>())?
     {
-        let address: &PyString = server_address_attr.downcast(py)?;
+        let address: &Bound<PyString> = server_address_attr.downcast_bound(py)?;
         Ok(format!("{UNIX_PREFIX}{address}"))
     } else {
         return Err(py_err(format!(
@@ -190,7 +193,7 @@ pub(crate) fn address_from_server(py: Python, server: Py<PyAny>) -> Result<Strin
 /// :return: The listener linked with the server, or a Task to await for said listener.
 /// :rtype: Listener or Task
 #[pyfunction]
-#[pyo3(text_signature = "(listener=None)")]
+#[pyo3(signature = (listener=None))]
 pub fn werkzeug_develop(py: Python, listener: Option<Py<PyAny>>) -> PyResult<Py<PyAny>> {
     loop_wrap(
         py,
@@ -236,11 +239,12 @@ def run(input=None):
 /// Call the given code, returning the required 'retval' attribute from it.
 fn call_code(py: Python, input: Option<Py<PyAny>>, code: &str) -> PyResult<Py<PyAny>> {
     // give fake filename and module name to not interfere with other projects' empty-string module
-    let run = PyModule::from_code(py, code, "ngrok_wrapper", "ngrok_wrapper")?.getattr("run")?;
+    let run =
+        PyModule::from_code_bound(py, code, "ngrok_wrapper", "ngrok_wrapper")?.getattr("run")?;
 
     let res = match input {
         Some(input) => {
-            let args = PyTuple::new(py, &[input]);
+            let args = PyTuple::new_bound(py, &[input]);
             run.call1(args)?
         }
         None => run.call0()?,
@@ -251,14 +255,13 @@ fn call_code(py: Python, input: Option<Py<PyAny>>, code: &str) -> PyResult<Py<Py
 
 /// Create and bind a python localhost TCP socket.
 pub(crate) fn bound_default_tcp_socket(py: Python) -> PyResult<Py<PyAny>> {
-    let socket = PyModule::import(py, intern!(py, "socket"))?;
+    let socket = PyModule::import_bound(py, intern!(py, "socket"))?;
     let sock_func = socket.getattr(intern!(py, "socket"))?;
     let obj = sock_func.call0()?;
     let bind = obj.getattr(intern!(py, "bind"))?;
-    let host: &PyAny = PyString::new(py, "localhost");
-    let port: &PyAny = 0u8.into_py(py).into_ref(py);
-    let address = PyTuple::new(py, [host, port]);
-    let args = PyTuple::new(py, [address]);
+    let tup = ("localhost", 0u8);
+    let address = PyTuple::new_bound(py, vec![tup.0.to_object(py), tup.1.to_object(py)]);
+    let args = PyTuple::new_bound(py, vec![address]);
     bind.call1(args)?;
     let res = obj.into_py(py);
     Ok(res)
@@ -266,14 +269,14 @@ pub(crate) fn bound_default_tcp_socket(py: Python) -> PyResult<Py<PyAny>> {
 
 /// Create and bind a python unix socket.
 pub(crate) fn bound_default_unix_socket(py: Python) -> PyResult<Py<PyAny>> {
-    let socket = PyModule::import(py, intern!(py, "socket"))?;
+    let socket = PyModule::import_bound(py, intern!(py, "socket"))?;
     let sock_func = socket.getattr(intern!(py, "socket"))?;
     let af_unix = socket.getattr(intern!(py, "AF_UNIX"))?;
-    let sock_args = PyTuple::new(py, [af_unix]);
+    let sock_args = PyTuple::new_bound(py, [af_unix]);
     let obj = sock_func.call1(sock_args)?;
     let bind = obj.getattr(intern!(py, "bind"))?;
     let address = pipe_name(py)?;
-    let args = PyTuple::new(py, &[address]);
+    let args = PyTuple::new_bound(py, &[address]);
     bind.call1(args)?;
     let res = obj.into_py(py);
     Ok(res)

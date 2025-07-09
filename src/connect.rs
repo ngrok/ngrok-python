@@ -140,7 +140,7 @@ fn get_bool(v: &PyAny) -> Result<bool, PyErr> {
 }
 
 fn get_list(v: &PyAny) -> Result<Vec<&PyAny>, PyErr> {
-    if v.is_instance(v.py().get_type::<PyList>())? {
+    if v.is_instance(v.py().get_type_bound::<PyList>())? {
         return v.downcast::<PyList>()?.extract::<Vec<&PyAny>>();
     }
     // turn scalars into lists

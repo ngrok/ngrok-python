@@ -24,7 +24,7 @@ use pyo3::{
     pyclass,
     pyfunction,
     pymethods,
-    types::PyByteArray,
+    types::{PyByteArray, PyByteArrayMethods},
     Bound,
     PyAny,
     PyErr,
@@ -126,7 +126,7 @@ impl SessionBuilder {
                             if let Some(err) = err.clone() {
                                 Python::with_gil(|py| -> PyResult<()> {
                                     handler
-                                        .call(py, (format!("{host}:{port}"), err.to_string()), None)
+                                        .call_bound(py, (format!("{host}:{port}"), err.to_string()), None)
                                         .map(|_o| ())
                                 })
                                 .map_err(|e| {
@@ -210,6 +210,7 @@ impl SessionBuilder {
     /// (first) position. Comments must follow `RFC 7230`_ or a connection error may occur.
     ///
     /// .. _RFC 7230: https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6
+    #[pyo3(signature = (client_type, version, comments=None))]
     pub fn client_info(
         self_: PyRefMut<Self>,
         client_type: String,
@@ -306,7 +307,7 @@ impl SessionBuilder {
     /// Roughly corresponds to the `root_cas parameter in the ngrok docs`_.
     ///
     /// .. _root_cas parameter in the ngrok docs: https://ngrok.com/docs/ngrok-agent/config#root_cas
-    pub fn ca_cert<'a>(self_: PyRefMut<'a, Self>, cert_bytes: &PyByteArray) -> PyRefMut<'a, Self> {
+    pub fn ca_cert<'a>(self_: PyRefMut<'a, Self>, cert_bytes: &Bound<PyByteArray>) -> PyRefMut<'a, Self> {
         self_.set(|b| {
             b.ca_cert(Bytes::from(cert_bytes.to_vec()));
         });
@@ -343,7 +344,7 @@ impl SessionBuilder {
                 let handler = Python::with_gil(|py| handler.clone_ref(py));
                 async move {
                     Python::with_gil(|py| -> PyResult<()> {
-                        handler.call(py, (), None).map(|_o| ())
+                        handler.call_bound(py, (), None).map(|_o| ())
                     })
                     .map_err(|e| format!("Callback error {e:?}"))
                 }
@@ -374,7 +375,7 @@ impl SessionBuilder {
                 let handler = Python::with_gil(|py| handler.clone_ref(py));
                 async move {
                     Python::with_gil(|py| -> PyResult<()> {
-                        handler.call(py, (), None).map(|_o| ())
+                        handler.call_bound(py, (), None).map(|_o| ())
                     })
                     .map_err(|e| format!("Callback error {e:?}"))
                 }
@@ -406,7 +407,7 @@ impl SessionBuilder {
                 async move {
                     Python::with_gil(|py| -> PyResult<()> {
                         handler
-                            .call(py, (req.version, req.permit_major_version), None)
+                            .call_bound(py, (req.version, req.permit_major_version), None)
                             .map(|_o| ())
                     })
                     .map_err(|e| format!("Callback error {e:?}"))
@@ -429,9 +430,9 @@ impl SessionBuilder {
                 async move {
                     Python::with_gil(|py| -> PyResult<()> {
                         if let Some(m) = millis {
-                            handler.call(py, (m,), None)
+                            handler.call_bound(py, (m,), None)
                         } else {
-                            handler.call(py, (), None)
+                            handler.call_bound(py, (), None)
                         }
                         .map(|_o| ())
                     })

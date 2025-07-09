@@ -9,8 +9,9 @@ use listener_builder::{
 use pyo3::{
     exceptions::PyValueError,
     pymodule,
-    types::PyModule,
+    types::{PyModule, PyModuleMethods},
     wrap_pyfunction,
+    Bound,
     PyErr,
     PyResult,
     Python,
@@ -62,7 +63,7 @@ pub mod wrapper;
 
 /// The ngrok Agent SDK for Python
 #[pymodule]
-fn ngrok(py: Python<'_>, m: &PyModule) -> PyResult<()> {
+fn ngrok(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(async_connect, m)?)?;
     m.add_function(wrap_pyfunction!(async_disconnect, m)?)?;
     m.add_function(wrap_pyfunction!(async_listeners, m)?)?;

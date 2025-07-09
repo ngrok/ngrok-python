@@ -1,8 +1,6 @@
 use bytes::Bytes;
 use pyo3::{
-    pymethods,
-    types::PyByteArray,
-    PyRefMut,
+    pymethods, types::{PyByteArray, PyByteArrayMethods}, Bound, PyRefMut
 };
 
 use crate::listener_builder::TlsListenerBuilder;
@@ -27,7 +25,7 @@ impl TlsListenerBuilder {
     /// .. _Mutual TLS: https://ngrok.com/docs/cloud-edge/modules/mutual-tls/
     pub fn mutual_tlsca<'a>(
         self_: PyRefMut<'a, Self>,
-        mutual_tlsca: &PyByteArray,
+        mutual_tlsca: &Bound<PyByteArray>,
     ) -> PyRefMut<'a, Self> {
         self_.set(|b| {
             b.mutual_tlsca(Bytes::from(mutual_tlsca.to_vec()));
@@ -49,8 +47,8 @@ impl TlsListenerBuilder {
     /// .. _TLS Termination: https://ngrok.com/docs/cloud-edge/modules/tls-termination/
     pub fn termination<'a>(
         self_: PyRefMut<'a, Self>,
-        cert_pem: &PyByteArray,
-        key_pem: &PyByteArray,
+        cert_pem: &Bound<PyByteArray>,
+        key_pem: &Bound<PyByteArray>,
     ) -> PyRefMut<'a, Self> {
         self_.set(|b| {
             b.termination(

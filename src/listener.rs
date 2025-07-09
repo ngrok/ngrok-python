@@ -62,7 +62,8 @@ use crate::{
 };
 
 /// Python dictionary of id's to sockets.
-static SOCK_CELL: Lazy<Py<PyDict>> = Lazy::new(|| Python::with_gil(|py| PyDict::new(py).into()));
+static SOCK_CELL: Lazy<Py<PyDict>> =
+    Lazy::new(|| Python::with_gil(|py| PyDict::new_bound(py).into()));
 
 // no forward host section to allow for relative unix paths
 pub(crate) const UNIX_PREFIX: &str = "unix:";
@@ -362,42 +363,43 @@ impl Listener {
     // for aiohttp case, proxy calls to socket
     #[getter]
     pub fn get_family(&self, py: Python) -> PyResult<Py<PyAny>> {
-        let attr = intern!(py, "family").as_gil_ref();
-        self.get_sock_attr(py, attr)
+        let attr = PyString::intern_bound(py, "family"); 
+        self.get_sock_attr(py, &attr)
     }
 
     pub fn getsockname(&self, py: Python) -> PyResult<Py<PyAny>> {
-        let attr = intern!(py, "getsockname").as_gil_ref();
-        self.get_sock_attr(py, attr)?.call0(py)
+        let attr = PyString::intern_bound(py, "getsockname"); 
+        self.get_sock_attr(py, &attr)?.call0(py)
     }
 
     #[getter]
     pub fn get_type(&self, py: Python) -> PyResult<Py<PyAny>> {
-        let attr = intern!(py, "type").as_gil_ref();
-        self.get_sock_attr(py, attr)
+        let attr = PyString::intern_bound(py, "type"); 
+        self.get_sock_attr(py, &attr)
     }
 
     pub fn setblocking(&self, py: Python, blocking: bool) -> PyResult<Py<PyAny>> {
-        let args = PyTuple::new(py, [blocking]);
-        let attr = intern!(py, "setblocking").as_gil_ref();
-        self.get_sock_attr(py, attr)?.call1(py, args)
+        let args = PyTuple::new_bound(py, [blocking]);
+        let attr = PyString::intern_bound(py, "setblocking"); 
+        self.get_sock_attr(py, &attr)?.call1(py, args)
     }
 
     pub fn fileno(&self, py: Python) -> PyResult<Py<PyAny>> {
-        let attr = intern!(py, "fileno").as_gil_ref();
-        self.get_sock_attr(py, attr)?.call0(py)
+        let attr = PyString::intern_bound(py, "fileno"); 
+        self.get_sock_attr(py, &attr)?.call0(py)
     }
 
     pub fn accept(&self, py: Python) -> PyResult<Py<PyAny>> {
-        let attr = intern!(py, "accept").as_gil_ref();
-        self.get_sock_attr(py, attr)?.call0(py)
+        let attr = PyString::intern_bound(py, "accept"); 
+        self.get_sock_attr(py, &attr)?.call0(py)
     }
 
     pub fn gettimeout(&self, py: Python) -> PyResult<Py<PyAny>> {
-        let attr = intern!(py, "gettimeout").as_gil_ref();
-        self.get_sock_attr(py, attr)?.call0(py)
+        let attr = PyString::intern_bound(py, "gettimeout"); 
+        self.get_sock_attr(py, &attr)?.call0(py)
     }
 
+    #[pyo3(signature = (backlog, listen_attr=None))]
     pub fn listen(
         &self,
         py: Python,
@@ -405,25 +407,25 @@ impl Listener {
         listen_attr: Option<&str>,
     ) -> PyResult<Py<PyAny>> {
         // call listen on socket
-        let args = PyTuple::new(py, [backlog]);
-        let listen_string = PyString::new(py, listen_attr.unwrap_or("listen"));
-        let result = self.get_sock_attr(py, listen_string)?.call1(py, args);
+        let args = PyTuple::new_bound(py, [backlog]);
+        let listen_string = PyString::new_bound(py, listen_attr.unwrap_or("listen"));
+        let result = self.get_sock_attr(py, &listen_string)?.call1(py, args);
 
         // set up forwarding depending on socket type
         let sockname = self.getsockname(py)?;
-        let socket = PyModule::import(py, "socket")?;
+        let socket = PyModule::import_bound(py, "socket")?;
         // windows does not have AF_UNIX enum at all
         let af_unix = socket.getattr(intern!(py, "AF_UNIX"));
         if let Ok(af_unix) = af_unix {
-            if self.get_family(py)?.as_ref(py).eq(af_unix)? {
+            if self.get_family(py)?.bind(py).eq(af_unix)? {
                 // unix socket
-                let sockname_str: &PyString = sockname.downcast(py)?;
+                let sockname_str: &Bound<PyString> = sockname.downcast_bound(py)?;
                 self.forward(py, format!("{UNIX_PREFIX}{sockname_str}"))?;
                 return result;
             }
         }
         // fallback to tcp
-        let sockname_tuple: &PyTuple = sockname.downcast(py)?;
+        let sockname_tuple: &Bound<PyTuple> = sockname.downcast_bound(py)?;
         self.forward(py, format!("localhost:{}", sockname_tuple.get_item(1)?))?;
         result
     }
@@ -436,12 +438,12 @@ impl Listener {
     }
 
     // Get or create the python socket to use for this listener, and return an attribute of it.
-    fn get_sock_attr(&self, py: Python, attr: &PyString) -> PyResult<Py<PyAny>> {
+    fn get_sock_attr(&self, py: Python, attr: &Bound<PyString>) -> PyResult<Py<PyAny>> {
         self.get_sock(py)?.getattr(py, attr)
     }
 
     fn get_sock(&self, py: Python) -> PyResult<Py<PyAny>> {
-        let map: &PyDict = SOCK_CELL.as_ref(py);
+        let map: &Bound<PyDict> = SOCK_CELL.bind(py);
         let maybe_socket = map.get_item(&self.tun_meta.id);
         Ok(match maybe_socket {
             Ok(Some(s)) => s.into_py(py),
