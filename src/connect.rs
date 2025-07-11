@@ -6,6 +6,7 @@ use log::{
 use pyo3::{
     pyfunction,
     types::{
+        PyAnyMethods,
         PyBool,
         PyByteArray,
         PyDict,
@@ -58,8 +59,8 @@ macro_rules! plumb {
         plumb!($builder, $self, $config, $name, $name)
     };
     ($builder:tt, $self:tt, $config:tt, $name:tt, $config_name:tt) => {
-        if let Some(v) = $config.get_item(stringify!($config_name))? {
-            $builder::$name($self.borrow_mut(), get_string(v)?);
+        if let v = $config.get_item(stringify!($config_name))? {
+            $builder::$name($self.borrow_mut(), get_string(&v)?);
         }
     };
 }
@@ -80,8 +81,8 @@ macro_rules! plumb_bool {
 
 macro_rules! plumb_bool_2arg {
     ($builder:tt, $self:tt, $config:tt, $name:tt) => {
-        if let Some(v) = $config.get_item(stringify!($name))? {
-            $builder::$name($self.borrow_mut(), get_bool(v)?);
+        if let v = $config.get_item(stringify!($name))? {
+            $builder::$name($self.borrow_mut(), get_bool(&v)?);
         }
     };
 }
@@ -92,9 +93,9 @@ macro_rules! plumb_vec {
         plumb_vec!($builder, $self, $config, $name, $name)
     };
     ($builder:tt, $self:tt, $config:tt, $name:tt, $config_name:tt) => {
-        if let Some(v) = $config.get_item(stringify!($config_name))? {
+        if let v = $config.get_item(stringify!($config_name))? {
             for val in get_list(v)? {
-                $builder::$name($self.borrow_mut(), get_string(val)?);
+                $builder::$name($self.borrow_mut(), get_string(&val)?);
             }
         }
     };
@@ -131,15 +132,16 @@ macro_rules! config_common {
     };
 }
 
-fn get_string(v: &PyAny) -> Result<String, PyErr> {
+fn get_string(v: &Bound<PyAny>) -> Result<String, PyErr> {
     v.downcast::<PyString>()?.extract::<String>()
 }
 
-fn get_bool(v: &PyAny) -> Result<bool, PyErr> {
+fn get_bool(v: &Bound<PyAny>) -> Result<bool, PyErr> {
     v.downcast::<PyBool>()?.extract::<bool>()
 }
 
-fn get_list(v: &PyAny) -> Result<Vec<&PyAny>, PyErr> {
+fn get_list(v: &Bound<PyAny>) -> Result<Vec<&PyAny>, PyErr> {
+    //let type := v.py().get_type_bound::<PyList>();
     if v.is_instance(v.py().get_type_bound::<PyList>())? {
         return v.downcast::<PyList>()?.extract::<Vec<&PyAny>>();
     }
@@ -166,7 +168,7 @@ fn get_byte_array(v: &PyAny) -> Result<&PyByteArray, PyDowncastError> {
 #[pyo3(signature = (addr=None, proto=None, **options), text_signature = "(addr=None, proto=None, **options)")]
 pub fn connect(
     py: Python,
-    addr: Option<&PyAny>,
+    addr: Option<&Bound<PyAny>>,
     proto: Option<String>,
     options: Option<&PyDict>,
 ) -> PyResult<Py<PyAny>> {
@@ -183,7 +185,7 @@ pub fn connect(
 #[pyo3(signature = (addr=None, proto=None, **options), text_signature = "(addr=None, proto=None, **options)")]
 pub fn forward(
     py: Python,
-    addr: Option<&PyAny>,
+    addr: Option<&Bound<PyAny>>,
     proto: Option<String>,
     options: Option<&PyDict>,
 ) -> PyResult<Py<PyAny>> {
@@ -191,12 +193,12 @@ pub fn forward(
     // decode address string
     let mut addr_str = format!("{TCP_PREFIX}localhost:80");
     if let Some(a) = addr {
-        if a.is_instance(py.get_type::<PyInt>())? {
+        if a.is_instance(&py.get_type_bound::<PyInt>())? {
             addr_str = format!(
                 "{TCP_PREFIX}localhost:{}",
                 a.downcast::<PyInt>()?.extract::<i32>()?
             );
-        } else if a.is_instance(py.get_type::<PyString>())? {
+        } else if a.is_instance(&py.get_type_bound::<PyString>())? {
             addr_str = a.downcast::<PyString>()?.extract::<String>()?;
 
             // Fix up an addr that is missing a port
@@ -249,8 +251,8 @@ pub fn async_connect(py: Python, config: Py<PyDict>) -> PyResult<Bound<'_, PyAny
 
 fn configure_session(options: &Py<PyDict>) -> Result<SessionBuilder, PyErr> {
     Python::with_gil(|py: Python| {
-        let s_builder = PyCell::new(py, SessionBuilder::new())?;
-        let cfg = options.as_ref(py);
+        let s_builder: Bound<SessionBuilder> = Bound::new(py, SessionBuilder::new())?;
+        let cfg = options.bind(py);
         type B = SessionBuilder;
         plumb!(B, s_builder, cfg, authtoken);
         plumb_bool!(B, s_builder, cfg, authtoken_from_env);
@@ -435,13 +437,18 @@ async fn labeled_listener(
     options: Py<PyDict>,
 ) -> PyResult<Listener> {
     let bld = Python::with_gil(|py: Python| {
-        let bld = PyCell::new(py, session.labeled_listener())?;
-        let cfg = options.as_ref(py);
+        let bld = Bound::new(py, session.labeled_listener())?;
+        let cfg = options.bind(py);
         type B = LabeledListenerBuilder;
         plumb!(B, bld, cfg, metadata);
         plumb!(B, bld, cfg, app_protocol);
         plumb_bool_2arg!(B, bld, cfg, verify_upstream_tls);
         plumb_vec!(B, bld, cfg, label, labels, ":");
+        if let v = cfg.get_item(stringify!($config_name))? {
+            for val in get_list(&v)? {
+                B::label(bld.borrow_mut(), get_string(&val)?);
+            }
+        }
         Ok::<_, PyErr>(bld.replace(session.labeled_listener()))
     })?;
     spawn_forward(bld.async_listen().await?, addr).await
@@ -465,7 +472,7 @@ pub fn kill(py: Python) -> PyResult<Py<PyAny>> {
 ///
 /// :param str or None url: The url of the Listener to disconnect, or None to disconnect all listeners.
 #[pyfunction]
-#[pyo3(text_signature = "(url=None)")]
+#[pyo3(signature = (url=None))]
 pub fn disconnect(py: Python, url: Option<Py<PyString>>) -> PyResult<Py<PyAny>> {
     // move to async, handling if there is an async loop running or not
     wrapper::loop_wrap(
@@ -476,6 +483,7 @@ pub fn disconnect(py: Python, url: Option<Py<PyString>>) -> PyResult<Py<PyAny>> 
 }
 
 #[pyfunction]
+#[pyo3(signature = (url=None))]
 pub fn async_disconnect(py: Python, url: Option<String>) -> PyResult<Bound<'_, PyAny>> {
     debug!("Disconnecting. url: {url:?}");
     pyo3_async_runtimes::tokio::future_into_py(py, async move {
