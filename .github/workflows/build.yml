@@ -14,7 +14,8 @@ on:
         type: boolean
       publish:
         required: false
-        type: string
+        type: boolean
+        default: false
       setup:
         required: false
         type: string

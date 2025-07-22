@@ -61,32 +61,10 @@ jobs:
         run: |
           NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make mypy
           NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} make testfast
-  decide:
-    name: Decide on Publishing
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Decide
-        id: decide
-        run: |
-          echo "github.ref: ${{ github.ref }}"
-          echo "github.repository: ${{ github.repository }}"
-          echo "git log:"
-          git log -1 --pretty=%B
-
-          if [ '${{ github.ref }}' == 'refs/heads/main' ] && [ '${{ github.repository }}' == 'ngrok/ngrok-python' ] && git log -1 --pretty=%B | grep "^Release [0-9]\+\.[0-9]\+\.[0-9]\+$"; then
-            echo "SHOULD_PUBLISH=true" >> $GITHUB_OUTPUT
-          else
-            echo "SHOULD_PUBLISH=false" >> $GITHUB_OUTPUT
-          fi
-          cat $GITHUB_OUTPUT
-    outputs:
-      publish: ${{ steps.decide.outputs.SHOULD_PUBLISH }}
 
   build:
     needs:
       - clippy
-      - decide
       - fmt
       - test
       - udeps
@@ -96,7 +74,7 @@ jobs:
       docker: ${{ matrix.settings.docker }}
       host: ${{ matrix.settings.host }}
       if: true
-      publish: ${{ needs.decide.outputs.publish }}
+      publish: false
       setup: ${{ matrix.settings.setup }}
       target: ${{ matrix.settings.target }}
     strategy:
@@ -136,7 +114,6 @@ jobs:
             target: x86_64-pc-windows-msvc 
   
   build-freebsd:
-    needs: decide
     runs-on: ubuntu-22.04
     name: Build FreeBSD
     timeout-minutes: 20
@@ -152,9 +129,8 @@ jobs:
           RUSTUP_HOME: /usr/local/rustup
           CARGO_HOME: /usr/local/cargo
           RUSTUP_IO_THREADS: 1
-          SHOULD_PUBLISH: ${{ needs.decide.outputs.publish }}
         with:
-          envs: RUSTUP_HOME CARGO_HOME RUSTUP_IO_THREADS SHOULD_PUBLISH
+          envs: RUSTUP_HOME CARGO_HOME RUSTUP_IO_THREADS
           usesh: true
           mem: 3000
           prepare: |
@@ -167,16 +143,8 @@ jobs:
             export PATH="/usr/local/cargo/bin:$PATH"
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
-            if [ "${SHOULD_PUBLISH}" == 'true' ]; then
-              echo "~~~~ maturin just building since pypi doesn't support BSD wheels"
-              # https://discuss.python.org/t/pypi-org-unsupported-platform-tag-openbsd-7-0-amd64/16302
-              # . .env/bin/activate && maturin publish --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
-              . .env/bin/activate && maturin build
-            else
-              echo "~~~~ maturin building"
-              . .env/bin/activate && maturin build
-            fi
-            # make the rsync back faster
+            echo "~~~~ maturin building"
+            . .env/bin/activate && maturin build
             rm -rf .env/ target/debug/ target/release/
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -184,20 +152,3 @@ jobs:
           name: bindings-freebsd
           path: target/wheels/*.whl
           if-no-files-found: error
-  tag:
-    if: ${{ github.ref == 'refs/heads/main' && needs.decide.outputs.publish == true }}
-    needs:
-      - decide
-      - build
-    runs-on: ubuntu-latest
-    name: Tag Release
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
-      - name: Tag
-        run: |
-          version="$(extract-crate-version ngrok-python)"
-          git config user.name "GitHub Action"
-          git config user.email noreply@ngrok.com
-          git tag -a -m "Version ${version}" v${version}
-          git push --tags
