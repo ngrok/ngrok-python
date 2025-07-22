@@ -58,7 +58,7 @@ jobs:
         if: ${{ inputs.target == 'x86_64-unknown-linux-musl' || inputs.target == 'aarch64-unknown-linux-musl' }}
         with:
           image: ${{ inputs.docker }}
-          options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
+          options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
             echo "apk add:"
             apk upgrade
@@ -71,16 +71,17 @@ jobs:
             ./venv/bin/pip install patchelf
             make build
 
-            if [ "${SHOULD_PUBLISH}" == 'true' ]; then
+            if [ "${{ inputs.publish }}" = 'true' ]; then
               echo "~~~~ maturin publishing"
               . ./venv/bin/activate && maturin publish --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
             fi
+
       - name: Build and (Publish) aarch64-unknown-linux-gnu
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'aarch64-unknown-linux-gnu' }}
         with:
           image: ${{ inputs.docker }}
-          options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
+          options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
             # Ensure multilib support is available
             sudo apt -y update
@@ -98,8 +99,7 @@ jobs:
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf
-            # this is in raw 'sh', use single '='
-            if [ "${SHOULD_PUBLISH}" = 'true' ]; then
+            if [${{ inputs.publish }}]; then
               echo "~~~~ maturin publishing"
               # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
               . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
@@ -107,12 +107,13 @@ jobs:
               echo "~~~~ maturin building"
               . .env/bin/activate && maturin build --target ${{ inputs.target }}
             fi
+
       - name: Build and (Publish) armv7-unknown-linux-gnueabihf
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'armv7-unknown-linux-gnueabihf' }}
         with:
           image: ${{ inputs.docker }}
-          options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
+          options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
             # Ensure multilib support is available
             sudo apt -y update
@@ -133,8 +134,7 @@ jobs:
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf
-            # this is in raw 'sh', use single '='
-            if [ "${SHOULD_PUBLISH}" = 'true' ]; then
+            if [${{ inputs.publish }}]; then
               echo "~~~~ maturin publishing"
               # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
               . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
@@ -142,6 +142,7 @@ jobs:
               echo "~~~~ maturin building"
               RUST_BACKTRACE=1 . .env/bin/activate && maturin build --target ${{ inputs.target }} --verbose
             fi
+
       - name: Build Python Extension Module (non-docker)
         if: ${{ inputs.publish != true && !inputs.docker && !contains(inputs.target,'android') }}
         uses: PyO3/maturin-action@v1
@@ -161,6 +162,23 @@ jobs:
           maturin-version: v1.6.0
           target: ${{ inputs.target }}
           args: --no-sdist -i python3.12 -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+      - name: Tag Release
+        if: ${{ inputs.publish == true }}
+        run: |
+          version="$(grep '^version =' Cargo.toml | head -n1 | awk -F\" '{print $2}')"
+          tag="v${version}"
+          git config user.name "GitHub Action"
+          git config user.email noreply@ngrok.com
+          echo "Version: ${version} tag: $tag"
+          echo "Fetching all tags in the repository"
+          git fetch --tags
+          if git rev-parse "refs/tags/$tag" >/dev/null 2>&1; then
+            echo "Tag $tag already exists, skipping tag creation."
+          else
+            echo "Tag $tag does not exist, pushing tag."
+            git tag -a -m "Version ${version}" $tag
+            git push --tags
+          fi
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
