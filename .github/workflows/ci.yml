@@ -74,11 +74,7 @@ jobs:
           echo "git log:"
           git log -1 --pretty=%B
 
-          if [ '${{ github.ref }}' == 'refs/heads/main' ] && [ '${{ github.repository }}' == 'ngrok/ngrok-python' ] && git log -1 --pretty=%B | grep "^Release [0-9]\+\.[0-9]\+\.[0-9]\+$"; then
-            echo "SHOULD_PUBLISH=true" >> $GITHUB_OUTPUT
-          else
-            echo "SHOULD_PUBLISH=false" >> $GITHUB_OUTPUT
-          fi
+          echo "SHOULD_PUBLISH=false" >> $GITHUB_OUTPUT
           cat $GITHUB_OUTPUT
     outputs:
       publish: ${{ steps.decide.outputs.SHOULD_PUBLISH }}
