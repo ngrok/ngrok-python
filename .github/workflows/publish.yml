@@ -6,7 +6,6 @@ on:
 jobs:
   publish:
     name: Build ${{ matrix.settings.target }}
-    runs-on: ${{ matrix.settings.host }}
     strategy:
       fail-fast: false
       matrix:
