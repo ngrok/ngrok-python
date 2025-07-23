@@ -87,7 +87,7 @@ jobs:
 
             if [ "${{ inputs.publish }}" = 'true' ]; then
               echo "~~~~ maturin publishing"
-              . ./venv/bin/activate && maturin publish --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+              . ./venv/bin/activate && maturin publish --no-sdist --skip-existing -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
             fi
 
       - name: Build and (Publish) aarch64-unknown-linux-gnu
@@ -116,7 +116,7 @@ jobs:
             if [ "${{ inputs.publish }}" = 'true' ]; then
               echo "~~~~ maturin publishing"
               # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
-              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
             else
               echo "~~~~ maturin building"
               . .env/bin/activate && maturin build --target ${{ inputs.target }}
@@ -151,7 +151,7 @@ jobs:
             if [ "${{ inputs.publish }}" = 'true' ]; then
               echo "~~~~ maturin publishing"
               # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
-              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
             else
               echo "~~~~ maturin building"
               RUST_BACKTRACE=1 . .env/bin/activate && maturin build --target ${{ inputs.target }} --verbose
