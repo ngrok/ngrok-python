@@ -113,7 +113,7 @@ jobs:
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf
-            if [${{ inputs.publish }}]; then
+            if [ "${{ inputs.publish }}" = 'true' ]; then
               echo "~~~~ maturin publishing"
               # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
               . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
@@ -148,7 +148,7 @@ jobs:
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf
-            if [${{ inputs.publish }}]; then
+            if [ "${{ inputs.publish }}" = 'true' ]; then
               echo "~~~~ maturin publishing"
               # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
               . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
