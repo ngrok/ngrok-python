@@ -5,6 +5,8 @@ on:
 
 jobs:
   publish-all:
+    fail-fast: false
+    strategy:
       matrix:
         settings:
           # List all targets you want to publish
