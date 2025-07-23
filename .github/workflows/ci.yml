@@ -73,7 +73,6 @@ jobs:
     with:
       docker: ${{ matrix.settings.docker }}
       host: ${{ matrix.settings.host }}
-      if: true
       setup: ${{ matrix.settings.setup }}
       target: ${{ matrix.settings.target }}
     strategy:

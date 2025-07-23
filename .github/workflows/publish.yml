@@ -5,11 +5,12 @@ on:
 
 jobs:
   publish-all:
-    fail-fast: false
+    name: Build & Publish All
+    runs-on: ${{ matrix.settings.host }}
     strategy:
+      fail-fast: false
       matrix:
         settings:
-          # List all targets you want to publish
           - host: macos-latest
             target: aarch64-apple-darwin
           - host: macos-latest
@@ -36,16 +37,19 @@ jobs:
             target: i686-pc-windows-msvc
           - host: windows-latest
             target: x86_64-pc-windows-msvc
-      uses: ./.github/workflows/build.yml
-      secrets: inherit
-      with:
-        docker: ${{ matrix.settings.docker }}
-        host: ${{ matrix.settings.host }}
-        if: true
-        publish: true
-        setup: ${{ matrix.settings.setup }}
-        target: ${{ matrix.settings.target }}
-  
+
+    steps:
+      - name: Call reusable build.yml
+        uses: ./.github/workflows/build.yml
+        with:
+          docker: ${{ matrix.settings.docker }}
+          host: ${{ matrix.settings.host }}
+          if: true
+          publish: true
+          setup: ${{ matrix.settings.setup }}
+          target: ${{ matrix.settings.target }}
+        secrets: inherit
+
   tag-release:
     needs: publish-all
     runs-on: ubuntu-latest
