@@ -4,8 +4,8 @@ on:
     branches: [main]
 
 jobs:
-  publish-all:
-    name: Build & Publish All
+  publish:
+    name: Build ${{ matrix.settings.target }}
     runs-on: ${{ matrix.settings.host }}
     strategy:
       fail-fast: false
@@ -38,22 +38,20 @@ jobs:
           - host: windows-latest
             target: x86_64-pc-windows-msvc
 
-    steps:
-      - name: Call reusable build.yml
-        uses: ./.github/workflows/build.yml
-        with:
-          docker: ${{ matrix.settings.docker }}
-          host: ${{ matrix.settings.host }}
-          if: true
-          publish: true
-          setup: ${{ matrix.settings.setup }}
-          target: ${{ matrix.settings.target }}
-        secrets: inherit
+    uses: ./.github/workflows/build.yml
+    with:
+      docker: ${{ matrix.settings.docker }}
+      host: ${{ matrix.settings.host }}
+      if: true
+      publish: true
+      setup: ${{ matrix.settings.setup }}
+      target: ${{ matrix.settings.target }}
+    secrets: inherit
 
   tag-release:
-    needs: publish-all
-    runs-on: ubuntu-latest
     name: Tag Release
+    needs: publish
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: jrobsonchase/direnv-action@v0.7
