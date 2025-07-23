@@ -175,7 +175,7 @@ jobs:
           command: publish
           maturin-version: v1.9.1
           target: ${{ inputs.target }}
-          args: --no-sdist -i python3.12 -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+          args: --no-sdist --skip-existing -i python3.12 -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
