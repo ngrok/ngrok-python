@@ -58,7 +58,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          architecture: "x64"
+          architecture: "arm64"
+          run: |
+            echo "Runner OS: $RUNNER_OS"
+            echo "Runner Architecture: $RUNNER_ARCH"
+            echo "Runner Name: $RUNNER_NAME"
+            systeminfo
       - name: Build and (Publish) musl for ${{ inputs.target }}
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'x86_64-unknown-linux-musl' || inputs.target == 'aarch64-unknown-linux-musl' }}
