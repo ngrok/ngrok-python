@@ -53,7 +53,7 @@ jobs:
         with:
           python-version: "3.12"
           architecture: "x86"
-      - name: Setup x85 Python for aarch64-pc-windows-msvc
+      - name: Setup x64 Python for aarch64-pc-windows-msvc
         if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
         uses: actions/setup-python@v5
         with:
