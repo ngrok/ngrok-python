@@ -1,6 +1,7 @@
 name: Publish All
 on:
-  workflow_dispatch:
+  pull_request:
+    branches: [add-manual-publish-option]
 
 jobs:
   publish-all:
