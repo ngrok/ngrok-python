@@ -16,6 +16,11 @@ on:
       MATURIN_PASSWORD:
         required: true
   push:
+    inputs:
+      publish:
+        required: false
+        default: false
+        type: boolean
     branches:
       - '**'
     tags-ignore:
