@@ -5,7 +5,7 @@ on:
 
 jobs:
   ci:
-    name: Runs CI
+    name: Run CI
     uses: ./.github/workflows/ci.yml
     secrets:
       NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
