@@ -72,7 +72,7 @@ jobs:
         if: ${{ inputs.target == 'x86_64-unknown-linux-musl' || inputs.target == 'aarch64-unknown-linux-musl' }}
         with:
           image: ${{ inputs.docker }}
-          options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
+          options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
             echo "apk add:"
             apk upgrade
@@ -85,7 +85,7 @@ jobs:
             ./venv/bin/pip install patchelf
             make build
 
-            if [ "${{ inputs.publish }}" = 'true' ]; then
+            if [ "${SHOULD_PUBLISH}" == 'true' ]; then
               echo "~~~~ maturin publishing"
               . ./venv/bin/activate && maturin publish --no-sdist --skip-existing -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
             fi
@@ -95,7 +95,7 @@ jobs:
         if: ${{ inputs.target == 'aarch64-unknown-linux-gnu' }}
         with:
           image: ${{ inputs.docker }}
-          options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
+          options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
             # Ensure multilib support is available
             sudo apt -y update
@@ -113,7 +113,8 @@ jobs:
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf
-            if [ "${{ inputs.publish }}" = 'true' ]; then
+            # this is in raw 'sh', use single '='
+            if [ "${SHOULD_PUBLISH}" = 'true' ]; then
               echo "~~~~ maturin publishing"
               # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
               . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
@@ -126,7 +127,7 @@ jobs:
         if: ${{ inputs.target == 'armv7-unknown-linux-gnueabihf' }}
         with:
           image: ${{ inputs.docker }}
-          options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
+          options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
             # Ensure multilib support is available
             sudo apt -y update
@@ -147,7 +148,8 @@ jobs:
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf
-            if [ "${{ inputs.publish }}" = 'true' ]; then
+            # this is in raw 'sh', use single '='
+            if [ "${SHOULD_PUBLISH}" = 'true' ]; then
               echo "~~~~ maturin publishing"
               # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
               . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
@@ -160,7 +162,7 @@ jobs:
         if: ${{ inputs.target == 'x86_64-unknown-linux-gnu' }}
         with:
           image: ${{ inputs.docker }}
-          options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
+          options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
             # Update and install required packages
             sudo apt-get update
@@ -179,7 +181,7 @@ jobs:
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf
 
-            if [ "${{ inputs.publish }}" = 'true' ]; then
+            if [ "${SHOULD_PUBLISH}" = 'true' ]; then
               echo "~~~~ maturin publishing"
               . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing -i python3.12 -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
             else
