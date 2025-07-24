@@ -10,7 +10,9 @@ on:
         required: false
         default: false
         type: boolean
-    secrets: inherit
+    secrets:
+      NGROK_AUTHTOKEN:
+        required: true
   push:
     branches:
       - '**'
