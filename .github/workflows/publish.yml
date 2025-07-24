@@ -1,52 +1,15 @@
-on:
-  workflow_dispatch:
 name: Publish All
+on:
+  pull_request:
+    branches: [main]
 
 jobs:
-  publish:
-    name: Build ${{ matrix.settings.target }}
-    strategy:
-      fail-fast: false
-      matrix:
-        settings:
-          - host: macos-latest
-            target: aarch64-apple-darwin
-          - host: macos-latest
-            target: universal2-apple-darwin
-          - host: macos-latest
-            target: x86_64-apple-darwin
-          - host: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            docker: ghcr.io/rust-cross/manylinux2014-cross:aarch64
-          - host: ubuntu-24.04-arm
-            target: aarch64-unknown-linux-musl
-            docker: alpine:3.21
-          - host: ubuntu-latest
-            target: armv7-unknown-linux-gnueabihf
-            docker: ghcr.io/rust-cross/manylinux2014-cross:armv7
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            docker: ghcr.io/rust-cross/manylinux2014-cross:x86_64
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-            docker: alpine:3.21
-          - host: windows-latest
-            target: aarch64-pc-windows-msvc
-          - host: windows-latest
-            target: i686-pc-windows-msvc
-          - host: windows-latest
-            target: x86_64-pc-windows-msvc
-
-    uses: ./.github/workflows/build.yml
-    with:
-      docker: ${{ matrix.settings.docker }}
-      host: ${{ matrix.settings.host }}
-      if: true
-      publish: true
-      setup: ${{ matrix.settings.setup }}
-      target: ${{ matrix.settings.target }}
+  ci:
+    name: Runs CI
+    uses: ./.github/workflows/ci.yml
     secrets: inherit
-
+    with:
+      publish: true
   tag-release:
     name: Tag Release
     needs: publish

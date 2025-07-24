@@ -4,6 +4,10 @@ env:
   APP_NAME: ngrok
   MACOSX_DEPLOYMENT_TARGET: '10.13'
 on:
+  workflow_call:
+    secrets:
+      NGROK_AUTHTOKEN:
+        required: true
   push:
     branches:
       - '**'
