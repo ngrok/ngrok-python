@@ -102,26 +102,6 @@ jobs:
             sudo apt -y full-upgrade
             sudo apt -y install gcc-multilib
 
-            # Install Rust
-            curl --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
-            export PATH="$HOME/.cargo/bin:$PATH"
-
-            # ring 0.17 assembly build needs __ARM_ARCH set
-            export CFLAGS_aarch64_unknown_linux_gnu="-D__ARM_ARCH=8"
-            rustup component add llvm-tools-preview || true
-            rustup target add aarch64-unknown-linux-gnu
-            python3 -m venv .env
-            . .env/bin/activate && pip install -r requirements.txt
-            . .env/bin/activate && pip install patchelf
-            if [ "${{ inputs.publish }}" = 'true' ]; then
-              echo "~~~~ maturin publishing"
-              # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
-              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
-            else
-              echo "~~~~ maturin building"
-              . .env/bin/activate && maturin build --target ${{ inputs.target }}
-            fi
-
       - name: Build and (Publish) armv7-unknown-linux-gnueabihf
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'armv7-unknown-linux-gnueabihf' }}
