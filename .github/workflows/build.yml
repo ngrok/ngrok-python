@@ -162,31 +162,31 @@ jobs:
         with:
           image: ${{ inputs.docker }}
           options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
-        run: |
-          # Update and install required packages
-          sudo apt-get update
-          sudo apt-get install -y llvm-dev clang libclang-dev gcc-multilib
+          run: |
+            # Update and install required packages
+            sudo apt-get update
+            sudo apt-get install -y llvm-dev clang libclang-dev gcc-multilib
 
-          # Install Rust minimal toolchain
-          curl --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
-          export PATH="$HOME/.cargo/bin:$PATH"
+            # Install Rust minimal toolchain
+            curl --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+            export PATH="$HOME/.cargo/bin:$PATH"
 
-          # Add necessary Rust targets and components
-          rustup component add llvm-tools-preview || true
-          rustup target add x86_64-unknown-linux-gnu
+            # Add necessary Rust targets and components
+            rustup component add llvm-tools-preview || true
+            rustup target add x86_64-unknown-linux-gnu
 
-          # Create and activate Python virtual environment
-          python3 -m venv .env
-          . .env/bin/activate && pip install -r requirements.txt
-          . .env/bin/activate && pip install patchelf
+            # Create and activate Python virtual environment
+            python3 -m venv .env
+            . .env/bin/activate && pip install -r requirements.txt
+            . .env/bin/activate && pip install patchelf
 
-          if [ "${{ inputs.publish }}" = 'true' ]; then
-            echo "~~~~ maturin publishing"
-            . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing -i python3.12 -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
-          else
-            echo "~~~~ maturin building"
-            . .env/bin/activate && maturin build --target ${{ inputs.target }}
-          fi
+            if [ "${{ inputs.publish }}" = 'true' ]; then
+              echo "~~~~ maturin publishing"
+              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing -i python3.12 -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+            else
+              echo "~~~~ maturin building"
+              . .env/bin/activate && maturin build --target ${{ inputs.target }}
+            fi
 
       - name: Build Python Extension Module (non-docker)
         if: ${{ inputs.publish != true && !inputs.docker && !contains(inputs.target,'android') }}
