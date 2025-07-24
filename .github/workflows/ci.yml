@@ -5,9 +5,12 @@ env:
   MACOSX_DEPLOYMENT_TARGET: '10.13'
 on:
   workflow_call:
-    secrets:
-      NGROK_AUTHTOKEN:
-        required: true
+    inputs:
+      publish:
+        required: false
+        default: false
+        type: boolean
+    secrets: inherit
   push:
     branches:
       - '**'
