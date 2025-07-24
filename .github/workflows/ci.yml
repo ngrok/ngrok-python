@@ -99,6 +99,7 @@ jobs:
             docker: ghcr.io/rust-cross/manylinux2014-cross:armv7
           - host: ubuntu-latest
             target: x86_64-unknown-linux-gnu
+            docker: ghcr.io/rust-cross/manylinux2014-cross:x86_64
           - host: ubuntu-latest
             target: x86_64-unknown-linux-musl
             docker: alpine:3.21
