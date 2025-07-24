@@ -13,6 +13,8 @@ on:
     secrets:
       NGROK_AUTHTOKEN:
         required: true
+      MATURIN_PASSWORD:
+        required: true
   push:
     branches:
       - '**'
