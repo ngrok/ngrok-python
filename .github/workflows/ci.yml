@@ -83,7 +83,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
-      publish: ${{ inputs.publish }}
+      publish: ${{ inputs.publish || false }}
       docker: ${{ matrix.settings.docker }}
       host: ${{ matrix.settings.host }}
       setup: ${{ matrix.settings.setup }}
