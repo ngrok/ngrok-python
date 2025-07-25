@@ -31,7 +31,7 @@ changelog = "https://github.com/ngrok/ngrok-python/blob/main/CHANGELOG.md"
 ngrok-asgi = "ngrok:__main__.asgi_cli"
 
 [build-system]
-requires = ["maturin>=1.5,<=1.6"]
+requires = ["maturin>=1.5,<=1.9.1"]
 build-backend = "maturin"
 
 [tool.maturin]

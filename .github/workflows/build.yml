@@ -14,7 +14,8 @@ on:
         type: boolean
       publish:
         required: false
-        type: string
+        type: boolean
+        default: false
       setup:
         required: false
         type: string
@@ -26,6 +27,10 @@ jobs:
     if: ${{ inputs.if }}
     name: stable - ${{ inputs.target }} - python@3.12
     runs-on: ${{ inputs.host }}
+    env:
+      PYTHON_VERSION: "3.12"
+      MATURIN_VERSION: "v1.9.1"
+      XWIN_VERSION: "16"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,8 +55,22 @@ jobs:
         if: ${{ inputs.target == 'i686-pc-windows-msvc' }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
           architecture: "x86"
+      - name: Download ARM64 Python SDK
+        if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
+        run: |
+          curl -LO https://www.python.org/ftp/python/${{ env.PYTHON_VERSION }}.0/python-${{ env.PYTHON_VERSION }}.0-embed-arm64.zip
+          mkdir python-arm64
+          tar -xf python-${{ env.PYTHON_VERSION }}.0-embed-arm64.zip -C python-arm64
+      - name: Set ARM64 Python environment variables 
+        if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
+        shell: pwsh
+        run: |
+          echo "PYTHONHOME=${{ github.workspace }}\python-arm64" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "PYTHONPATH=${{ github.workspace }}\python-arm64" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "PATH=${{ github.workspace }}\python-arm64;${env:PATH}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Build and (Publish) musl for ${{ inputs.target }}
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'x86_64-unknown-linux-musl' || inputs.target == 'aarch64-unknown-linux-musl' }}
@@ -72,8 +91,9 @@ jobs:
 
             if [ "${SHOULD_PUBLISH}" == 'true' ]; then
               echo "~~~~ maturin publishing"
-              . ./venv/bin/activate && maturin publish --no-sdist -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+              . ./venv/bin/activate && maturin publish --no-sdist --skip-existing -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
             fi
+
       - name: Build and (Publish) aarch64-unknown-linux-gnu
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'aarch64-unknown-linux-gnu' }}
@@ -101,7 +121,7 @@ jobs:
             if [ "${SHOULD_PUBLISH}" = 'true' ]; then
               echo "~~~~ maturin publishing"
               # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
-              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
             else
               echo "~~~~ maturin building"
               . .env/bin/activate && maturin build --target ${{ inputs.target }}
@@ -136,30 +156,59 @@ jobs:
             if [ "${SHOULD_PUBLISH}" = 'true' ]; then
               echo "~~~~ maturin publishing"
               # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
-              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
             else
               echo "~~~~ maturin building"
               RUST_BACKTRACE=1 . .env/bin/activate && maturin build --target ${{ inputs.target }} --verbose
+            fi
+      - name: Build and (Publish) x86_64-unknown-linux-gnu
+        uses: addnab/docker-run-action@v3
+        if: ${{ inputs.target == 'x86_64-unknown-linux-gnu' }}
+        with:
+          image: ${{ inputs.docker }}
+          options: '-e SHOULD_PUBLISH=${{ inputs.publish }} --user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
+          run: |
+            # Update and install required packages
+            sudo apt-get update
+            sudo apt-get install -y llvm-dev clang libclang-dev gcc-multilib
+
+            # Install Rust minimal toolchain
+            curl --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+            export PATH="$HOME/.cargo/bin:$PATH"
+
+            # Add necessary Rust targets and components
+            rustup component add llvm-tools-preview || true
+            rustup target add x86_64-unknown-linux-gnu
+
+            # Create and activate Python virtual environment
+            python3 -m venv .env
+            . .env/bin/activate && pip install -r requirements.txt
+            . .env/bin/activate && pip install patchelf
+
+            if [ "${SHOULD_PUBLISH}" = 'true' ]; then
+              echo "~~~~ maturin publishing"
+              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing -i python3.12 -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+            else
+              echo "~~~~ maturin building"
+              . .env/bin/activate && maturin build --target ${{ inputs.target }}
             fi
       - name: Build Python Extension Module (non-docker)
         if: ${{ inputs.publish != true && !inputs.docker && !contains(inputs.target,'android') }}
         uses: PyO3/maturin-action@v1
         with:
-          maturin-version: v1.6.0
+          maturin-version: ${{ env.MATURIN_VERSION }}
           target: ${{ inputs.target }}
-          # builds in release mode with the specified python version as the interpreter and the Cargo.toml file as the manifest
-          args: --release -i python3.12 --target ${{ inputs.target }} -m Cargo.toml
+          args: --release -i python${{ env.PYTHON_VERSION }} --target ${{ inputs.target }} -m Cargo.toml
         env:
-          # see https://github.com/PyO3/maturin/issues/2110
-          XWIN_VERSION: '16'
+          XWIN_VERSION: ${{ env.XWIN_VERSION }}
       - name: Publish to PyPI (non-docker)
         if: ${{ inputs.publish == true && !inputs.docker && !contains(inputs.target,'android') }}
         uses: PyO3/maturin-action@v1
         with:
           command: publish
-          maturin-version: v1.6.0
+          maturin-version: ${{ env.MATURIN_VERSION }}
           target: ${{ inputs.target }}
-          args: --no-sdist -i python3.12 -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+          args: --no-sdist --skip-existing -i python${{ env.PYTHON_VERSION }} -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
