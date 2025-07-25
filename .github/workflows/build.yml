@@ -27,6 +27,10 @@ jobs:
     if: ${{ inputs.if }}
     name: stable - ${{ inputs.target }} - python@3.12
     runs-on: ${{ inputs.host }}
+    env:
+      PYTHON_VERSION: "3.12"
+      MATURIN_VERSION: "v1.9.1"
+      XWIN_VERSION: "16"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -51,14 +55,14 @@ jobs:
         if: ${{ inputs.target == 'i686-pc-windows-msvc' }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
           architecture: "x86"
       - name: Download ARM64 Python SDK
         if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
         run: |
-          curl -LO https://www.python.org/ftp/python/3.12.0/python-3.12.0-embed-arm64.zip
+          curl -LO https://www.python.org/ftp/python/${{ env.PYTHON_VERSION }}.0/python-${{ env.PYTHON_VERSION }}.0-embed-arm64.zip
           mkdir python-arm64
-          tar -xf python-3.12.0-embed-arm64.zip -C python-arm64
+          tar -xf python-${{ env.PYTHON_VERSION }}.0-embed-arm64.zip -C python-arm64
       - name: Set ARM64 Python environment variables 
         if: ${{ inputs.target == 'aarch64-pc-windows-msvc' }}
         shell: pwsh
@@ -192,21 +196,19 @@ jobs:
         if: ${{ inputs.publish != true && !inputs.docker && !contains(inputs.target,'android') }}
         uses: PyO3/maturin-action@v1
         with:
-          maturin-version: v1.9.1
+          maturin-version: ${{ env.MATURIN_VERSION }}
           target: ${{ inputs.target }}
-          # builds in release mode with the specified python version as the interpreter and the Cargo.toml file as the manifest
-          args: --release -i python3.12 --target ${{ inputs.target }} -m Cargo.toml
+          args: --release -i python${{ env.PYTHON_VERSION }} --target ${{ inputs.target }} -m Cargo.toml
         env:
-          # see https://github.com/PyO3/maturin/issues/2110
-          XWIN_VERSION: '16'
+          XWIN_VERSION: ${{ env.XWIN_VERSION }}
       - name: Publish to PyPI (non-docker)
         if: ${{ inputs.publish == true && !inputs.docker && !contains(inputs.target,'android') }}
         uses: PyO3/maturin-action@v1
         with:
           command: publish
-          maturin-version: v1.9.1
+          maturin-version: ${{ env.MATURIN_VERSION }}
           target: ${{ inputs.target }}
-          args: --no-sdist --skip-existing -i python3.12 -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+          args: --no-sdist --skip-existing -i python${{ env.PYTHON_VERSION }} -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
