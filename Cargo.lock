@@ -1036,9 +1036,9 @@ dependencies = [
 
 [[package]]
 name = "ngrok"
-version = "0.17.0"
+version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b2d865d242cc88f2849b250154b260ed9c765f442c1e867fd539b60c1c0164a"
+checksum = "41ad94d0fd5a5e1f5bb6a99f06b8babc62594799785451f4aeb048c9b2848ef8"
 dependencies = [
  "arc-swap",
  "async-trait",
@@ -1077,7 +1077,7 @@ dependencies = [
 
 [[package]]
 name = "ngrok-python"
-version = "1.6.0"
+version = "1.7.0"
 dependencies = [
  "async-trait",
  "aws-lc-rs",
