@@ -17,6 +17,12 @@ def get_parser():
     )
     # ngrok session options
     parser.add_argument(
+        "--log-level",
+        default="INFO",
+        choices=["ERROR", "WARN", "INFO", "DEBUG", "TRACE"],
+        help="Logging level for the ngrok bridge and Python logger.",
+    )
+    parser.add_argument(
         "--authtoken",
         help="Ngrok authtoken, otherwise uses NGROK_AUTH_TOKEN environment variable",
     )

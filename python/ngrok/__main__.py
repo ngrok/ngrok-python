@@ -183,11 +183,17 @@ async def bind(parser, args):
 
 
 def main(args):
-    logging.basicConfig(level=logging.INFO)
-
     # argument parsing
     parser = ngrok_parser.get_parser()
     args, unknown = parser.parse_known_args()
+
+    logging.basicConfig()
+    ngrok.log_level(args.log_level)
+    py_level = {
+        "WARN": logging.WARNING,
+        "TRACE": logging.DEBUG,
+    }.get(args.log_level, getattr(logging, args.log_level, logging.INFO))
+    logging.getLogger("ngrok").setLevel(py_level)
 
     # validation
     if args.config:
