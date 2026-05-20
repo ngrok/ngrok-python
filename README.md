@@ -323,6 +323,7 @@ python -m ngrok gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorke
     - [Modify asgi.py Example](https://github.com/ngrok/ngrok-python/tree/main/examples/djangosite/djangosite/ngrok-asgi.py)
     - or [via `ngrok-asgi`](#asgi-runner)
   - [Flask](https://github.com/ngrok/ngrok-python/tree/main/examples/flask-ngrok.py)
+  - [Google Colab](https://github.com/ngrok/ngrok-python/tree/main/examples/google-colab.ipynb)
   - [Gunicorn](#gunicorn)
   - [Hypercorn](https://github.com/ngrok/ngrok-python/tree/main/examples/hypercorn-http2-ngrok.py)
   - [Streamlit](https://github.com/ngrok/ngrok-python/tree/main/examples/streamlit/streamlit-ngrok.py)
