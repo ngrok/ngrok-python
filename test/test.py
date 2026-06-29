@@ -207,9 +207,11 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         error = None
         try:
             _, session = await make_http_and_session()
-            await session.http_endpoint().traffic_policy(
-                '{ "inbound": "not valid" }'
-            ).listen()
+            await (
+                session.http_endpoint()
+                .traffic_policy('{ "inbound": "not valid" }')
+                .listen()
+            )
         except ValueError as err:
             error = err
         self.assertIsInstance(error, ValueError)
@@ -410,7 +412,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         listener.forward(tcp_server.listen_to)
         try:
             resp = requests.get(listener.url(), timeout=3)
-        except requests.exceptions.ReadTimeout as err:
+        except requests.exceptions.ReadTimeout:
             pass
 
         self.assertIn(b"PROXY TCP", ProxyHandler.read_value)
@@ -711,7 +713,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         except ValueError as err:
             error = err
         self.assertIsInstance(error, ValueError)
-        self.assertEqual("ERR_NGROK_326", error.args[2])
+        self.assertEqual("ERR_NGROK_9034", error.args[2])
 
 
 if __name__ == "__main__":
