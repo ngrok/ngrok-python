@@ -113,7 +113,10 @@
         '';
       in
       {
-        devShell = pkgs.mkShell {
+        # Use clangStdenv so bundled C deps (e.g. aws-lc-sys) are compiled with
+        # clang. The Nix glibc 2.39 headers trigger a -Werror=stringop-overflow
+        # false positive under gcc, which aborts the aws-lc-sys build.
+        devShell = (pkgs.mkShell.override { stdenv = pkgs.clangStdenv; }) {
           CHALK_OVERFLOW_DEPTH = 3000;
           CHALK_SOLVER_MAX_SIZE = 1500;
           OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
