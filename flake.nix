@@ -125,14 +125,12 @@
           LIBCLANG_PATH="${pkgs.llvmPackages.libclang.lib}/lib";
           buildInputs = with pkgs; [
             toolchain
-            python-toolchain
-            llvm-toolchain
             fix-n-fmt
             setup-hooks
             cargo-udeps
             semver-checks
             extract-version
-          ] ++ lib.optionals stdenv.isDarwin [
+          ] ++ python-toolchain ++ llvm-toolchain ++ lib.optionals stdenv.isDarwin [
             # nix darwin stdenv has broken libiconv: https://github.com/NixOS/nixpkgs/issues/158331
             libiconv
             pkgs.darwin.apple_sdk.frameworks.Security

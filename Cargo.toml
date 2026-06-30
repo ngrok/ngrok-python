@@ -15,7 +15,7 @@ futures = "0.3.26"
 lazy_static = "1.4.0"
 log = "0.4"
 mio = { version = "1.0.3" }
-ngrok = { version = "0.18.0", features = ["hyper"] }
+ngrok = { version = "0.19.0", features = ["hyper"] }
 once_cell = {version = "1.21"}
 pyo3 = { version = "0.22", features = ["abi3", "abi3-py310", "extension-module", "multiple-pymethods", "experimental-async", "gil-refs", "generate-import-lib"]}
 pyo3-async-runtimes = { version = "0.22", features = ["attributes", "tokio-runtime"] }
@@ -27,8 +27,8 @@ rustls-pemfile = "2.0.0"
 tokio = { version = "1.40", features = ["sync"] }
 tracing = { version = "0.1.37", features = ["log", "log-always"] }
 url = "2.4.0"
-aws-lc-sys = { version = "=0.28.0", features = ["bindgen"] }
-aws-lc-rs = "=1.13.0"
+aws-lc-sys = { version = "=0.41.0", features = ["bindgen"] }
+aws-lc-rs = "=1.17.0"
 
 [build-dependencies]
 prost-build = "0.13.5"
