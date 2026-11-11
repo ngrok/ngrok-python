@@ -11,6 +11,7 @@ import random
 import requests
 import socketserver
 import threading
+import time
 import unittest
 import logging
 
@@ -28,6 +29,33 @@ def retry_request():
     s.mount("http://", adapter)
     s.mount("https://", adapter)
     return s
+
+
+def tls_passthrough_request(url, timeout=10, get=requests.get, sleep=time.sleep):
+    """GET a tls endpoint's URL over HTTPS; return the SSLError, or the response.
+
+    A tls endpoint passes TLS through to the plain-HTTP test server, so the
+    handshake fails with an SSLError. Until a fresh endpoint is routable,
+    ngrok's edge answers it with its own 404 and ERR_NGROK_3200 (endpoint
+    offline); only that answer is retried, for up to timeout seconds. Each
+    GET is bounded by the time left, at least a second, so a stalled
+    handshake raises requests' Timeout instead of hanging the test.
+    get and sleep are replaceable so test_tls_passthrough.py can fake the edge.
+    """
+    deadline = time.monotonic() + timeout
+    while True:
+        try:
+            response = get(url, timeout=max(deadline - time.monotonic(), 1))
+        except requests.exceptions.SSLError as err:
+            return err
+        offline = (
+            response.status_code == 404
+            and response.headers.get("ngrok-error-code") == "ERR_NGROK_3200"
+        )
+        if not offline or time.monotonic() > deadline:
+            return response
+        # The edge gives no signal when the endpoint becomes routable.
+        sleep(0.5)
 
 
 class HelloHandler(BaseHTTPRequestHandler):
@@ -507,12 +535,8 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
         listener.forward(http_server.listen_to)
 
-        error = None
-        try:
-            response = requests.get(listener.url().replace("tls:", "https:"))
-        except requests.exceptions.SSLError as err:
-            error = err
-        self.assertIsInstance(error, requests.exceptions.SSLError)
+        result = tls_passthrough_request(listener.url().replace("tls:", "https:"))
+        self.assertIsInstance(result, requests.exceptions.SSLError)
 
         await shutdown(listener, http_server)
 
