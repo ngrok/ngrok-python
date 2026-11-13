@@ -133,7 +133,6 @@
           ] ++ python-toolchain ++ llvm-toolchain ++ lib.optionals stdenv.isDarwin [
             # nix darwin stdenv has broken libiconv: https://github.com/NixOS/nixpkgs/issues/158331
             libiconv
-            pkgs.darwin.apple_sdk.frameworks.Security
           ];
         };
       });

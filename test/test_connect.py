@@ -188,12 +188,8 @@ class TestNgrokConnect(unittest.IsolatedAsyncioTestCase):
 
         listener.forward(http_server.listen_to)
 
-        error = None
-        try:
-            requests.get(listener.url().replace("tls:", "https:"))
-        except requests.exceptions.SSLError as err:
-            error = err
-        self.assertIsInstance(error, requests.exceptions.SSLError)
+        result = test.tls_passthrough_request(listener.url().replace("tls:", "https:"))
+        self.assertIsInstance(result, requests.exceptions.SSLError)
 
         shutdown(listener.url(), http_server)
 
