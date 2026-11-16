@@ -1051,9 +1051,9 @@ dependencies = [
 
 [[package]]
 name = "ngrok"
-version = "0.19.0"
+version = "0.19.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10f6c455d972d973dded17538cb01426ca79eccb9774ae8ab8f1af637f469f3f"
+checksum = "cc448f204f9e168e07f71ee16b8462591408315dc0d3dc3b6977bdb4a0d12f68"
 dependencies = [
  "arc-swap",
  "async-trait",
@@ -1071,7 +1071,6 @@ dependencies = [
  "hyper-util",
  "muxado",
  "once_cell",
- "parking_lot",
  "pin-project",
  "proxy-protocol",
  "regex",

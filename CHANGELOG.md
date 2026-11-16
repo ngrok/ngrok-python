@@ -1,3 +1,7 @@
+## Unreleased
+
+- Change how a session waits between reconnect attempts after it loses its connection, for every session: the wait starts at 50 ms and doubles up to 30 s, each wait scaled by a random factor in [0, 1). Before, the wait grew 50-fold per attempt with no cap and no random factor: about 2 minutes before the fourth attempt and 1 h 44 min before the fifth.
+
 ## 1.7.0 
 - Add support for CEL filtering when listing resources.
 - Add support for service users
