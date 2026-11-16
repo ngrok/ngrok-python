@@ -31,23 +31,19 @@ def retry_request():
     return s
 
 
-def tls_passthrough_request(url, timeout=10, get=requests.get, sleep=time.sleep):
-    """GET a tls endpoint's URL over HTTPS; return the SSLError, or the response.
+def get_when_online(url, timeout=10, get=requests.get, sleep=time.sleep):
+    """GET a fresh endpoint's URL, retrying while ngrok's edge says it is offline.
 
-    A tls endpoint passes TLS through to the plain-HTTP test server, so the
-    handshake fails with an SSLError. Until a fresh endpoint is routable,
-    ngrok's edge answers it with its own 404 and ERR_NGROK_3200 (endpoint
-    offline); only that answer is retried, for up to timeout seconds. Each
-    GET is bounded by the time left, at least a second, so a stalled
-    handshake raises requests' Timeout instead of hanging the test.
-    get and sleep are replaceable so test_tls_passthrough.py can fake the edge.
+    Until a fresh endpoint is routable, ngrok's edge answers it with its own
+    404 and ERR_NGROK_3200 (endpoint offline); only that answer is retried,
+    for up to timeout seconds, and any other response is returned at once.
+    Each GET is bounded by the time left, at least a second, so a stalled
+    request raises requests' Timeout instead of hanging the test.
+    get and sleep are replaceable so tests can fake the edge.
     """
     deadline = time.monotonic() + timeout
     while True:
-        try:
-            response = get(url, timeout=max(deadline - time.monotonic(), 1))
-        except requests.exceptions.SSLError as err:
-            return err
+        response = get(url, timeout=max(deadline - time.monotonic(), 1))
         offline = (
             response.status_code == 404
             and response.headers.get("ngrok-error-code") == "ERR_NGROK_3200"
@@ -56,6 +52,18 @@ def tls_passthrough_request(url, timeout=10, get=requests.get, sleep=time.sleep)
             return response
         # The edge gives no signal when the endpoint becomes routable.
         sleep(0.5)
+
+
+def tls_passthrough_request(url, timeout=10, get=requests.get, sleep=time.sleep):
+    """GET a tls endpoint's URL over HTTPS; return the SSLError, or the response.
+
+    A tls endpoint passes TLS through to the plain-HTTP test server, so the
+    handshake fails with an SSLError, which ends get_when_online's retries.
+    """
+    try:
+        return get_when_online(url, timeout, get, sleep)
+    except requests.exceptions.SSLError as err:
+        return err
 
 
 class HelloHandler(BaseHTTPRequestHandler):
