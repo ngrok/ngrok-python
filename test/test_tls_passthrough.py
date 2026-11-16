@@ -2,16 +2,18 @@ import requests
 import socket
 import threading
 import unittest
-from test import tls_passthrough_request
+from test import get_when_online, tls_passthrough_request
 
 OFFLINE = "ERR_NGROK_3200"
 
 
-def response(status_code, ngrok_error_code=None):
+def response(status_code, ngrok_error_code=None, location=None):
     r = requests.Response()
     r.status_code = status_code
     if ngrok_error_code:
         r.headers["ngrok-error-code"] = ngrok_error_code
+    if location:
+        r.headers["location"] = location
     return r
 
 
@@ -20,17 +22,21 @@ class FakeEdge:
 
     Answers each GET with the next step: a requests.Response, or "handshake"
     to raise the SSLError that TLS passthrough to a plain-HTTP server gives.
+    A redirect is followed unless allow_redirects is False, as requests.get
+    does, to the 404 that the https URL of an http-scheme endpoint answers.
     """
 
     def __init__(self, *steps):
         self.steps = list(steps)
         self.requests = 0
 
-    def get(self, url, timeout):
+    def get(self, url, timeout, allow_redirects=True):
         self.requests += 1
         step = self.steps.pop(0)
         if step == "handshake":
             raise requests.exceptions.SSLError("wrong version number")
+        if allow_redirects and step.is_redirect:
+            return response(404)
         return step
 
 
@@ -70,6 +76,36 @@ class TestTlsPassthroughRequest(unittest.TestCase):
         result = self.request(edge, timeout=-1)
         self.assertEqual(404, result.status_code)
         self.assertEqual(1, edge.requests)
+
+
+class TestGetWhenOnline(unittest.TestCase):
+    url = "http://example.ngrok.app"
+
+    def get(self, edge):
+        return get_when_online(self.url, get=edge.get, sleep=no_sleep)
+
+    # Until an http-scheme endpoint is routable, the edge redirects its http
+    # URL to https on the same host, where no endpoint will ever answer.
+    def test_a_redirect_to_https_on_the_same_host_is_retried(self):
+        edge = FakeEdge(
+            response(307, location="https://example.ngrok.app/"),
+            response(307, location="https://example.ngrok.app/"),
+            response(200),
+        )
+        self.assertEqual(200, self.get(edge).status_code)
+        self.assertEqual(3, edge.requests)
+
+    def test_a_redirect_elsewhere_is_returned(self):
+        edge = FakeEdge(response(307, location="https://elsewhere.example/"))
+        self.assertEqual(307, self.get(edge).status_code)
+        self.assertEqual(1, edge.requests)
+
+    # A proxy-proto endpoint answers 503 ERR_NGROK_3004 once a request
+    # reaches the test's handler, which writes no HTTP response.
+    def test_offline_answers_are_retried_until_one_reaches_the_server(self):
+        edge = FakeEdge(response(404, OFFLINE), response(503, "ERR_NGROK_3004"))
+        self.assertEqual(503, self.get(edge).status_code)
+        self.assertEqual(2, edge.requests)
 
 
 class TestTlsPassthroughRequestStall(unittest.TestCase):
