@@ -175,6 +175,20 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
         await self.forward_validate_shutdown(http_server, listener, listener.url())
 
+    async def test_reconnect_options_connect(self):
+        http_server = make_http()
+        session = (
+            await ngrok.SessionBuilder()
+            .authtoken_from_env()
+            .reconnect_backoff(100, 5000)
+            .reconnect_jitter(False)
+            .reconnect_max_attempts(5)
+            .connect()
+        )
+        listener = await session.http_endpoint().listen()
+        self.assertTrue(listener.url().startswith("https://"))
+        await self.forward_validate_shutdown(http_server, listener, listener.url())
+
     async def test_http_listener(self):
         http_server, session = await make_http_and_session()
         listener = await session.http_endpoint().scheme("hTtP").listen()

@@ -1,6 +1,8 @@
 use std::{
     borrow::BorrowMut,
     env,
+    fmt::Display,
+    num::NonZeroU32,
     sync::Arc,
     time::Duration,
 };
@@ -24,8 +26,13 @@ use pyo3::{
     pyclass,
     pyfunction,
     pymethods,
-    types::PyByteArray,
+    types::{
+        PyAnyMethods,
+        PyByteArray,
+        PyLong,
+    },
     Bound,
+    FromPyObject,
     PyAny,
     PyErr,
     PyObject,
@@ -50,6 +57,7 @@ use crate::{
         TcpListenerBuilder,
         TlsListenerBuilder,
     },
+    py_err,
     py_ngrok_err,
 };
 
@@ -250,6 +258,88 @@ impl SessionBuilder {
                 .expect("fixme");
         });
         self_
+    }
+
+    /// Configures how long the session waits between attempts to reconnect
+    /// after it loses its connection to the ngrok service, in milliseconds.
+    ///
+    /// The first attempt is immediate. After it, the session waits ``initial_ms``,
+    /// then twice as long before each attempt, up to ``max_ms``. Each wait is
+    /// scaled by a random factor in [0, 1) unless :meth:`reconnect_jitter`
+    /// turns that off. The defaults are 50 ms and 30 s. For a fixed wait
+    /// between every attempt, pass the same value for both and turn jitter off.
+    ///
+    /// These waits never stop the session from reconnecting on their own:
+    /// :meth:`reconnect_max_attempts`, or closing the session, does.
+    ///
+    /// An argument that is not an int is refused with a ``TypeError``, and an
+    /// int below 0 or above 18446744073709551615 with a ``ValueError``, each
+    /// naming the argument. The ngrok Rust SDK then checks the range: it
+    /// rejects an ``initial_ms`` below 1 or above ``max_ms``, and a ``max_ms``
+    /// above one day (86400000), with a ``ValueError`` that starts with the
+    /// call and its arguments, as in
+    /// "reconnect_backoff(initial_ms=2000, max_ms=1000): ", and names the rule
+    /// broken. A refused call leaves the builder unchanged.
+    pub fn reconnect_backoff<'a>(
+        self_: PyRefMut<'a, Self>,
+        initial_ms: &Bound<'_, PyLong>,
+        max_ms: &Bound<'_, PyLong>,
+    ) -> PyResult<PyRefMut<'a, Self>> {
+        let initial_ms: u64 = int_in_range("initial_ms", initial_ms, 0, u64::MAX)?;
+        let max_ms: u64 = int_in_range("max_ms", max_ms, 0, u64::MAX)?;
+        let mut result = Ok(());
+        self_.set(|b| {
+            result = b
+                .reconnect_backoff(
+                    Duration::from_millis(initial_ms),
+                    Duration::from_millis(max_ms),
+                )
+                .map(|_| ())
+                .map_err(|e| {
+                    py_err(format!(
+                        "reconnect_backoff(initial_ms={initial_ms}, max_ms={max_ms}): {e}"
+                    ))
+                });
+        });
+        result.map(|_| self_)
+    }
+
+    /// Configures whether each wait between reconnect attempts is scaled by a
+    /// random factor in [0, 1). On by default, so that sessions that lose
+    /// their connections together don't all reconnect at the same moment.
+    pub fn reconnect_jitter(self_: PyRefMut<Self>, enabled: bool) -> PyRefMut<Self> {
+        self_.set(|b| {
+            b.reconnect_jitter(enabled);
+        });
+        self_
+    }
+
+    /// Configures the session to stop reconnecting after ``attempts`` failed
+    /// attempts in one outage, counting the immediate first attempt. Each new
+    /// outage starts the count again. By default the session never stops on
+    /// its own.
+    ///
+    /// When the session stops, every listener stops forwarding with the last
+    /// attempt's error: awaiting a listener's ``forward`` raises a ``ValueError``
+    /// whose message starts "error forwarding:", and awaiting its ``join`` one
+    /// that starts "error on join:". Nothing raises for the forwarding that
+    /// ``ngrok.forward``, or ``ngrok.listen`` given a server, starts: it ends
+    /// without a sign. The handler given to
+    /// :meth:`handle_disconnection` is called before each attempt, and not
+    /// again once the session stops.
+    ///
+    /// ``attempts`` must be an int from 1 to 4294967295. Anything else is
+    /// refused, naming the argument: what is not an int with a ``TypeError``,
+    /// an int out of that range with a ``ValueError``.
+    pub fn reconnect_max_attempts<'a>(
+        self_: PyRefMut<'a, Self>,
+        attempts: &Bound<'_, PyLong>,
+    ) -> PyResult<PyRefMut<'a, Self>> {
+        let attempts: NonZeroU32 = int_in_range("attempts", attempts, 1, u32::MAX)?;
+        self_.set(|b| {
+            b.reconnect_max_attempts(attempts);
+        });
+        Ok(self_)
     }
 
     /// Configures the opaque, machine-readable metadata string for this session.
@@ -551,4 +641,17 @@ impl Drop for Session {
     fn drop(&mut self) {
         debug!("Session drop");
     }
+}
+
+/// `value` as a `T`, or a ValueError naming the argument and the range from
+/// `min` to `max` that `T` holds.
+fn int_in_range<'py, T: FromPyObject<'py>>(
+    name: &str,
+    value: &Bound<'py, PyLong>,
+    min: impl Display,
+    max: impl Display,
+) -> PyResult<T> {
+    value
+        .extract()
+        .map_err(|_| py_err(format!("{name} must be from {min} to {max}, got {value}")))
 }
