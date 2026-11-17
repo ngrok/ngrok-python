@@ -21,4 +21,5 @@ Release
 1. Merge the pull request
 1. Run the `Publish All` workflow on `main`: Actions → Publish All → Run workflow
     - The workflow builds the wheels, publishes them to PyPI, and pushes the `v<version>` tag
+    - PyPI trusts this workflow through [trusted publishing](https://docs.pypi.org/trusted-publishers/) in the `pypi` environment, so no API token is needed
 1. Verify release appears on [PyPI](https://pypi.org/project/ngrok/#history)
