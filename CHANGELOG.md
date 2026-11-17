@@ -1,3 +1,9 @@
+## 1.8.0
+
+- Change how a session waits between reconnect attempts after it loses its connection, for every session: the wait starts at 50 ms and doubles up to 30 s, each wait scaled by a random factor in [0, 1). Before, the wait grew 50-fold per attempt with no cap and no random factor: about 2 minutes before the fourth attempt and 1 h 44 min before the fifth.
+- Add `SessionBuilder.reconnect_backoff(initial_ms, max_ms)`, which sets the first wait between reconnect attempts and the cap the doubling waits stop at, and `SessionBuilder.reconnect_jitter(enabled)`, which turns off or on the random scaling of each wait. The defaults are 50 ms, 30 s and jitter on. `reconnect_backoff` refuses a start below 1 ms or above the cap, and a cap above one day, with a `ValueError`.
+- Add `SessionBuilder.reconnect_max_attempts(attempts)`, which stops a session reconnecting after that many failed attempts in one outage; every listener then stops forwarding, and awaiting its `forward()` or `join()` raises the last attempt's error. The forwarding that `ngrok.forward` and `ngrok.listen(server)` start then stops without raising or logging. It refuses anything but an int from 1 to 4294967295. By default a session never stops reconnecting on its own.
+
 ## 1.7.0 
 - Add support for CEL filtering when listing resources.
 - Add support for service users

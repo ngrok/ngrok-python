@@ -4,6 +4,7 @@ from collections import defaultdict
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+from urllib.parse import urlparse
 import asyncio
 import ngrok
 import os
@@ -31,31 +32,50 @@ def retry_request():
     return s
 
 
-def tls_passthrough_request(url, timeout=10, get=requests.get, sleep=time.sleep):
-    """GET a tls endpoint's URL over HTTPS; return the SSLError, or the response.
+def get_when_online(url, timeout=10, get=requests.get, sleep=time.sleep):
+    """GET a fresh endpoint's URL, retrying while ngrok's edge says it is offline.
 
-    A tls endpoint passes TLS through to the plain-HTTP test server, so the
-    handshake fails with an SSLError. Until a fresh endpoint is routable,
-    ngrok's edge answers it with its own 404 and ERR_NGROK_3200 (endpoint
-    offline); only that answer is retried, for up to timeout seconds. Each
-    GET is bounded by the time left, at least a second, so a stalled
-    handshake raises requests' Timeout instead of hanging the test.
-    get and sleep are replaceable so test_tls_passthrough.py can fake the edge.
+    Until a fresh endpoint is routable, ngrok's edge answers it with its own
+    404 and ERR_NGROK_3200 (endpoint offline), or, for an http URL, with a
+    redirect to https on the same host, where no endpoint answers an
+    http-scheme listener. Only those answers are retried, for up to timeout
+    seconds; redirects are not followed, and any other response is returned
+    at once. Each GET is bounded by the time left, at least a second, so a
+    stalled request raises requests' Timeout instead of hanging the test.
+    get and sleep are replaceable so tests can fake the edge.
     """
     deadline = time.monotonic() + timeout
+    requested = urlparse(url)
     while True:
-        try:
-            response = get(url, timeout=max(deadline - time.monotonic(), 1))
-        except requests.exceptions.SSLError as err:
-            return err
+        response = get(
+            url, timeout=max(deadline - time.monotonic(), 1), allow_redirects=False
+        )
+        location = urlparse(response.headers.get("location", ""))
         offline = (
             response.status_code == 404
             and response.headers.get("ngrok-error-code") == "ERR_NGROK_3200"
+        ) or (
+            response.is_redirect
+            and requested.scheme == "http"
+            and location.scheme == "https"
+            and location.netloc == requested.netloc
         )
         if not offline or time.monotonic() > deadline:
             return response
         # The edge gives no signal when the endpoint becomes routable.
         sleep(0.5)
+
+
+def tls_passthrough_request(url, timeout=10, get=requests.get, sleep=time.sleep):
+    """GET a tls endpoint's URL over HTTPS; return the SSLError, or the response.
+
+    A tls endpoint passes TLS through to the plain-HTTP test server, so the
+    handshake fails with an SSLError, which ends get_when_online's retries.
+    """
+    try:
+        return get_when_online(url, timeout, get, sleep)
+    except requests.exceptions.SSLError as err:
+        return err
 
 
 class HelloHandler(BaseHTTPRequestHandler):
@@ -155,11 +175,30 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
 
         await self.forward_validate_shutdown(http_server, listener, listener.url())
 
+    async def test_reconnect_options_connect(self):
+        http_server = make_http()
+        session = (
+            await ngrok.SessionBuilder()
+            .authtoken_from_env()
+            .reconnect_backoff(100, 5000)
+            .reconnect_jitter(False)
+            .reconnect_max_attempts(5)
+            .connect()
+        )
+        listener = await session.http_endpoint().listen()
+        self.assertTrue(listener.url().startswith("https://"))
+        await self.forward_validate_shutdown(http_server, listener, listener.url())
+
     async def test_http_listener(self):
         http_server, session = await make_http_and_session()
         listener = await session.http_endpoint().scheme("hTtP").listen()
         self.assertTrue(listener.url().startswith("http://"))
-        await self.forward_validate_shutdown(http_server, listener, listener.url())
+        listener.forward(http_server.listen_to)
+        # retry_request would follow the redirect a fresh http-scheme endpoint
+        # gets, and retry the https URL it names, where nothing answers.
+        get_when_online(listener.url())
+        await self.validate_http_request(listener.url())
+        await shutdown(listener, http_server)
 
     async def test_https_listener_with_policy(self):
         policy = """
@@ -439,7 +478,7 @@ class TestNgrok(unittest.IsolatedAsyncioTestCase):
         tcp_server.listen_to = "{}:{}".format(addr[0], addr[1])
         listener.forward(tcp_server.listen_to)
         try:
-            resp = requests.get(listener.url(), timeout=3)
+            get_when_online(listener.url())
         except requests.exceptions.ReadTimeout:
             pass
 
