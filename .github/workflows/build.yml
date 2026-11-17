@@ -44,6 +44,11 @@ jobs:
             .cargo-cache
             target/
           key: ${{ inputs.target }}-cargo-${{ inputs.host }}
+      # The cache restores target/, which can hold wheels from an older
+      # version. Remove them so the artifact holds only this build's wheel.
+      - name: Remove cached wheels
+        run: rm -rf target/wheels
+        shell: bash
       - name: Setup toolchain
         run: ${{ inputs.setup }}
         if: ${{ inputs.setup }}
@@ -71,7 +76,7 @@ jobs:
           echo "PYTHONPATH=${{ github.workspace }}\python-arm64" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "PATH=${{ github.workspace }}\python-arm64;${env:PATH}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Build and (Publish) musl for ${{ inputs.target }}
+      - name: Build musl for ${{ inputs.target }}
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'x86_64-unknown-linux-musl' || inputs.target == 'aarch64-unknown-linux-musl' }}
         with:
@@ -90,11 +95,11 @@ jobs:
             make build
 
             if [ "${SHOULD_PUBLISH}" == 'true' ]; then
-              echo "~~~~ maturin publishing"
-              . ./venv/bin/activate && maturin publish --no-sdist --skip-existing -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+              echo "~~~~ maturin building release wheel"
+              . ./venv/bin/activate && maturin build --release --strip
             fi
 
-      - name: Build and (Publish) aarch64-unknown-linux-gnu
+      - name: Build aarch64-unknown-linux-gnu
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'aarch64-unknown-linux-gnu' }}
         with:
@@ -118,16 +123,11 @@ jobs:
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf
-            # this is in raw 'sh', use single '='
-            if [ "${SHOULD_PUBLISH}" = 'true' ]; then
-              echo "~~~~ maturin publishing"
-              # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
-              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
-            else
-              echo "~~~~ maturin building"
-              . .env/bin/activate && maturin build --target ${{ inputs.target }}
-            fi
-      - name: Build and (Publish) armv7-unknown-linux-gnueabihf
+            # Build without '--release': optimization breaks TLS signature
+            # validation on this platform. The publish job uploads this wheel.
+            echo "~~~~ maturin building"
+            . .env/bin/activate && maturin build --strip --target ${{ inputs.target }}
+      - name: Build armv7-unknown-linux-gnueabihf
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'armv7-unknown-linux-gnueabihf' }}
         with:
@@ -153,16 +153,11 @@ jobs:
             python3 -m venv .env
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf
-            # this is in raw 'sh', use single '='
-            if [ "${SHOULD_PUBLISH}" = 'true' ]; then
-              echo "~~~~ maturin publishing"
-              # pass '--debug' to avoid optimization, which breaks tls signature validation on this platform
-              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing --debug -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
-            else
-              echo "~~~~ maturin building"
-              RUST_BACKTRACE=1 . .env/bin/activate && maturin build --target ${{ inputs.target }} --verbose
-            fi
-      - name: Build and (Publish) x86_64-unknown-linux-gnu
+            # Build without '--release': optimization breaks TLS signature
+            # validation on this platform. The publish job uploads this wheel.
+            echo "~~~~ maturin building"
+            . .env/bin/activate && maturin build --strip --target ${{ inputs.target }} --verbose
+      - name: Build x86_64-unknown-linux-gnu
         uses: addnab/docker-run-action@v3
         if: ${{ inputs.target == 'x86_64-unknown-linux-gnu' }}
         with:
@@ -186,30 +181,23 @@ jobs:
             . .env/bin/activate && pip install -r requirements.txt
             . .env/bin/activate && pip install patchelf
 
+            # this is in raw 'sh', use single '='
             if [ "${SHOULD_PUBLISH}" = 'true' ]; then
-              echo "~~~~ maturin publishing"
-              . .env/bin/activate && maturin publish --target ${{ inputs.target }} --no-sdist --skip-existing -i python3.12 -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
+              echo "~~~~ maturin building release wheel"
+              . .env/bin/activate && maturin build --release --strip --target ${{ inputs.target }} -i python3.12
             else
               echo "~~~~ maturin building"
               . .env/bin/activate && maturin build --target ${{ inputs.target }}
             fi
       - name: Build Python Extension Module (non-docker)
-        if: ${{ inputs.publish != true && !inputs.docker && !contains(inputs.target,'android') }}
+        if: ${{ !inputs.docker && !contains(inputs.target,'android') }}
         uses: PyO3/maturin-action@v1
         with:
           maturin-version: ${{ env.MATURIN_VERSION }}
           target: ${{ inputs.target }}
-          args: --release -i python${{ env.PYTHON_VERSION }} --target ${{ inputs.target }} -m Cargo.toml
+          args: --release --strip -i python${{ env.PYTHON_VERSION }} --target ${{ inputs.target }} -m Cargo.toml
         env:
           XWIN_VERSION: ${{ env.XWIN_VERSION }}
-      - name: Publish to PyPI (non-docker)
-        if: ${{ inputs.publish == true && !inputs.docker && !contains(inputs.target,'android') }}
-        uses: PyO3/maturin-action@v1
-        with:
-          command: publish
-          maturin-version: ${{ env.MATURIN_VERSION }}
-          target: ${{ inputs.target }}
-          args: --no-sdist --skip-existing -i python${{ env.PYTHON_VERSION }} -m Cargo.toml -u __token__ -p ${{ secrets.MATURIN_PASSWORD }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

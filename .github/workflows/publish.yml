@@ -8,14 +8,48 @@ jobs:
     uses: ./.github/workflows/ci.yml
     secrets:
       NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
-      MATURIN_PASSWORD: ${{ secrets.MATURIN_PASSWORD }}
     permissions:
       contents: write
     with:
       publish: true
+  pypi-publish:
+    name: Publish to PyPI
+    needs: ci
+    runs-on: ubuntu-latest
+    # PyPI trusts this workflow and environment, and issues a short-lived
+    # upload token through OIDC. No API token is stored in the repository.
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download wheels
+        uses: actions/download-artifact@v4
+        with:
+          pattern: bindings-*
+          path: dist
+          merge-multiple: true
+      - name: Check wheels
+        run: |
+          # PyPI does not accept FreeBSD wheels.
+          rm -f dist/*freebsd*
+          version="$(grep '^version =' Cargo.toml | head -n1 | awk -F\" '{print $2}')"
+          ls -l dist
+          for wheel in dist/*.whl; do
+            case "$(basename "$wheel")" in
+              "ngrok-${version}-"*) ;;
+              *) echo "::error::$wheel is not version ${version}"; exit 1 ;;
+            esac
+          done
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          skip-existing: true
   tag-release:
     name: Tag Release
-    needs: ci
+    needs: pypi-publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
