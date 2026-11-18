@@ -35,7 +35,7 @@ jobs:
     name: Udeps
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jrobsonchase/direnv-action@57d5101f123f9106acdd8797515c262b565ec7a5 # v0.7
       - uses: ./.github/workflows/rust-cache
       - name: Run Udeps
@@ -45,7 +45,7 @@ jobs:
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jrobsonchase/direnv-action@57d5101f123f9106acdd8797515c262b565ec7a5 # v0.7
       - name: Run Rustfmt
         run: |
@@ -54,7 +54,7 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jrobsonchase/direnv-action@57d5101f123f9106acdd8797515c262b565ec7a5 # v0.7
       - uses: ./.github/workflows/rust-cache
       - name: Run Clippy
@@ -64,7 +64,7 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jrobsonchase/direnv-action@57d5101f123f9106acdd8797515c262b565ec7a5 # v0.7
       - uses: ./.github/workflows/rust-cache
       - name: Run Tests
@@ -131,10 +131,10 @@ jobs:
     steps:
       - name: Run lscpu
         run: lscpu
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Build
         id: build
-        uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1
+        uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1.6.0
         env:
           RUSTUP_HOME: /usr/local/rustup
           CARGO_HOME: /usr/local/cargo
@@ -157,7 +157,7 @@ jobs:
             . .env/bin/activate && maturin build
             rm -rf .env/ target/debug/ target/release/
       - name: Upload artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: bindings-freebsd
           path: target/wheels/*.whl
