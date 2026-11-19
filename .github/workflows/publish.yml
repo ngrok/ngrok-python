@@ -23,9 +23,9 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Download wheels
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: bindings-*
           path: dist
@@ -43,7 +43,7 @@ jobs:
             esac
           done
       - name: Publish
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
           packages-dir: dist/
           skip-existing: true
@@ -52,8 +52,8 @@ jobs:
     needs: pypi-publish
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: jrobsonchase/direnv-action@v0.7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jrobsonchase/direnv-action@57d5101f123f9106acdd8797515c262b565ec7a5 # v0.7
       - name: Tag Release
         run: |
           version="$(grep '^version =' Cargo.toml | head -n1 | awk -F\" '{print $2}')"
